@@ -1,6 +1,6 @@
-# Vendra — B2B IT Procurement Network · Pitch Deck Spec
+# InfraVendra — B2B IT Procurement Network · Pitch Deck Spec
 
-> **Working product name: “Vendra”** (swap for `[Product Name]`). India-first B2B IT
+> **Working product name: “InfraVendra”** (swap for `[Product Name]`). India-first B2B IT
 > Procurement **Network** — *not* an ITSM/helpdesk tool, *not* a generic marketplace.
 > Positioning line: **“One RFQ. Verified IT vendors. Competitive quotes. Smarter
 > negotiation. Faster procurement.”**
@@ -16,7 +16,7 @@
 
 ## Slide 1 — Cover
 - **Headline:** One RFQ. Verified IT vendors. Faster procurement.
-- **Takeaway:** Vendra is the structured workspace that replaces email/Excel/WhatsApp IT buying.
+- **Takeaway:** InfraVendra is the structured workspace that replaces email/Excel/WhatsApp IT buying.
 - **Content:** Product name + tagline, 5 capability chips (Verified vendors · Structured RFQ · Quote comparison · On-record negotiation · Vendor-led network), founder/round placeholders.
 - **Layout:** Dark hero, oversized 3-line headline with gradient middle line, ambient glows + dotted grid. "Working name — swap for [Product Name]" tag top-right.
 - **Mockup:** None — typographic hero.
@@ -88,8 +88,8 @@
 
 ## Slide 10 — IT Catalog (light)
 - **Headline:** One product identity. Every vendor's live terms.
-- **Takeaway:** Vendra owns the master spec; vendors attach commercials — so quotes are comparable by construction.
-- **Content:** 6 category cards (Computing / Networking / Storage / Cybersecurity / Software / Services with sub-items). "Vendra maintains" (master identity/spec) vs "Vendors maintain" (price, stock, lead time, warranty, discount, terms; CSV/Excel bulk upload then APIs; AI normalization + duplicate-SKU detection).
+- **Takeaway:** InfraVendra owns the master spec; vendors attach commercials — so quotes are comparable by construction.
+- **Content:** 6 category cards (Computing / Networking / Storage / Cybersecurity / Software / Services with sub-items). "InfraVendra maintains" (master identity/spec) vs "Vendors maintain" (price, stock, lead time, warranty, discount, terms; CSV/Excel bulk upload then APIs; AI normalization + duplicate-SKU detection).
 - **Layout:** Light slide; 6-up category grid + two responsibility cards.
 - **Mockup:** Category taxonomy grid.
 - **Speaker notes:** Catalog is why comparison works. We own identity, vendors own commercials. AI normalization collapses naming variants. Unglamorous but foundational.
@@ -97,7 +97,7 @@
 ## Slide 11 — The Network (differentiator)
 - **Headline:** Not RFQ software. A procurement network.
 - **Takeaway:** Software gets used; a network compounds — every participant makes it more valuable.
-- **Content:** Node diagram (Vendra core ↔ Businesses, Verified vendors, OEM/distributor ecosystem) + flywheel (more vendors → coverage → buyers → RFQs → vendors). Vision: Businesses ↔ Verified vendors ↔ OEM/distributor ecosystem.
+- **Content:** Node diagram (InfraVendra core ↔ Businesses, Verified vendors, OEM/distributor ecosystem) + flywheel (more vendors → coverage → buyers → RFQs → vendors). Vision: Businesses ↔ Verified vendors ↔ OEM/distributor ecosystem.
 - **Layout:** Two-column: SVG-linked node diagram (left) + flywheel chip-chain card (right).
 - **Mockup:** Network graph with gradient core node.
 - **Speaker notes:** The investment thesis. "We're building the liquidity layer for B2B IT procurement." Walk the flywheel once. Next slide is the cheap-growth unlock.
@@ -107,13 +107,13 @@
 - **Takeaway:** Vendors bring their own customers, so we don't cold-start demand and CAC collapses.
 - **Content:** Branded vendor customer portal (ABC Technologies · 50 corporate customers): invite customers → customers create RFQs → vendor sees them first → other verified vendors compete → network grows. Customers keep control (can invite/discover other vendors). Why a vendor opts in (free portal, first look at RFQs, management tools). "The math."
 - **Layout:** Two-column: branded portal mockup (left) + ↓CAC stat + "why a vendor does this" + "the math" card (right).
-- **Mockup:** `abc-technologies.vendra.app` branded workspace, "Powered by Vendra."
+- **Mockup:** `abc-technologies.infravendra.app` branded workspace, "Powered by InfraVendra."
 - **Speaker notes:** The slide investors remember. Solves cold-start demand. Handle the capture objection head-on — buyer always retains control, which keeps RFQs competitive. Vendor trades exclusivity for a free portal + first look.
 
 ## Slide 13 — Competitive Landscape (light)
 - **Headline:** There's plenty of software. None of it is this.
 - **Takeaway:** ITSM manages internal tickets; marketplaces are generic; we're the IT-specialized verified procurement network in between.
-- **Content:** 2×2 positioning matrix (Internal ITSM ↔ External procurement · Generic ↔ IT-specialized+verified). Plots ServiceNow/ManageEngine, IndiaMART/GeM, vendor directories, email/Excel/WhatsApp, and **Vendra** (top-right, empty quadrant). Honest side cards. Real incumbent = email+Excel+WhatsApp.
+- **Content:** 2×2 positioning matrix (Internal ITSM ↔ External procurement · Generic ↔ IT-specialized+verified). Plots ServiceNow/ManageEngine, IndiaMART/GeM, vendor directories, email/Excel/WhatsApp, and **InfraVendra** (top-right, empty quadrant). Honest side cards. Real incumbent = email+Excel+WhatsApp.
 - **Layout:** Light slide; matrix (left) + three positioning cards (right).
 - **Mockup:** 2×2 positioning matrix with highlighted "us" marker.
 - **Speaker notes:** Never claim no competition. Top-right quadrant is empty = us. Defensibility is the combination (verification + network), not any single feature.
@@ -144,7 +144,7 @@
 
 ## Slide 17 — Demo Story + Roadmap/Vision
 - **Headline:** 50 laptops in Bangalore. Days → minutes.
-- **Takeaway:** The same requirement takes 2–5 days today vs ~30 minutes on Vendra — with savings and an audit trail.
+- **Takeaway:** The same requirement takes 2–5 days today vs ~30 minutes on InfraVendra — with savings and an audit trail.
 - **Content:** 250-employee Bangalore company needs 50 laptops + networking. Before (2–5 days, no record) vs After (~30 min, savings + audit trail) — **labelled illustrative target, not measured**. Roadmap: MVP (registration, verified profiles, catalog, RFQ, matching, comparison, basic negotiation, dashboards) / V2 (customer portal, bulk upload, AI normalization, advanced scoring, POs, notifications, analytics) / V3 (AI negotiation assistant, price/availability intelligence, ERP, API, mobile, automation). Long-term flow: Requirement → Discovery → RFQ → Quote → Negotiation → Purchase → Delivery → Warranty → Renewal.
 - **Layout:** Before/after split + 3-column roadmap.
 - **Mockup:** Before/after stat cards.
@@ -153,13 +153,13 @@
 ## Slide 18 — Closing
 - **Headline:** IT procurement shouldn't live across 20 emails, 5 spreadsheets and 3 WhatsApp groups.
 - **Takeaway:** One requirement, one RFQ, verified vendors, smarter negotiation, better decisions.
-- **Content:** Manifesto headline, 5 chips, Vendra wordmark, tagline, founder/contact placeholders.
+- **Content:** Manifesto headline, 5 chips, InfraVendra wordmark, tagline, founder/contact placeholders.
 - **Layout:** Centered dark manifesto slide with glows.
 - **Mockup:** None.
 - **Speaker notes:** Land slow. End on the ask + contact. No invented metric — strength is clarity of vision.
 
 ## Slide 19 — Investor One-Pager (light)
-- **Headline:** Vendra, on a single page.
+- **Headline:** InfraVendra, on a single page.
 - **Takeaway:** The whole thesis skimmable in 60 seconds.
 - **Content:** Seven boxes — **Problem → Solution → Differentiation → Business Model → GTM → Network Effect → Long-Term Vision** — plus an explicit pre-launch/no-claims disclaimer with placeholders.
 - **Layout:** Light slide; 6-box grid + full-width vision card + disclaimer.
@@ -182,4 +182,4 @@
 
 > Pre-launch. No traction, customers, revenue, partnerships, certifications or market
 > statistics are claimed. `[Company Name]`, `[Founder Name]`, pricing and TAM/SAM/SOM are
-> placeholders to validate. Working product name: **“Vendra.”**
+> placeholders to validate. Working product name: **“InfraVendra.”**

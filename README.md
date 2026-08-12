@@ -1,8 +1,8 @@
 # Kishore-Mohankumar
 
-## Vendra — B2B IT Procurement Network · Pitch Deck
+## InfraVendra — B2B IT Procurement Network · Pitch Deck
 
-A premium, modern investor pitch deck for **Vendra** (working name — swap for
+A premium, modern investor pitch deck for **InfraVendra** (working name — swap for
 `[Product Name]`): an **India-first B2B IT Procurement Network** connecting companies
 with verified IT vendors.
 
