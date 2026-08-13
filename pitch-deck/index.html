@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI Revenue Recovery OS — Investor Deck</title>
+<style>
+/* ============================================================
+   AI REVENUE RECOVERY OS — Investor Deck
+   Design system
+   ============================================================ */
+:root{
+  --navy-900:#07101F;
+  --navy-850:#0A1628;
+  --navy-800:#0C1B30;
+  --navy-700:#102340;
+  --navy-600:#16305A;
+  --line:#1E3A5F;
+  --line-soft:#172C49;
+  --ink:#EAF1F9;
+  --ink-soft:#C4D3E4;
+  --muted:#8AA0BC;
+  --muted-2:#6A82A0;
+  --teal:#31E1C4;
+  --teal-600:#1FBFA6;
+  --cyan:#5AB8FF;
+  --cyan-600:#3B93E6;
+  --amber:#F5B44C;
+  --coral:#F0765E;
+  --violet:#9B8CFF;
+  --green:#4FD08A;
+  --grad-accent:linear-gradient(120deg,var(--teal),var(--cyan));
+  --radius:14px;
+  --radius-sm:9px;
+  --shadow:0 24px 60px -28px rgba(0,0,0,.75);
+  --maxw:1180px;
+  --font:"Inter","SF Pro Display",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:"SF Mono","JetBrains Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font);
+  background:var(--navy-900);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  overflow-x:hidden;
+}
+/* ---------- Deck layout ---------- */
+.deck{width:100%;}
+.slide{
+  position:relative;
+  min-height:100vh;
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:74px 64px 88px;
+  border-bottom:1px solid var(--line-soft);
+  background:
+    radial-gradient(1200px 600px at 82% -8%, rgba(49,225,196,.055), transparent 60%),
+    radial-gradient(1000px 620px at -6% 108%, rgba(90,184,255,.05), transparent 55%),
+    linear-gradient(180deg,var(--navy-850),var(--navy-900));
+  overflow:hidden;
+}
+.slide-inner{width:100%;max-width:var(--maxw);margin:0 auto;position:relative;z-index:2;}
+/* corner index + brand */
+.slide__meta{
+  position:absolute;top:30px;left:64px;right:64px;
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted-2);
+  z-index:3;
+}
+.slide__meta .brand{display:flex;align-items:center;gap:9px;font-weight:600;color:var(--ink-soft);}
+.slide__meta .dot{width:8px;height:8px;border-radius:50%;background:var(--grad-accent);box-shadow:0 0 12px rgba(49,225,196,.7);}
+.slide__num{font-variant-numeric:tabular-nums;}
+/* ---------- Typographic scale ---------- */
+.kicker{
+  display:inline-flex;align-items:center;gap:9px;
+  font-size:12px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--teal);margin-bottom:22px;
+}
+.kicker::before{content:"";width:26px;height:1.5px;background:var(--grad-accent);}
+h1.title{font-size:64px;line-height:1.03;font-weight:700;letter-spacing:-.03em;}
+h2.head{font-size:40px;line-height:1.08;font-weight:700;letter-spacing:-.025em;margin-bottom:10px;}
+h2.head .accent{color:var(--teal);}
+.subhead{font-size:18px;line-height:1.5;color:var(--ink-soft);font-weight:400;max-width:60ch;}
+.lead{font-size:16px;line-height:1.6;color:var(--muted);max-width:64ch;}
+.eyebrow{font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:600;}
+.pullquote{
+  font-size:23px;line-height:1.42;font-weight:500;letter-spacing:-.01em;color:var(--ink);
+  border-left:3px solid var(--teal);padding:6px 0 6px 22px;
+}
+.pullquote .accent{color:var(--teal);}
+strong,b{color:#fff;font-weight:650;}
+.mono{font-family:var(--mono);}
+/* ---------- Reusable primitives ---------- */
+.grid{display:grid;gap:20px;}
+.card{
+  background:linear-gradient(180deg,rgba(18,38,66,.72),rgba(12,27,48,.72));
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:24px;
+  position:relative;
+}
+.card--accent{border-color:rgba(49,225,196,.35);box-shadow:0 0 0 1px rgba(49,225,196,.06),0 20px 50px -30px rgba(49,225,196,.3);}
+.card h3{font-size:16px;font-weight:650;letter-spacing:-.01em;margin-bottom:8px;color:#fff;}
+.card p{font-size:13.5px;line-height:1.55;color:var(--muted);}
+.tag{
+  display:inline-flex;align-items:center;gap:7px;
+  font-size:11.5px;font-weight:600;letter-spacing:.04em;
+  padding:5px 11px;border-radius:100px;border:1px solid var(--line);
+  color:var(--ink-soft);background:rgba(255,255,255,.02);
+}
+.tag--teal{color:var(--teal);border-color:rgba(49,225,196,.4);background:rgba(49,225,196,.07);}
+.tag--amber{color:var(--amber);border-color:rgba(245,180,76,.35);background:rgba(245,180,76,.07);}
+.tag--coral{color:var(--coral);border-color:rgba(240,118,94,.35);background:rgba(240,118,94,.07);}
+.chip{font-size:12px;font-weight:600;color:var(--ink-soft);padding:6px 12px;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.015);}
+.hr{height:1px;background:var(--line-soft);border:0;margin:18px 0;}
+.muted{color:var(--muted);}
+.teal{color:var(--teal);}
+.cyan{color:var(--cyan);}
+.amber{color:var(--amber);}
+.coral{color:var(--coral);}
+ul.clean{list-style:none;display:flex;flex-direction:column;gap:10px;}
+ul.clean li{position:relative;padding-left:20px;font-size:14px;line-height:1.5;color:var(--ink-soft);}
+ul.clean li::before{content:"";position:absolute;left:0;top:8px;width:7px;height:7px;border-radius:2px;background:var(--teal);}
+ul.clean.coral li::before{background:var(--coral);}
+ul.clean.muted-dots li::before{background:var(--muted-2);}
+/* pill flow / channel bar */
+.flowline{display:flex;align-items:center;gap:0;flex-wrap:wrap;}
+.flowline .node{
+  font-size:12.5px;font-weight:600;color:var(--ink-soft);
+  padding:9px 15px;border:1px solid var(--line);border-radius:9px;
+  background:rgba(18,38,66,.6);white-space:nowrap;
+}
+.flowline .arrow{color:var(--muted-2);padding:0 9px;font-size:15px;}
+/* stat */
+.stat .n{font-size:42px;font-weight:750;letter-spacing:-.03em;line-height:1;
+  background:var(--grad-accent);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+.stat .l{font-size:12.5px;color:var(--muted);margin-top:8px;line-height:1.4;}
+.stat.plain .n{-webkit-text-fill-color:var(--ink);background:none;color:var(--ink);}
+/* two-col comparison */
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:22px;}
+.vs .col{border-radius:var(--radius);border:1px solid var(--line);padding:24px;}
+.vs .col.old{background:linear-gradient(180deg,rgba(30,20,26,.5),rgba(12,27,48,.5));border-color:#3a2733;}
+.vs .col.new{background:linear-gradient(180deg,rgba(14,40,52,.6),rgba(12,27,48,.6));border-color:rgba(49,225,196,.35);}
+.vs .col h4{font-size:13px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px;font-weight:700;}
+.vs .col.old h4{color:var(--coral);}
+.vs .col.new h4{color:var(--teal);}
+/* footer note */
+.note{font-size:11.5px;color:var(--muted-2);letter-spacing:.02em;margin-top:20px;line-height:1.5;}
+.note b{color:var(--muted);font-weight:650;}
+/* section number ghost */
+.ghostnum{position:absolute;right:40px;bottom:8px;font-size:150px;font-weight:800;letter-spacing:-.05em;
+  color:rgba(255,255,255,.022);z-index:1;line-height:1;user-select:none;}
+/* SVG helpers */
+svg{display:block;max-width:100%;}
+.svgwrap{width:100%;overflow-x:auto;}
+/* progress + nav */
+.progressbar{position:fixed;top:0;left:0;height:3px;background:var(--grad-accent);z-index:100;width:0;box-shadow:0 0 12px rgba(49,225,196,.6);}
+.dotnav{position:fixed;right:16px;top:50%;transform:translateY(-50%);z-index:100;display:flex;flex-direction:column;gap:9px;}
+.dotnav button{width:9px;height:9px;border-radius:50%;border:0;background:#2a3f5c;cursor:pointer;padding:0;transition:.2s;}
+.dotnav button:hover{background:var(--muted);}
+.dotnav button.active{background:var(--teal);box-shadow:0 0 10px rgba(49,225,196,.8);transform:scale(1.25);}
+.helpbar{position:fixed;left:16px;bottom:14px;z-index:100;font-size:11px;color:var(--muted-2);letter-spacing:.05em;
+  background:rgba(7,16,31,.7);border:1px solid var(--line-soft);padding:6px 11px;border-radius:8px;backdrop-filter:blur(6px);}
+.helpbar kbd{font-family:var(--mono);color:var(--ink-soft);background:rgba(255,255,255,.05);padding:1px 5px;border-radius:4px;font-size:10px;}
+/* diagram box primitive */
+.dbox{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:rgba(18,38,66,.55);text-align:center;}
+.dbox .t{font-size:13px;font-weight:650;color:#fff;}
+.dbox .s{font-size:11px;color:var(--muted);margin-top:3px;}
+.dbox.accent{border-color:rgba(49,225,196,.45);background:rgba(49,225,196,.06);}
+.dbox.risk{border-color:rgba(240,118,94,.4);background:rgba(240,118,94,.05);}
+/* responsive */
+@media (max-width:920px){
+  .slide{padding:64px 26px 78px;}
+  .slide__meta{left:26px;right:26px;}
+  h1.title{font-size:42px;}
+  h2.head{font-size:30px;}
+  .vs{grid-template-columns:1fr;}
+  .dotnav{display:none;}
+  .ghostnum{font-size:90px;}
+}
+@media print{
+  .progressbar,.dotnav,.helpbar{display:none;}
+  .slide{min-height:auto;page-break-after:always;border:0;}
+}
+</style>
+</head>
+<body>
+<div class="progressbar" id="progress"></div>
+<nav class="dotnav" id="dotnav"></nav>
+<div class="helpbar">Navigate <kbd>↑</kbd> <kbd>↓</kbd> · <kbd>J</kbd>/<kbd>K</kbd> · slide-based deck</div>
+
+<main class="deck" id="deck">
+<!-- ==================== SLIDES ==================== -->
+
+<!-- ============ SLIDE 1 — COVER ============ -->
+<section class="slide" id="s1" style="justify-content:center;">
+  <div class="slide__meta">
+    <span class="brand"><span class="dot"></span> AI Revenue Recovery OS</span>
+    <span class="slide__num">Investor Overview · Confidential</span>
+  </div>
+  <div class="slide-inner" style="text-align:center;">
+    <div class="kicker" style="justify-content:center;">Healthcare Revenue Intelligence &amp; Execution</div>
+    <h1 class="title" style="font-size:72px;margin-bottom:20px;">AI Revenue<br/>Recovery&nbsp;OS</h1>
+    <div style="font-size:19px;font-weight:600;letter-spacing:.02em;margin-bottom:14px;">
+      <span class="teal">Predict.</span> <span class="cyan">Prevent.</span> <span style="color:#fff;">Work.</span> <span class="teal">Resolve.</span> <span class="cyan">Recover.</span>
+    </div>
+    <p class="subhead" style="margin:0 auto 42px;text-align:center;">The intelligence and execution layer for autonomous healthcare revenue recovery.</p>
+
+    <!-- Claim → Intelligence → Action → Recovery visualization -->
+    <div class="svgwrap" style="max-width:960px;margin:0 auto;">
+    <svg viewBox="0 0 960 150" width="960" height="150" role="img" aria-label="A claim moving through Intelligence, Action, and Recovery">
+      <defs>
+        <linearGradient id="cvg" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#5AB8FF"/><stop offset="1" stop-color="#31E1C4"/>
+        </linearGradient>
+        <filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <line x1="120" y1="75" x2="840" y2="75" stroke="url(#cvg)" stroke-width="2" opacity=".5"/>
+      <!-- moving pulse -->
+      <circle r="5" fill="#31E1C4" filter="url(#glow)">
+        <animate attributeName="cx" values="120;840" dur="4s" repeatCount="indefinite"/>
+        <animate attributeName="cy" values="75;75" dur="4s" repeatCount="indefinite"/>
+      </circle>
+      <g font-family="var(--font)" text-anchor="middle">
+        <g>
+          <circle cx="120" cy="75" r="30" fill="#0C1B30" stroke="#5AB8FF" stroke-width="1.5"/>
+          <text x="120" y="80" fill="#EAF1F9" font-size="13" font-weight="700">Claim</text>
+          <text x="120" y="128" fill="#8AA0BC" font-size="11">$ at risk</text>
+        </g>
+        <g>
+          <circle cx="360" cy="75" r="34" fill="#0C1B30" stroke="url(#cvg)" stroke-width="1.5"/>
+          <text x="360" y="72" fill="#31E1C4" font-size="12.5" font-weight="700">Intelligence</text>
+          <text x="360" y="88" fill="#8AA0BC" font-size="10">risk · context</text>
+          <text x="360" y="132" fill="#8AA0BC" font-size="11">Understand</text>
+        </g>
+        <g>
+          <circle cx="600" cy="75" r="34" fill="#0C1B30" stroke="url(#cvg)" stroke-width="1.5"/>
+          <text x="600" y="72" fill="#5AB8FF" font-size="13" font-weight="700">Action</text>
+          <text x="600" y="88" fill="#8AA0BC" font-size="10">right channel</text>
+          <text x="600" y="132" fill="#8AA0BC" font-size="11">Execute</text>
+        </g>
+        <g>
+          <circle cx="840" cy="75" r="30" fill="#0E2834" stroke="#31E1C4" stroke-width="1.75"/>
+          <text x="840" y="80" fill="#31E1C4" font-size="12.5" font-weight="700">Recovery</text>
+          <text x="840" y="128" fill="#8AA0BC" font-size="11">$ collected</text>
+        </g>
+      </g>
+    </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 2 — THE PROBLEM ============ -->
+<section class="slide" id="s2">
+  <div class="slide__meta"><span class="brand"><span class="dot"></span> AI Revenue Recovery OS</span><span class="slide__num">02 · The Problem</span></div>
+  <div class="slide-inner">
+    <div class="kicker">The Problem</div>
+    <h2 class="head">Healthcare revenue is lost <span class="accent">in the gaps</span></h2>
+    <p class="lead" style="margin-bottom:28px;">Every claim passes through a dozen handoffs between systems, standards and teams. Money leaks at each seam — not because the data is missing, but because intelligence and execution are fragmented across it.</p>
+
+    <div class="svgwrap" style="margin-bottom:12px;">
+    <svg viewBox="0 0 1120 96" width="1120" height="96" role="img" aria-label="Revenue pipeline leaking at multiple stages">
+      <defs>
+        <linearGradient id="pipe" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#3B93E6"/><stop offset=".5" stop-color="#31E1C4"/><stop offset="1" stop-color="#1FBFA6"/>
+        </linearGradient>
+        <linearGradient id="drip" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#F0765E"/><stop offset="1" stop-color="#F0765E" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <text x="20" y="30" fill="#EAF1F9" font-size="13" font-weight="700" font-family="var(--font)">$ in</text>
+      <text x="1100" y="30" text-anchor="end" fill="#8AA0BC" font-size="13" font-weight="700" font-family="var(--font)">$ collected</text>
+      <rect x="80" y="18" width="960" height="18" rx="9" fill="#122641"/>
+      <rect x="80" y="18" width="960" height="18" rx="9" fill="url(#pipe)" opacity=".5"/>
+      <!-- leak drips at multiple stages -->
+      <g>
+        <!-- 12 leak points -->
+        <g fill="url(#drip)">
+          <rect x="150" y="36" width="4" height="50" rx="2"/><rect x="230" y="36" width="4" height="42" rx="2"/>
+          <rect x="315" y="36" width="4" height="56" rx="2"/><rect x="400" y="36" width="4" height="38" rx="2"/>
+          <rect x="485" y="36" width="4" height="48" rx="2"/><rect x="565" y="36" width="4" height="52" rx="2"/>
+          <rect x="650" y="36" width="4" height="40" rx="2"/><rect x="735" y="36" width="4" height="54" rx="2"/>
+          <rect x="815" y="36" width="4" height="44" rx="2"/><rect x="895" y="36" width="4" height="50" rx="2"/>
+          <rect x="965" y="36" width="4" height="42" rx="2"/>
+        </g>
+        <g fill="#F0765E">
+          <circle cx="152" cy="88" r="3"/><circle cx="317" cy="90" r="3"/><circle cx="567" cy="88" r="3"/><circle cx="737" cy="90" r="3"/><circle cx="897" cy="86" r="3"/>
+        </g>
+      </g>
+    </svg>
+    </div>
+    <!-- stages rendered as chips to stay legible -->
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 22px;">
+      <span class="chip">Eligibility</span><span class="chip">Benefits</span><span class="chip">Authorization</span>
+      <span class="chip">Coding</span><span class="chip">Documentation</span><span class="chip">Claim submission</span>
+      <span class="chip">Payer acceptance</span><span class="chip">Claim status</span><span class="chip">Denials</span>
+      <span class="chip">AR aging</span><span class="chip">Underpayments</span><span class="chip">Appeals</span>
+      <span class="chip">Payment posting</span><span class="chip">Follow-up</span>
+    </div>
+
+    <div class="pullquote" style="max-width:78ch;">
+      The problem isn't a lack of RCM data. The problem is <span class="accent">fragmented intelligence</span> and <span class="accent">manual execution</span> across that data.
+    </div>
+  </div>
+  <div class="ghostnum">02</div>
+</section>
+
+<!-- ============ SLIDE 3 — THE CURRENT RCM MACHINE ============ -->
+<section class="slide" id="s3">
+  <div class="slide__meta"><span class="brand"><span class="dot"></span> AI Revenue Recovery OS</span><span class="slide__num">03 · Status Quo</span></div>
+  <div class="slide-inner">
+    <div class="kicker">The Current RCM Machine</div>
+    <h2 class="head">A relay of disconnected workflows</h2>
+    <p class="lead" style="margin-bottom:26px;">A single claim traverses a dozen systems and transaction standards before a human ever picks up the phone — then the loop repeats.</p>
+
+    <div style="display:grid;grid-template-columns:1.55fr 1fr;gap:30px;align-items:center;">
+      <div class="svgwrap">
+      <svg viewBox="0 0 640 420" width="640" height="420" role="img" aria-label="837 to clearinghouse to payer to 835 to AR to denial to human follow-up">
+        <defs>
+          <marker id="ar3" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L6,4 L0,8 Z" fill="#4a648a"/></marker>
+        </defs>
+        <style>
+          .mx{fill:#0F2138;stroke:#1E3A5F;stroke-width:1.2;}
+          .mxr{fill:#1a1420;stroke:#6b3a3a;stroke-width:1.2;}
+          .lb{fill:#EAF1F9;font-size:12px;font-weight:600;font-family:var(--font);}
+          .lbs{fill:#8AA0BC;font-size:10px;font-family:var(--mono);}
+          .edi{fill:#5AB8FF;font-size:11px;font-weight:700;font-family:var(--mono);}
+          .cn{stroke:#33507a;stroke-width:1.3;marker-end:url(#ar3);fill:none;}
+        </style>
+        <!-- column of nodes -->
+        <!-- EHR/PM -->
+        <rect class="mx" x="200" y="10" width="240" height="34" rx="7"/><text class="lb" x="320" y="32" text-anchor="middle">EHR / Practice Management</text>
+        <line class="cn" x1="320" y1="44" x2="320" y2="60"/>
+        <rect class="mx" x="220" y="62" width="200" height="34" rx="7"/><text class="lb" x="320" y="84" text-anchor="middle">RCM System</text>
+        <line class="cn" x1="320" y1="96" x2="320" y2="112"/>
+        <rect class="mx" x="235" y="114" width="170" height="32" rx="7"/><text class="lb" x="320" y="134" text-anchor="middle">Clearinghouse</text>
+        <!-- EDI markers left -->
+        <text class="edi" x="470" y="58" text-anchor="start">837 →</text>
+        <text class="edi" x="470" y="112" text-anchor="start">999 · 277CA</text>
+        <line class="cn" x1="320" y1="146" x2="320" y2="162"/>
+        <rect class="mx" x="255" y="164" width="130" height="32" rx="7"/><text class="lb" x="320" y="184" text-anchor="middle">Payer</text>
+        <text class="edi" x="405" y="184" text-anchor="start">← 835</text>
+        <line class="cn" x1="320" y1="196" x2="320" y2="212"/>
+        <rect class="mx" x="265" y="214" width="110" height="32" rx="7"/><text class="lb" x="320" y="234" text-anchor="middle">AR</text>
+        <line class="cn" x1="320" y1="246" x2="320" y2="262"/>
+        <rect class="mxr" x="255" y="264" width="130" height="32" rx="7"/><text class="lb" x="320" y="284" text-anchor="middle" fill="#F0765E">Denial</text>
+        <line class="cn" x1="320" y1="296" x2="320" y2="312"/>
+        <rect class="mxr" x="205" y="314" width="230" height="32" rx="7"/><text class="lb" x="320" y="334" text-anchor="middle">Portal · Phone · Fax</text>
+        <line class="cn" x1="320" y1="346" x2="320" y2="362"/>
+        <rect class="mxr" x="215" y="364" width="210" height="32" rx="7"/><text class="lb" x="320" y="384" text-anchor="middle">Human follow-up + notes</text>
+        <!-- loop back -->
+        <path class="cn" d="M425,380 C560,380 560,230 390,230" />
+        <text class="lbs" x="548" y="305" text-anchor="middle" fill="#F0765E">follow&#8209;up</text>
+        <text class="lbs" x="548" y="320" text-anchor="middle" fill="#F0765E">again…</text>
+      </svg>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:14px;">
+          <h3>What it produces</h3>
+          <ul class="clean muted-dots" style="margin-top:6px;">
+            <li>Multiple systems &amp; interfaces</li>
+            <li>Multiple parallel workflows</li>
+            <li>Repetitive human work</li>
+            <li>Fragmented decision-making</li>
+          </ul>
+        </div>
+        <div class="pullquote">
+          Healthcare RCM has become a <span class="accent">collection of disconnected workflows</span> — not one intelligent system.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ghostnum">03</div>
+</section>
+
+<!-- ============ SLIDE 4 — THE HUMAN BOTTLENECK ============ -->
+<section class="slide" id="s4">
+  <div class="slide__meta"><span class="brand"><span class="dot"></span> AI Revenue Recovery OS</span><span class="slide__num">04 · The Bottleneck</span></div>
+  <div class="slide-inner">
+    <div class="kicker">The Human Bottleneck</div>
+    <h2 class="head">Expert judgment, spent on <span class="accent">repetition</span></h2>
+    <p class="lead" style="margin-bottom:28px;">A single account can consume 15–40 minutes of an AR specialist's time — most of it navigating systems and waiting on hold, not applying expertise.</p>
+
+    <!-- render steps as a horizontal chip flow to guarantee legibility -->
+    <div class="flowline" style="margin-bottom:26px;">
+      <span class="node">Claim assigned</span><span class="arrow">→</span>
+      <span class="node">Research</span><span class="arrow">→</span>
+      <span class="node">Check payer</span><span class="arrow">→</span>
+      <span class="node">Navigate portal</span><span class="arrow">→</span>
+      <span class="node">Call payer</span><span class="arrow">→</span>
+      <span class="node coral-node" style="border-color:#6b3a3a;color:#F0a58e;">Navigate IVR</span><span class="arrow">→</span>
+      <span class="node coral-node" style="border-color:#6b3a3a;color:#F0a58e;">Wait on hold</span><span class="arrow">→</span>
+      <span class="node">Authenticate</span><span class="arrow">→</span>
+      <span class="node">Ask status</span><span class="arrow">→</span>
+      <span class="node">Document</span><span class="arrow">→</span>
+      <span class="node">Update system</span><span class="arrow">→</span>
+      <span class="node">Schedule follow-up</span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:center;">
+      <div class="card card--accent">
+        <h3 style="color:var(--teal);">The reframe</h3>
+        <p style="font-size:15px;color:var(--ink-soft);line-height:1.55;">AI should absorb repetitive execution so human experts can focus on <strong>exceptions, judgment and complex recovery</strong>.</p>
+      </div>
+      <p class="note" style="margin:0;font-size:13px;color:var(--muted);">
+        This is <b>not</b> "AI replaces AR workers." High-value expertise is being consumed by low-value operational motion. We give that capacity back.
+      </p>
+    </div>
+  </div>
+  <div class="ghostnum">04</div>
+</section>
+
+<!-- ============ SLIDE 5 — WHY EXISTING SOFTWARE ISN'T ENOUGH ============ -->
+<section class="slide" id="s5">
+  <div class="slide__meta"><span class="brand"><span class="dot"></span> AI Revenue Recovery OS</span><span class="slide__num">05 · The Gap</span></div>
+  <div class="slide-inner">
+    <div class="kicker">Why Existing Software Isn't Enough</div>
+    <h2 class="head">Systems of record vs. a <span class="accent">system of action</span></h2>
+    <div class="vs" style="margin:26px 0 22px;">
+      <div class="col old">
+        <h4>Traditional RCM software</h4>
+        <ul class="clean coral">
+          <li>Stores information</li>
+          <li>Tracks claims</li>
+          <li>Manages workflows</li>
+          <li>Provides reports</li>
+          <li>Displays dashboards</li>
+        </ul>
+        <p class="note" style="margin-top:16px;color:var(--muted-2);">A passive record of what already happened.</p>
+      </div>
+      <div class="col new">
+        <h4>AI Revenue Recovery OS</h4>
+        <ul class="clean">
+          <li>Understands revenue risk &amp; predicts problems</li>
+          <li>Prioritizes work &amp; chooses the next action</li>
+          <li>Executes the action across channels</li>
+          <li>Validates outcomes &amp; learns payer behavior</li>
+          <li>Escalates exceptions &amp; measures recovery</li>
+        </ul>
+        <p class="note" style="margin-top:16px;color:var(--teal);">An active operator on the revenue cycle.</p>
+      </div>
+    </div>
+    <div class="pullquote" style="max-width:86ch;">
+      Traditional RCM software tells teams <span class="accent">what happened.</span> AI Revenue Recovery OS determines <span class="accent">what should happen next.</span>
+    </div>
+  </div>
+  <div class="ghostnum">05</div>
+</section>
+
+<!-- ============ SLIDE 6 — WHY NOW ============ -->
+<section class="slide" id="s6">
+  <div class="slide__meta"><span class="brand"><span class="dot"></span> AI Revenue Recovery OS</span><span class="slide__num">06 · Why Now</span></div>
+  <div class="slide-inner">
+    <div class="kicker">Why Now</div>
+    <h2 class="head">Four forces are <span class="accent">converging</span></h2>
+    <p class="lead" style="margin-bottom:30px;">For the first time, the data, connectivity and reasoning capability required for autonomous RCM exist at the same time.</p>
+
+    <div class="grid" style="grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:26px;">
+      <div class="card" style="padding:20px 18px;">
+        <div class="tag tag--teal" style="margin-bottom:12px;">AI</div>
+        <p style="font-size:13px;">LLMs + agentic workflows + production-grade voice AI</p>
+      </div>
+      <div class="card" style="padding:20px 18px;">
+        <div class="tag" style="margin-bottom:12px;color:var(--cyan);border-color:rgba(90,184,255,.4);">EDI</div>
+        <p style="font-size:13px;">Large-scale machine-readable healthcare transactions</p>
+      </div>
+      <div class="card" style="padding:20px 18px;">
+        <div class="tag" style="margin-bottom:12px;color:var(--cyan);border-color:rgba(90,184,255,.4);">APIs</div>
+        <p style="font-size:13px;">Rising payer / provider interoperability</p>
+      </div>
+      <div class="card" style="padding:20px 18px;">
+        <div class="tag tag--teal" style="margin-bottom:12px;">FHIR</div>
+        <p style="font-size:13px;">Standardized healthcare data exchange</p>
+      </div>
+      <div class="card" style="padding:20px 18px;">
+        <div class="tag tag--amber" style="margin-bottom:12px;">Labor</div>
+        <p style="font-size:13px;">Productivity must rise without proportional headcount</p>
+      </div>
+    </div>
+
+    <div class="pullquote" style="max-width:88ch;">
+      For the first time, the <span class="accent">data, connectivity and AI capability</span> required for autonomous RCM are converging.
+    </div>
+  </div>
+  <div class="ghostnum">06</div>
+</section>
+
+<!-- ============ SLIDE 7 — 2027 INTEROPERABILITY INFLECTION ============ -->
+<section class="slide" id="s7">
+  <div class="slide__meta"><span class="brand"><span class="dot"></span> AI Revenue Recovery OS</span><span class="slide__num">07 · Regulatory Tailwind</span></div>
+  <div class="slide-inner">
+    <div class="kicker">The 2026–2027 Interoperability Inflection</div>
+    <h2 class="head">Payer connectivity is moving toward <span class="accent">API-first</span> workflows</h2>
+    <p class="lead" style="margin-bottom:22px;">
+      Under CMS's <strong>Interoperability &amp; Prior Authorization Final Rule (CMS-0057-F, 2024)</strong>, specific CMS-regulated payers face new FHIR API and prior-authorization requirements. This reshapes — but does not fully replace — how revenue workflows connect.
+    </p>
+
+    <div style="display:grid;grid-template-columns:1.1fr 1fr;gap:24px;margin-bottom:20px;">
+      <div class="card">
+        <h3>What the rule requires</h3>
+        <ul class="clean" style="margin-top:6px;">
+          <li><strong>Prior Authorization API</strong> (FHIR) — end-to-end electronic PA</li>
+          <li><strong>Provider Access API</strong> — claims, encounter &amp; PA data to in-network providers</li>
+          <li><strong>Payer-to-Payer API</strong> — data follows the patient between payers</li>
+          <li><strong>Patient Access API</strong> — enhanced to include PA information</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Who &amp; when</h3>
+        <p style="font-size:13px;margin-bottom:12px;"><strong>Impacted payers:</strong> Medicare Advantage, Medicaid &amp; CHIP (FFS + managed care), and QHP issuers on the Federally-Facilitated Exchanges.</p>
+        <div style="display:flex;gap:10px;">
+          <div class="dbox" style="flex:1;">
+            <div class="t teal">Jan 1, 2026</div>
+            <div class="s">Operational PA rules: 72&nbsp;hr expedited / 7&nbsp;day standard decisions; denial reasons; metrics reporting</div>
+          </div>
+          <div class="dbox accent" style="flex:1;">
+            <div class="t teal">Jan 1, 2027</div>
+            <div class="s">FHIR API build-out (Prior Auth, Provider Access, Payer-to-Payer, Patient Access)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1.15fr;gap:16px;align-items:center;margin-bottom:16px;">
+      <div>
+        <div class="eyebrow" style="color:var(--coral);margin-bottom:8px;">Legacy</div>
+        <div class="flowline" style="flex-direction:column;align-items:stretch;gap:6px;">
+          <span class="node" style="border-color:#5a3a3a;">Phone → IVR</span>
+          <span class="node" style="border-color:#5a3a3a;">Human → Notes</span>
+        </div>
+      </div>
+      <div>
+        <div class="eyebrow" style="color:var(--cyan);margin-bottom:8px;">Emerging</div>
+        <div class="flowline" style="flex-direction:column;align-items:stretch;gap:6px;">
+          <span class="node" style="border-color:rgba(90,184,255,.4);">FHIR / API → Structured data</span>
+          <span class="node" style="border-color:rgba(90,184,255,.4);">Automated workflow</span>
+        </div>
+      </div>
+      <div>
+        <div class="eyebrow" style="color:var(--teal);margin-bottom:8px;">Real-world future (all coexist)</div>
+        <div class="flowline">
+          <span class="node">EDI</span><span class="arrow">+</span><span class="node">API</span><span class="arrow">+</span><span class="node">FHIR</span><span class="arrow">+</span><span class="node">Portal</span><span class="arrow">+</span><span class="node">Voice</span><span class="arrow">+</span><span class="node">Human</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="pullquote" style="max-width:92ch;">
+      We orchestrate <span class="accent">all of these channels</span> — rather than betting on only one.
+    </div>
+    <p class="note">
+      <b>Accuracy note:</b> The rule does <b>not</b> make all insurance verification API-only, does not eliminate existing X12 transactions (270/271, 278), and does not apply to all commercial or employer plans — only the CMS-regulated payer categories above. &nbsp;Source: CMS-0057-F Fact Sheet &amp; Federal Register (2024-00895), cms.gov.
+    </p>
+  </div>
+  <div class="ghostnum">07</div>
+</section>
+
+<!-- ============ SLIDE 8 — THE SOLUTION / ARCHITECTURE ============ -->
+<section class="slide" id="s8">
+  <div class="slide__meta"><span class="brand"><span class="dot"></span> AI Revenue Recovery OS</span><span class="slide__num">08 · The Solution</span></div>
+  <div class="slide-inner">
+    <div class="kicker">The Solution</div>
+    <h2 class="head">Meet AI Revenue Recovery OS</h2>
+    <p class="lead" style="margin-bottom:14px;">One intelligence layer reasons over the revenue cycle; one orchestrator executes across every available channel.</p>
+
+    <div class="svgwrap">
+    <svg viewBox="0 0 1120 470" width="1120" height="470" role="img" aria-label="Architecture: three engines feed an action orchestrator that executes across EDI, API, FHIR, portal and voice, driving the AI workforce and human exception handling to a recovery result">
+      <defs>
+        <linearGradient id="hg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5AB8FF"/><stop offset="1" stop-color="#31E1C4"/></linearGradient>
+        <marker id="a8b" markerWidth="9" markerHeight="9" refX="6" refY="4.5" orient="auto"><path d="M0,0 L7,4.5 L0,9 Z" fill="#33507a"/></marker>
+      </defs>
+      <style>
+        .n8{fill:#0F2138;stroke:#1E3A5F;stroke-width:1.2;}
+        .n8a{fill:#0E2834;stroke:#31E1C4;stroke-width:1.4;}
+        .t8{fill:#EAF1F9;font-size:13px;font-weight:650;font-family:var(--font);}
+        .t8s{fill:#8AA0BC;font-size:10.5px;font-family:var(--font);}
+        .c8{stroke:#33507a;stroke-width:1.3;fill:none;marker-end:url(#a8b);}
+        .ch{fill:#5AB8FF;font-size:12px;font-weight:700;font-family:var(--mono);}
+      </style>
+      <!-- header -->
+      <rect x="410" y="8" width="300" height="40" rx="9" fill="url(#hg)" opacity=".14" stroke="url(#hg)"/>
+      <text class="t8" x="560" y="33" text-anchor="middle" font-size="15" fill="#fff">AI REVENUE RECOVERY OS</text>
+      <!-- three engines -->
+      <line class="c8" x1="560" y1="48" x2="560" y2="66"/>
+      <g>
+        <rect class="n8" x="120" y="70" width="220" height="52" rx="9"/><text class="t8" x="230" y="92" text-anchor="middle">Revenue Risk Engine</text><text class="t8s" x="230" y="108" text-anchor="middle">predict leakage</text>
+        <rect class="n8" x="450" y="70" width="220" height="52" rx="9"/><text class="t8" x="560" y="92" text-anchor="middle">Claim Intelligence</text><text class="t8s" x="560" y="108" text-anchor="middle">context · payer · coding</text>
+        <rect class="n8" x="780" y="70" width="220" height="52" rx="9"/><text class="t8" x="890" y="92" text-anchor="middle">AI AR Engine</text><text class="t8s" x="890" y="108" text-anchor="middle">prioritize &amp; work AR</text>
+      </g>
+      <path class="c8" d="M230,122 L230,140 L545,140" /><path class="c8" d="M560,122 L560,140"/><path class="c8" d="M890,122 L890,140 L575,140"/>
+      <!-- orchestrator -->
+      <rect class="n8a" x="390" y="150" width="340" height="46" rx="9"/><text class="t8" x="560" y="178" text-anchor="middle" fill="#31E1C4" font-size="15">ACTION ORCHESTRATOR</text>
+      <!-- channels -->
+      <line class="c8" x1="560" y1="196" x2="560" y2="214"/>
+      <g>
+        <rect class="n8" x="120" y="218" width="150" height="40" rx="8"/><text class="ch" x="195" y="243" text-anchor="middle">EDI</text>
+        <rect class="n8" x="300" y="218" width="150" height="40" rx="8"/><text class="ch" x="375" y="243" text-anchor="middle">API</text>
+        <rect class="n8" x="480" y="218" width="150" height="40" rx="8"/><text class="ch" x="555" y="243" text-anchor="middle">FHIR</text>
+        <rect class="n8" x="660" y="218" width="150" height="40" rx="8"/><text class="ch" x="735" y="243" text-anchor="middle">PORTAL</text>
+        <rect class="n8" x="840" y="218" width="150" height="40" rx="8"/><text class="ch" x="915" y="243" text-anchor="middle">VOICE</text>
+      </g>
+      <path class="c8" d="M560,214 L195,214 L195,218"/><path class="c8" d="M560,214 L375,214 L375,218"/>
+      <path class="c8" d="M560,214 L735,214 L735,218"/><path class="c8" d="M560,214 L915,214 L915,218"/>
+      <!-- to workforce -->
+      <path class="c8" d="M195,258 L195,280 L545,280"/><path class="c8" d="M915,258 L915,280 L575,280"/><path class="c8" d="M555,258 L555,280"/>
+      <rect class="n8a" x="430" y="284" width="260" height="42" rx="9"/><text class="t8" x="560" y="310" text-anchor="middle" fill="#31E1C4">AI WORKFORCE</text>
+      <!-- agents -->
+      <line class="c8" x1="560" y1="326" x2="560" y2="342"/>
+      <rect class="n8" x="300" y="346" width="150" height="38" rx="8"/><text class="t8" x="375" y="370" text-anchor="middle" font-size="12">AR Agent</text>
+      <rect class="n8" x="485" y="346" width="150" height="38" rx="8"/><text class="t8" x="560" y="370" text-anchor="middle" font-size="12">Denial Agent</text>
+      <rect class="n8" x="670" y="346" width="150" height="38" rx="8"/><text class="t8" x="745" y="370" text-anchor="middle" font-size="12">Appeal Agent</text>
+      <path class="c8" d="M375,384 L375,400 L545,400"/><path class="c8" d="M745,384 L745,400 L575,400"/><path class="c8" d="M560,384 L560,400"/>
+      <!-- human exception -->
+      <rect class="n8" x="410" y="404" width="300" height="38" rx="8" stroke="#9B8CFF"/><text class="t8" x="560" y="428" text-anchor="middle" fill="#9B8CFF">HUMAN EXCEPTION MANAGEMENT</text>
+      <!-- recovery -->
+      <line class="c8" x1="560" y1="442" x2="560" y2="452"/>
+      <text class="t8" x="560" y="466" text-anchor="middle" fill="#31E1C4" font-size="13" font-weight="700">↓ RECOVERY RESULT</text>
+    </svg>
+    </div>
+
+    <div class="pullquote" style="margin-top:14px;">One intelligence layer. <span class="accent">Multiple execution channels.</span></div>
+  </div>
+  <div class="ghostnum">08</div>
+</section>
+
+<!-- ============ SLIDE 9 — HOW ONE CLAIM IS WORKED ============ -->
+<section class="slide" id="s9">
+  <div class="slide__meta"><span class="brand"><span class="dot"></span> AI Revenue Recovery OS</span><span class="slide__num">09 · In Practice</span></div>
+  <div class="slide-inner">
+    <div class="kicker">How One Claim Is Worked</div>
+    <h2 class="head">A single <span class="accent">$8,400</span> claim, worked end-to-end</h2>
+
+    <div style="display:grid;grid-template-columns:.9fr 2fr;gap:26px;align-items:start;margin-top:20px;">
+      <div class="card card--accent">
+        <div class="eyebrow" style="margin-bottom:12px;">The account</div>
+        <div class="stat" style="margin-bottom:14px;"><div class="n">$8,400</div><div class="l">outstanding balance</div></div>
+        <div class="eyebrow" style="margin:14px 0 8px;">AI analyzes</div>
+        <ul class="clean" style="gap:6px;">
+          <li>Payer &amp; claim age</li>
+          <li>Procedure &amp; denial history</li>
+          <li>Authorization on file</li>
+          <li>Timely-filing deadline</li>
+          <li>Prior attempts &amp; payment history</li>
+        </ul>
+      </div>
+      <div>
+        <div class="grid" style="grid-template-columns:repeat(2,1fr);gap:12px;">
+          <div class="card" style="padding:16px 18px;"><span class="tag tag--teal" style="margin-bottom:8px;">Step 1</span><p style="color:var(--ink-soft);font-size:13.5px;">Check <strong>EDI</strong> — is status already in the 277 / 835?</p></div>
+          <div class="card" style="padding:16px 18px;"><span class="tag tag--teal" style="margin-bottom:8px;">Step 2</span><p style="color:var(--ink-soft);font-size:13.5px;">Check <strong>API / FHIR</strong> connectivity for the payer.</p></div>
+          <div class="card" style="padding:16px 18px;"><span class="tag tag--teal" style="margin-bottom:8px;">Step 3</span><p style="color:var(--ink-soft);font-size:13.5px;">Check <strong>payer portal</strong> for claim detail.</p></div>
+          <div class="card" style="padding:16px 18px;"><span class="tag tag--teal" style="margin-bottom:8px;">Step 4</span><p style="color:var(--ink-soft);font-size:13.5px;">Decide: is a <strong>call</strong> actually necessary?</p></div>
+          <div class="card" style="padding:16px 18px;border-color:rgba(90,184,255,.35);"><span class="tag" style="margin-bottom:8px;color:var(--cyan);border-color:rgba(90,184,255,.4);">Step 5</span><p style="color:var(--ink-soft);font-size:13.5px;"><strong>AI Voice Agent</strong> calls payer — only if required.</p></div>
+          <div class="card" style="padding:16px 18px;"><span class="tag" style="margin-bottom:8px;">Step 6</span><p style="color:var(--ink-soft);font-size:13.5px;"><strong>Capture:</strong> status, denial reason, payment, reference #, rep, next action.</p></div>
+          <div class="card" style="padding:16px 18px;"><span class="tag" style="margin-bottom:8px;">Step 7–8</span><p style="color:var(--ink-soft);font-size:13.5px;"><strong>Validate</strong> response &amp; <strong>update</strong> workflow.</p></div>
+          <div class="card" style="padding:16px 18px;"><span class="tag" style="margin-bottom:8px;">Step 9–10</span><p style="color:var(--ink-soft);font-size:13.5px;"><strong>Schedule</strong> next action; <strong>escalate</strong> if confidence is low.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="pullquote" style="margin-top:22px;max-width:90ch;">Digital first, voice only when needed, human when it matters — <span class="accent">every step logged and validated.</span></div>
+  </div>
+  <div class="ghostnum">09</div>
+</section>
+
+<!-- ============ SLIDE 10 — AI AR WORKFORCE ============ -->
+<section class="slide" id="s10">
+  <div class="slide__meta"><span class="brand"><span class="dot"></span> AI Revenue Recovery OS</span><span class="slide__num">10 · AI Workforce</span></div>
+  <div class="slide-inner">
+    <div class="kicker">The AI AR Workforce</div>
+    <h2 class="head">Turn an AR queue into an <span class="accent">AI workforce</span></h2>
+    <div class="vs" style="margin:24px 0 22px;">
+      <div class="col old">
+        <h4>Human-only model</h4>
+        <ul class="clean coral">
+          <li>Manual queue prioritization</li>
+          <li>Manual research</li>
+          <li>Manual calls &amp; portal navigation</li>
+          <li>Manual notes</li>
+          <li>Manual follow-up</li>
+        </ul>
+        <p class="note" style="margin-top:14px;color:var(--muted-2);">Capacity scales only with headcount.</p>
+      </div>
+      <div class="col new">
+        <h4>AI Workforce model</h4>
+        <ul class="clean">
+          <li>Automatic prioritization</li>
+          <li>Digital checks first (EDI / API / portal)</li>
+          <li>Automated payer workflows; AI calls where required</li>
+          <li>Structured documentation &amp; automatic follow-up</li>
+          <li>Human exception handling on what matters</li>
+        </ul>
+        <p class="note" style="margin-top:14px;color:var(--teal);">Capacity scales with software.</p>
+      </div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;">
+      <span class="eyebrow" style="width:100%;margin-bottom:4px;">Specialized agents in the workforce</span>
+      <span class="chip">AI AR Agent</span><span class="chip">Claim Status Agent</span><span class="chip">Payer Calling Agent</span>
+      <span class="chip">Payer Portal Agent</span><span class="chip">Eligibility Agent</span><span class="chip">Denial Agent</span>
+      <span class="chip">Appeal Agent</span><span class="chip">Follow-up Agent</span><span class="chip">Documentation Agent</span>
+    </div>
+    <div class="pullquote">We don't replace the RCM team. <span class="accent">We multiply its capacity.</span></div>
+  </div>
+  <div class="ghostnum">10</div>
+</section>
+
+<!-- ============ SLIDE 11 — AI PAYER CALLING ============ -->
+<section class="slide" id="s11">
+  <div class="slide__meta"><span class="brand"><span class="dot"></span> AI Revenue Recovery OS</span><span class="slide__num">11 · Right-Channel Execution</span></div>
+  <div class="slide-inner">
+    <div class="kicker">AI Payer Calling</div>
+    <h2 class="head">Voice is a <span class="accent">capability</span>, not the product</h2>
+    <p class="lead" style="margin-bottom:24px;">A claim-status request should never automatically become a phone call. Voice is the last resort — invoked only when digital channels can't resolve the issue.</p>
+
+    <div style="display:grid;grid-template-columns:1.35fr 1fr;gap:28px;align-items:center;">
+      <div class="svgwrap">
+      <svg viewBox="0 0 560 420" width="560" height="420" role="img" aria-label="Decision flow: digital resolution first, voice only if needed, human escalation if uncertain">
+        <defs><marker id="a11" markerWidth="9" markerHeight="9" refX="6" refY="4.5" orient="auto"><path d="M0,0 L7,4.5 L0,9 Z" fill="#33507a"/></marker>
+        <marker id="a11t" markerWidth="9" markerHeight="9" refX="6" refY="4.5" orient="auto"><path d="M0,0 L7,4.5 L0,9 Z" fill="#1FBFA6"/></marker></defs>
+        <style>
+          .f{fill:#0F2138;stroke:#1E3A5F;stroke-width:1.2;} .fa{fill:#0E2834;stroke:#31E1C4;stroke-width:1.3;}
+          .fd{fill:#12233d;stroke:#5AB8FF;stroke-width:1.3;}
+          .ft{fill:#EAF1F9;font-size:12.5px;font-weight:600;font-family:var(--font);}
+          .cl{stroke:#33507a;stroke-width:1.3;fill:none;marker-end:url(#a11);}
+          .clt{stroke:#1FBFA6;stroke-width:1.4;fill:none;marker-end:url(#a11t);}
+          .yn{fill:#8AA0BC;font-size:11px;font-weight:700;font-family:var(--mono);}
+        </style>
+        <rect class="f" x="200" y="8" width="160" height="36" rx="8"/><text class="ft" x="280" y="31" text-anchor="middle">Claim</text>
+        <line class="cl" x1="280" y1="44" x2="280" y2="58"/>
+        <polygon class="fd" points="280,60 400,100 280,140 160,100"/><text class="ft" x="280" y="96" text-anchor="middle" font-size="11">Digital resolution</text><text class="ft" x="280" y="110" text-anchor="middle" font-size="11">available?</text>
+        <!-- YES branch left -->
+        <path class="clt" d="M160,100 L70,100 L70,150"/><text class="yn" x="110" y="92" fill="#1FBFA6">YES</text>
+        <rect class="fa" x="10" y="152" width="120" height="52" rx="8"/><text class="ft" x="70" y="174" text-anchor="middle" font-size="11">EDI / API</text><text class="ft" x="70" y="190" text-anchor="middle" font-size="11">Portal</text>
+        <!-- NO branch down -->
+        <path class="cl" d="M280,140 L280,158"/><text class="yn" x="300" y="152">NO</text>
+        <rect class="fd" x="200" y="160" width="160" height="36" rx="8"/><text class="ft" x="280" y="183" text-anchor="middle" font-size="11.5">AI Voice Agent</text>
+        <line class="cl" x1="280" y1="196" x2="280" y2="210"/>
+        <rect class="f" x="210" y="212" width="140" height="32" rx="7"/><text class="ft" x="280" y="233" text-anchor="middle" font-size="11">IVR navigation</text>
+        <line class="cl" x1="280" y1="244" x2="280" y2="256"/>
+        <rect class="f" x="195" y="258" width="170" height="32" rx="7"/><text class="ft" x="280" y="279" text-anchor="middle" font-size="11">Payer representative</text>
+        <line class="cl" x1="280" y1="290" x2="280" y2="302"/>
+        <rect class="fa" x="200" y="304" width="160" height="32" rx="7"/><text class="ft" x="280" y="325" text-anchor="middle" font-size="11">Structured extraction</text>
+        <line class="cl" x1="280" y1="336" x2="280" y2="348"/>
+        <rect class="fa" x="210" y="350" width="140" height="32" rx="7"/><text class="ft" x="280" y="371" text-anchor="middle" font-size="11">Validation</text>
+        <!-- converge to workflow update -->
+        <path class="clt" d="M70,204 L70,388 L200,388"/>
+        <line class="cl" x1="280" y1="382" x2="280" y2="388"/>
+        <rect class="f" x="200" y="388" width="160" height="30" rx="7"/><text class="ft" x="280" y="408" text-anchor="middle" font-size="11">Workflow update</text>
+        <!-- human escalation -->
+        <path class="cl" d="M360,366 L440,366 L440,300"/>
+        <rect class="f" x="380" y="262" width="130" height="36" rx="8" stroke="#9B8CFF"/><text class="ft" x="445" y="285" text-anchor="middle" fill="#9B8CFF" font-size="10.5">Human escalation</text>
+      </svg>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:14px;border-color:rgba(240,118,94,.3);">
+          <h3 style="color:var(--coral);">We name the hard parts</h3>
+          <ul class="clean coral" style="gap:7px;">
+            <li>IVR trees change constantly</li>
+            <li>Payer-specific authentication</li>
+            <li>Transfers &amp; long hold times</li>
+            <li>Inconsistent rep responses</li>
+            <li>Payer resistance to poor automation</li>
+          </ul>
+        </div>
+        <div class="card card--accent">
+          <h3 style="color:var(--teal);">How we handle them</h3>
+          <ul class="clean" style="gap:7px;">
+            <li>Payer-specific workflows</li>
+            <li>Confidence scoring &amp; evidence capture</li>
+            <li>Full audit trails</li>
+            <li>Human fallback by design</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <p class="note">We do <b>not</b> claim 100% autonomous calling. Voice is one orchestrated channel with human fallback — held to accuracy, evidence and audit standards.</p>
+  </div>
+  <div class="ghostnum">11</div>
+</section>
+
+<!-- ============ SLIDE 12 — REVENUE RISK ENGINE ============ -->
+<section class="slide" id="s12">
+  <div class="slide__meta"><span class="brand"><span class="dot"></span> AI Revenue Recovery OS</span><span class="slide__num">12 · Prevention</span></div>
+  <div class="slide-inner">
+    <div class="kicker">Revenue Risk Engine</div>
+    <h2 class="head">Stop finding revenue problems <span class="accent">after</span> they become AR</h2>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;margin:22px 0;">
+      <div class="card old" style="border-color:#3a2733;background:linear-gradient(180deg,rgba(30,20,26,.4),rgba(12,27,48,.5));">
+        <div class="eyebrow" style="color:var(--coral);margin-bottom:14px;">Traditional — reactive</div>
+        <div class="flowline" style="flex-direction:column;align-items:stretch;gap:0;">
+          <span class="node" style="border-color:#5a3a3a;">Claim</span><span class="arrow" style="text-align:center;">↓</span>
+          <span class="node" style="border-color:#5a3a3a;color:#F0765E;">Denial</span><span class="arrow" style="text-align:center;">↓</span>
+          <span class="node" style="border-color:#5a3a3a;color:#F0765E;">AR</span><span class="arrow" style="text-align:center;">↓</span>
+          <span class="node" style="border-color:#5a3a3a;">Human discovers issue</span><span class="arrow" style="text-align:center;">↓</span>
+          <span class="node" style="border-color:#5a3a3a;">Recovery (maybe)</span>
+        </div>
+      </div>
+      <div class="card new card--accent">
+        <div class="eyebrow" style="color:var(--teal);margin-bottom:14px;">AI Revenue Recovery OS — proactive</div>
+        <div class="flowline" style="flex-direction:column;align-items:stretch;gap:0;">
+          <span class="node" style="border-color:rgba(49,225,196,.35);">Claim creation</span><span class="arrow" style="text-align:center;color:var(--teal);">↓</span>
+          <span class="node" style="border-color:rgba(49,225,196,.35);">Risk prediction → Prevent</span><span class="arrow" style="text-align:center;color:var(--teal);">↓</span>
+          <span class="node" style="border-color:rgba(49,225,196,.35);">Submit → Monitor</span><span class="arrow" style="text-align:center;color:var(--teal);">↓</span>
+          <span class="node" style="border-color:rgba(49,225,196,.35);">Detect anomaly</span><span class="arrow" style="text-align:center;color:var(--teal);">↓</span>
+          <span class="node" style="border-color:rgba(49,225,196,.35);color:var(--teal);">Recover proactively</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;">
+      <span class="eyebrow" style="width:100%;margin-bottom:2px;">Risk categories scored per claim</span>
+      <span class="chip">Eligibility</span><span class="chip">Authorization</span><span class="chip">Coding</span><span class="chip">Documentation</span>
+      <span class="chip">Payer-specific behavior</span><span class="chip">Timely filing</span><span class="chip">Denial probability</span><span class="chip">Underpayment probability</span>
+    </div>
+    <div class="pullquote">The best dollar to recover is the dollar we <span class="accent">prevent from becoming lost revenue.</span></div>
+  </div>
+  <div class="ghostnum">12</div>
+</section>
+
+<!-- ============ SLIDE 13 — DENIAL INTELLIGENCE ============ -->
+<section class="slide" id="s13">
+  <div class="slide__meta"><span class="brand"><span class="dot"></span> AI Revenue Recovery OS</span><span class="slide__num">13 · Denial Intelligence</span></div>
+  <div class="slide-inner">
+    <div class="kicker">Denial Intelligence</div>
+    <h2 class="head">From denial code to <span class="accent">corrective action</span></h2>
+    <p class="lead" style="margin-bottom:20px;">Denials are rising — up 20% commercial and 56% Medicare Advantage (2022→2023, AHA). We turn each one into a classified, root-caused, recoverable action.</p>
+
+    <div class="svgwrap">
+    <svg viewBox="0 0 1120 250" width="1120" height="250" role="img" aria-label="837, 835, 277, payer policies and historical outcomes feed AI, which outputs classification, root cause, corrective action, appeal opportunity, recovery probability and action">
+      <defs><marker id="a13" markerWidth="9" markerHeight="9" refX="6" refY="4.5" orient="auto"><path d="M0,0 L7,4.5 L0,9 Z" fill="#33507a"/></marker></defs>
+      <style>
+        .i13{fill:#0F2138;stroke:#1E3A5F;stroke-width:1.2;} .ai13{fill:#0E2834;stroke:#31E1C4;stroke-width:1.4;}
+        .o13{fill:#12233d;stroke:#274a72;stroke-width:1.1;}
+        .t13{fill:#EAF1F9;font-size:12px;font-weight:600;font-family:var(--font);}
+        .m13{fill:#5AB8FF;font-size:12px;font-weight:700;font-family:var(--mono);}
+        .c13{stroke:#33507a;stroke-width:1.2;fill:none;marker-end:url(#a13);}
+      </style>
+      <!-- inputs -->
+      <g>
+        <rect class="i13" x="20" y="20" width="150" height="30" rx="7"/><text class="m13" x="95" y="40" text-anchor="middle">837</text>
+        <rect class="i13" x="20" y="58" width="150" height="30" rx="7"/><text class="m13" x="95" y="78" text-anchor="middle">835</text>
+        <rect class="i13" x="20" y="96" width="150" height="30" rx="7"/><text class="m13" x="95" y="116" text-anchor="middle">277</text>
+        <rect class="i13" x="20" y="134" width="150" height="30" rx="7"/><text class="t13" x="95" y="154" text-anchor="middle" font-size="11">Payer policies</text>
+        <rect class="i13" x="20" y="172" width="150" height="30" rx="7"/><text class="t13" x="95" y="192" text-anchor="middle" font-size="11">Historical outcomes</text>
+      </g>
+      <path class="c13" d="M170,35 L250,35 L250,115 L300,115"/><path class="c13" d="M170,73 L240,73 L240,115 L300,115"/>
+      <path class="c13" d="M170,111 L300,111"/><path class="c13" d="M170,149 L240,149 L240,120 L300,120"/><path class="c13" d="M170,187 L250,187 L250,125 L300,125"/>
+      <!-- AI core -->
+      <rect class="ai13" x="300" y="88" width="130" height="60" rx="12"/><text class="t13" x="365" y="123" text-anchor="middle" fill="#31E1C4" font-size="15" font-weight="700">AI</text>
+      <!-- outputs chain -->
+      <path class="c13" d="M430,118 L470,118"/>
+      <g>
+        <rect class="o13" x="472" y="18" width="180" height="30" rx="7"/><text class="t13" x="562" y="38" text-anchor="middle" font-size="11">Denial classification</text>
+        <rect class="o13" x="472" y="54" width="180" height="30" rx="7"/><text class="t13" x="562" y="74" text-anchor="middle" font-size="11">Root cause</text>
+        <rect class="o13" x="472" y="90" width="180" height="30" rx="7"/><text class="t13" x="562" y="110" text-anchor="middle" font-size="11">Corrective action</text>
+        <rect class="o13" x="472" y="126" width="180" height="30" rx="7"/><text class="t13" x="562" y="146" text-anchor="middle" font-size="11">Appeal opportunity</text>
+        <rect class="o13" x="472" y="162" width="180" height="30" rx="7"/><text class="t13" x="562" y="182" text-anchor="middle" font-size="11">Recovery probability</text>
+      </g>
+      <path class="c13" d="M652,33 L700,33 L700,118 L740,118"/><path class="c13" d="M652,177 L700,177 L700,118"/><path class="c13" d="M652,105 L740,113"/>
+      <rect class="ai13" x="742" y="98" width="150" height="40" rx="9"/><text class="t13" x="817" y="123" text-anchor="middle" fill="#31E1C4" font-size="14" font-weight="700">ACTION</text>
+      <!-- human gate -->
+      <rect class="o13" x="930" y="98" width="170" height="40" rx="9" stroke="#9B8CFF"/><text class="t13" x="1015" y="115" text-anchor="middle" fill="#9B8CFF" font-size="11">Human approval</text><text class="t13" x="1015" y="129" text-anchor="middle" fill="#8AA0BC" font-size="10">for high-risk actions</text>
+      <path class="c13" d="M892,118 L928,118"/>
+    </svg>
+    </div>
+    <p class="note"><b>Governed by design:</b> high-risk or high-value actions require human approval before execution. Denial statistics: AHA (2024); denial rework cost $25–$118/claim (MGMA / Optum).</p>
+  </div>
+  <div class="ghostnum">13</div>
+</section>
+
+<!-- ============ SLIDE 14 — PAYER INTELLIGENCE GRAPH ============ -->
+<section class="slide" id="s14">
+  <div class="slide__meta"><span class="brand"><span class="dot"></span> AI Revenue Recovery OS</span><span class="slide__num">14 · Payer Intelligence</span></div>
+  <div class="slide-inner">
+    <div class="kicker">Payer Intelligence Graph</div>
+    <h2 class="head">Structured operational knowledge of <span class="accent">how each payer behaves</span></h2>
+
+    <div style="display:grid;grid-template-columns:1.15fr 1fr;gap:30px;align-items:center;margin-top:18px;">
+      <div class="svgwrap">
+      <svg viewBox="0 0 520 380" width="520" height="380" role="img" aria-label="Graph from payer through plan, state, provider type, procedure, authorization, documentation, denial, appeal, payment to resolution">
+        <defs><marker id="a14" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L6,4 L0,8 Z" fill="#2f4d78"/></marker></defs>
+        <style>
+          .g14{fill:#0F2138;stroke:#274a72;stroke-width:1.1;} .g14a{fill:#0E2834;stroke:#31E1C4;stroke-width:1.3;}
+          .gt{fill:#EAF1F9;font-size:11.5px;font-weight:600;font-family:var(--font);}
+          .ge{stroke:#2f4d78;stroke-width:1.15;fill:none;marker-end:url(#a14);}
+        </style>
+        <!-- vertical spine of the graph -->
+        <path class="ge" d="M110,30 L110,64"/><path class="ge" d="M110,94 L110,128"/><path class="ge" d="M110,158 L110,192"/>
+        <path class="ge" d="M110,222 L110,256"/><path class="ge" d="M110,286 L110,320"/>
+        <path class="ge" d="M260,45 L150,45"/><path class="ge" d="M260,109 L150,109"/><path class="ge" d="M260,173 L150,173"/>
+        <path class="ge" d="M260,237 L150,237"/><path class="ge" d="M260,301 L150,301"/>
+        <g>
+          <rect class="g14a" x="40" y="16" width="140" height="30" rx="15"/><text class="gt" x="110" y="36" text-anchor="middle" fill="#31E1C4">Payer</text>
+          <rect class="g14" x="40" y="64" width="140" height="30" rx="8"/><text class="gt" x="110" y="84" text-anchor="middle">Plan</text>
+          <rect class="g14" x="40" y="128" width="140" height="30" rx="8"/><text class="gt" x="110" y="148" text-anchor="middle">Provider type</text>
+          <rect class="g14" x="40" y="192" width="140" height="30" rx="8"/><text class="gt" x="110" y="212" text-anchor="middle">Authorization</text>
+          <rect class="g14" x="40" y="256" width="140" height="30" rx="8"/><text class="gt" x="110" y="276" text-anchor="middle">Denial</text>
+          <rect class="g14" x="40" y="320" width="140" height="30" rx="8"/><text class="gt" x="110" y="340" text-anchor="middle">Payment</text>
+          <!-- right satellites -->
+          <rect class="g14" x="260" y="30" width="120" height="30" rx="8"/><text class="gt" x="320" y="50" text-anchor="middle">State</text>
+          <rect class="g14" x="260" y="94" width="120" height="30" rx="8"/><text class="gt" x="320" y="114" text-anchor="middle">Procedure</text>
+          <rect class="g14" x="260" y="158" width="120" height="30" rx="8"/><text class="gt" x="320" y="178" text-anchor="middle">Documentation</text>
+          <rect class="g14" x="260" y="222" width="120" height="30" rx="8"/><text class="gt" x="320" y="242" text-anchor="middle">Appeal</text>
+          <rect class="g14a" x="260" y="286" width="120" height="30" rx="15"/><text class="gt" x="320" y="306" text-anchor="middle" fill="#31E1C4">Resolution</text>
+        </g>
+      </svg>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:14px;">
+          <h3>Potential insights</h3>
+          <ul class="clean" style="gap:6px;">
+            <li>Payer-specific requirements &amp; denial patterns</li>
+            <li>Authorization &amp; documentation behavior</li>
+            <li>Successful recovery patterns</li>
+            <li>Preferred digital channel &amp; follow-up timing</li>
+            <li>Resolution probability</li>
+          </ul>
+        </div>
+        <div class="card" style="border-color:rgba(155,140,255,.35);">
+          <h3 style="color:var(--violet);">Privacy &amp; governance first</h3>
+          <p style="font-size:13px;">Intelligence is built from <strong>permitted customer data and workflow outcomes</strong> under strict <strong>tenant isolation</strong>. PHI from one customer is <strong>never</strong> shared with another.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;">
+            <span class="chip">Tenant isolation</span><span class="chip">Data governance</span><span class="chip">Permitted learning</span><span class="chip">Compliance</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ghostnum">14</div>
+</section>
+
+<!-- ============ SLIDE 15 — THE PLATFORM LOOP ============ -->
+<section class="slide" id="s15">
+  <div class="slide__meta"><span class="brand"><span class="dot"></span> AI Revenue Recovery OS</span><span class="slide__num">15 · The Flywheel</span></div>
+  <div class="slide-inner">
+    <div class="kicker">The Platform Loop</div>
+    <h2 class="head">A compounding <span class="accent">recovery flywheel</span></h2>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:center;margin-top:14px;">
+      <div class="svgwrap">
+      <svg viewBox="0 0 400 400" width="400" height="400" role="img" aria-label="Circular flywheel: observe, understand, decide, execute, validate, recover, learn">
+        <defs>
+          <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5AB8FF"/><stop offset="1" stop-color="#31E1C4"/></linearGradient>
+          <marker id="a15" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto"><path d="M0,0 L8,5 L0,10 Z" fill="#31E1C4"/></marker>
+        </defs>
+        <circle cx="200" cy="200" r="128" fill="none" stroke="url(#ring)" stroke-width="2" stroke-dasharray="6 8" opacity=".5"/>
+        <!-- rotating arrow accents -->
+        <path d="M200,72 A128,128 0 0 1 310,150" fill="none" stroke="url(#ring)" stroke-width="2.5" marker-end="url(#a15)"/>
+        <g font-family="var(--font)" text-anchor="middle">
+          <!-- 7 nodes around circle -->
+          <g><circle cx="200" cy="72" r="30" fill="#0E2834" stroke="#31E1C4" stroke-width="1.3"/><text x="200" y="76" fill="#EAF1F9" font-size="12" font-weight="700">Observe</text></g>
+          <g><circle cx="299" cy="120" r="30" fill="#0F2138" stroke="#274a72"/><text x="299" y="118" fill="#EAF1F9" font-size="11" font-weight="600">Under-</text><text x="299" y="131" fill="#EAF1F9" font-size="11" font-weight="600">stand</text></g>
+          <g><circle cx="322" cy="228" r="30" fill="#0F2138" stroke="#274a72"/><text x="322" y="232" fill="#EAF1F9" font-size="12" font-weight="600">Decide</text></g>
+          <g><circle cx="258" cy="316" r="30" fill="#0F2138" stroke="#274a72"/><text x="258" y="320" fill="#EAF1F9" font-size="12" font-weight="600">Execute</text></g>
+          <g><circle cx="142" cy="316" r="30" fill="#0F2138" stroke="#274a72"/><text x="142" y="320" fill="#EAF1F9" font-size="11" font-weight="600">Validate</text></g>
+          <g><circle cx="78" cy="228" r="30" fill="#0E2834" stroke="#31E1C4" stroke-width="1.3"/><text x="78" y="232" fill="#31E1C4" font-size="12" font-weight="700">Recover</text></g>
+          <g><circle cx="101" cy="120" r="30" fill="#0F2138" stroke="#274a72"/><text x="101" y="124" fill="#EAF1F9" font-size="12" font-weight="600">Learn</text></g>
+          <text x="200" y="196" fill="#8AA0BC" font-size="11" font-weight="700">EVERY</text>
+          <text x="200" y="211" fill="#8AA0BC" font-size="11" font-weight="700">RESOLVED</text>
+          <text x="200" y="226" fill="#31E1C4" font-size="11" font-weight="700">CLAIM</text>
+        </g>
+      </svg>
+      </div>
+      <div>
+        <ul class="clean" style="gap:12px;">
+          <li><strong>Observe</strong> — claims + EDI + APIs + payer interactions</li>
+          <li><strong>Understand</strong> — AI + rules + payer intelligence</li>
+          <li><strong>Decide</strong> — best next action</li>
+          <li><strong>Execute</strong> — EDI / API / portal / voice / human</li>
+          <li><strong>Validate</strong> — outcome + evidence</li>
+          <li><strong>Recover</strong> — revenue</li>
+          <li><strong>Learn</strong> — improve future decisions</li>
+        </ul>
+        <div class="pullquote" style="margin-top:22px;">Every resolved claim makes the system <span class="accent">smarter about future revenue recovery.</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="ghostnum">15</div>
+</section>
+
+<!-- ============ SLIDE 16 — MARKET OPPORTUNITY ============ -->
+<section class="slide" id="s16">
+  <div class="slide__meta"><span class="brand"><span class="dot"></span> AI Revenue Recovery OS</span><span class="slide__num">16 · Market</span></div>
+  <div class="slide-inner">
+    <div class="kicker">Market Opportunity</div>
+    <h2 class="head">A large market — sized <span class="accent">honestly</span></h2>
+    <p class="lead" style="margin-bottom:20px;">RCM estimates diverge ~5–6× because firms define "RCM" differently (services + labor vs. software). We separate the layers rather than picking the biggest number.</p>
+
+    <div style="display:grid;grid-template-columns:1.25fr 1fr;gap:30px;align-items:center;">
+      <div class="svgwrap">
+      <svg viewBox="0 0 560 300" width="560" height="300" role="img" aria-label="TAM SAM SOM nested bars">
+        <style>
+          .bl{fill:#EAF1F9;font-family:var(--font);font-weight:700;}
+          .bs{fill:#8AA0BC;font-family:var(--font);font-size:11px;}
+          .bn{fill:#fff;font-family:var(--font);font-weight:750;font-size:15px;}
+        </style>
+        <!-- TAM -->
+        <rect x="20" y="20" width="520" height="72" rx="10" fill="#12233d" stroke="#274a72"/>
+        <text class="bl" x="36" y="46" font-size="14">TAM</text>
+        <text class="bs" x="36" y="66">U.S. RCM market · Grand View 2024</text>
+        <text class="bn" x="524" y="60" text-anchor="end" fill="#5AB8FF">~$172B</text>
+        <text class="bs" x="524" y="80" text-anchor="end">~10% CAGR to 2030</text>
+        <!-- SAM -->
+        <rect x="60" y="104" width="440" height="72" rx="10" fill="#0E2834" stroke="#1FBFA6"/>
+        <text class="bl" x="76" y="130" font-size="14">SAM</text>
+        <text class="bs" x="76" y="150">RCM software / technology-addressable</text>
+        <text class="bn" x="484" y="144" text-anchor="end" fill="#31E1C4">~$55–60B</text>
+        <text class="bs" x="484" y="164" text-anchor="end">~34% software share · riding 24% AI-in-RCM CAGR</text>
+        <!-- SOM -->
+        <rect x="150" y="188" width="300" height="88" rx="10" fill="rgba(49,225,196,.12)" stroke="#31E1C4" stroke-width="1.5"/>
+        <text class="bl" x="166" y="214" font-size="14" fill="#31E1C4">SOM</text>
+        <text class="bs" x="166" y="234">Initial served market —</text>
+        <text class="bs" x="166" y="250">U.S. RCM / BPO + early provider orgs</text>
+        <text class="bn" x="434" y="232" text-anchor="end" fill="#31E1C4">~$7B</text>
+        <text class="bs" x="434" y="266" text-anchor="end">U.S. billing-outsourcing pool · ~12.6% CAGR</text>
+      </svg>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:12px;">
+          <h3>Bottom-up recovery wedge</h3>
+          <ul class="clean" style="gap:7px;font-size:13px;">
+            <li><strong>3B+</strong> U.S. medical claims adjudicated / year <span class="muted">(CAQH)</span></li>
+            <li><strong>11.8%</strong> initial denial rate, 2024 <span class="muted">(Optum)</span></li>
+            <li><strong>50–65%</strong> of denials never reworked <span class="muted">(MGMA)</span></li>
+            <li><strong>$25–$118</strong> cost to rework a denial <span class="muted">(MGMA / Optum)</span></li>
+          </ul>
+        </div>
+        <p class="note" style="margin-top:0;">
+          <b>Assumptions labeled.</b> TAM = services-inclusive market; SAM ≈ software share (~34%), corroborated by Precedence ($58.5B) &amp; MarketsandMarkets. ACV derived bottom-up in pilots — not from an unsourced figure. Sources: Grand View, Precedence, MarketsandMarkets, CAQH, Optum, MGMA (2024–25).
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="ghostnum">16</div>
+</section>
+
+<!-- ============ SLIDE 17 — AI RCM MARKET GROWTH ============ -->
+<section class="slide" id="s17">
+  <div class="slide__meta"><span class="brand"><span class="dot"></span> AI Revenue Recovery OS</span><span class="slide__num">17 · Adoption</span></div>
+  <div class="slide-inner">
+    <div class="kicker">AI RCM Market Growth</div>
+    <h2 class="head">Adoption is accelerating — integration is still <span class="accent">early</span></h2>
+
+    <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:30px;align-items:center;margin-top:14px;">
+      <div class="svgwrap">
+      <svg viewBox="0 0 580 300" width="580" height="300" role="img" aria-label="AI in RCM market growth from about 20 billion in 2024 to about 70 billion by 2030">
+        <defs><linearGradient id="area17" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#31E1C4" stop-opacity=".38"/><stop offset="1" stop-color="#31E1C4" stop-opacity="0"/></linearGradient></defs>
+        <!-- axes -->
+        <line x1="60" y1="250" x2="550" y2="250" stroke="#274a72" stroke-width="1"/>
+        <line x1="60" y1="40" x2="60" y2="250" stroke="#274a72" stroke-width="1"/>
+        <!-- gridlines -->
+        <g stroke="#172C49" stroke-width="1">
+          <line x1="60" y1="200" x2="550" y2="200"/><line x1="60" y1="150" x2="550" y2="150"/><line x1="60" y1="100" x2="550" y2="100"/><line x1="60" y1="55" x2="550" y2="55"/>
+        </g>
+        <g fill="#8AA0BC" font-size="10.5" font-family="var(--font)" text-anchor="end">
+          <text x="52" y="253">0</text><text x="52" y="203">$20B</text><text x="52" y="153">$40B</text><text x="52" y="103">$60B</text><text x="52" y="58">$80B</text>
+        </g>
+        <!-- curve: 2024 ~20.6B (y ~198) to 2030 ~70B (y ~76) -->
+        <path d="M60,198 C200,192 330,150 550,76 L550,250 L60,250 Z" fill="url(#area17)"/>
+        <path d="M60,198 C200,192 330,150 550,76" fill="none" stroke="#31E1C4" stroke-width="2.5"/>
+        <circle cx="60" cy="198" r="4.5" fill="#31E1C4"/><circle cx="550" cy="76" r="5" fill="#31E1C4"/>
+        <g fill="#EAF1F9" font-family="var(--font)">
+          <text x="70" y="186" font-size="12" font-weight="700">$20.6B</text><text x="70" y="219" font-size="10.5" fill="#8AA0BC">2024</text>
+          <text x="548" y="64" font-size="13" font-weight="700" text-anchor="end">$70.1B</text><text x="548" y="266" font-size="10.5" fill="#8AA0BC" text-anchor="end">2030</text>
+        </g>
+        <text x="300" y="290" text-anchor="middle" fill="#31E1C4" font-size="12" font-weight="700" font-family="var(--font)">AI in RCM · ~24% CAGR</text>
+      </svg>
+      </div>
+      <div>
+        <div class="grid" style="grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+          <div class="card" style="padding:16px;"><div class="stat"><div class="n" style="font-size:30px;">~24%</div><div class="l">AI-in-RCM CAGR — corroborated by two firms (Grand View, Market.us)</div></div></div>
+          <div class="card" style="padding:16px;"><div class="stat plain"><div class="n" style="font-size:30px;">80%</div><div class="l">of medical claim-status transactions electronic — the biggest remaining automation gap (CAQH)</div></div></div>
+        </div>
+        <div class="card card--accent">
+          <h3 style="color:var(--teal);">The adoption gap</h3>
+          <p style="font-size:13.5px;">$20B+ in administrative waste remains addressable through automation (CAQH 2024). Point AI tools are spreading — but <strong>fully integrated, cross-channel RCM automation is still early.</strong></p>
+        </div>
+      </div>
+    </div>
+    <div class="pullquote" style="margin-top:18px;">AI adoption is accelerating, but <span class="accent">fully integrated RCM automation remains early.</span></div>
+    <p class="note">Sources: Grand View Research &amp; Market.us (AI-in-RCM, 2024–25); CAQH Index 2024 (electronic-transaction adoption &amp; $20B+ opportunity).</p>
+  </div>
+  <div class="ghostnum">17</div>
+</section>
+
+<!-- ============ SLIDE 18 — COMPETITIVE LANDSCAPE ============ -->
+<section class="slide" id="s18">
+  <div class="slide__meta"><span class="brand"><span class="dot"></span> AI Revenue Recovery OS</span><span class="slide__num">18 · Landscape</span></div>
+  <div class="slide-inner">
+    <div class="kicker">Competitive Landscape</div>
+    <h2 class="head">Everyone owns a slice. <span class="accent">No one orchestrates across channels.</span></h2>
+
+    <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:28px;align-items:center;margin-top:12px;">
+      <div class="svgwrap">
+      <svg viewBox="0 0 560 440" width="560" height="440" role="img" aria-label="Two axis competitive matrix">
+        <style>
+          .axl{fill:#8AA0BC;font-size:11px;font-family:var(--font);font-weight:600;}
+          .co{font-size:10.5px;font-family:var(--font);fill:#C4D3E4;}
+        </style>
+        <!-- quadrant bg -->
+        <rect x="60" y="30" width="470" height="360" fill="#0d1d33" stroke="#172C49"/>
+        <!-- our quadrant highlight (top-right) -->
+        <rect x="295" y="30" width="235" height="180" fill="rgba(49,225,196,.07)"/>
+        <line x1="60" y1="210" x2="530" y2="210" stroke="#274a72" stroke-dasharray="4 5"/>
+        <line x1="295" y1="30" x2="295" y2="390" stroke="#274a72" stroke-dasharray="4 5"/>
+        <!-- axis labels -->
+        <text class="axl" x="295" y="415" text-anchor="middle">Single channel / function  →  Cross-channel orchestration</text>
+        <text class="axl" x="26" y="210" text-anchor="middle" transform="rotate(-90 26 210)">Record &amp; analytics  →  Autonomous execution</text>
+        <!-- dots -->
+        <g>
+          <!-- Us -->
+          <circle cx="470" cy="80" r="7" fill="#31E1C4" stroke="#fff" stroke-width="1.5"/>
+          <text class="co" x="470" y="66" text-anchor="middle" fill="#31E1C4" font-weight="700">AI Revenue Recovery OS</text>
+          <!-- broad RCM AI (top, mid-right) -->
+          <circle cx="360" cy="120" r="5" fill="#5AB8FF"/><text class="co" x="360" y="136" text-anchor="middle">Adonis</text>
+          <circle cx="345" cy="165" r="5" fill="#5AB8FF"/><text class="co" x="345" y="181" text-anchor="middle">Candid Health</text>
+          <circle cx="405" cy="150" r="5" fill="#5AB8FF"/><text class="co" x="408" y="150" text-anchor="start">QuickIntell</text>
+          <circle cx="320" cy="95" r="5" fill="#5AB8FF"/><text class="co" x="320" y="111" text-anchor="middle">Smarter Tech.</text>
+          <circle cx="425" cy="185" r="5" fill="#5AB8FF"/><text class="co" x="425" y="201" text-anchor="middle">AKASA</text>
+          <!-- voice single-channel (bottom-left/mid) -->
+          <circle cx="150" cy="150" r="5" fill="#9B8CFF"/><text class="co" x="150" y="138" text-anchor="middle">Infinitus</text>
+          <circle cx="130" cy="185" r="5" fill="#9B8CFF"/><text class="co" x="130" y="201" text-anchor="middle">SuperDial</text>
+          <circle cx="185" cy="170" r="5" fill="#9B8CFF"/><text class="co" x="185" y="158" text-anchor="middle">Prosper AI</text>
+          <circle cx="205" cy="130" r="5" fill="#9B8CFF"/><text class="co" x="205" y="118" text-anchor="middle">LunaBill</text>
+          <!-- coding single-function (bottom-left, lower) -->
+          <circle cx="120" cy="290" r="5" fill="#F5B44C"/><text class="co" x="120" y="306" text-anchor="middle">Fathom</text>
+          <circle cx="165" cy="320" r="5" fill="#F5B44C"/><text class="co" x="165" y="336" text-anchor="middle">CodaMetrix</text>
+          <circle cx="210" cy="300" r="5" fill="#F5B44C"/><text class="co" x="210" y="316" text-anchor="middle">Nym</text>
+          <!-- record / infra (top-left) -->
+          <circle cx="120" cy="70" r="5" fill="#6A82A0"/><text class="co" x="120" y="58" text-anchor="middle">Waystar</text>
+          <circle cx="185" cy="85" r="5" fill="#6A82A0"/><text class="co" x="185" y="73" text-anchor="middle">athenahealth</text>
+          <circle cx="235" cy="65" r="5" fill="#6A82A0"/><text class="co" x="235" y="53" text-anchor="middle">Experian Hlth</text>
+          <!-- analytics / payer intel (bottom mid) -->
+          <circle cx="255" cy="330" r="5" fill="#6A82A0"/><text class="co" x="255" y="346" text-anchor="middle">Anomaly · Rivet</text>
+          <circle cx="300" cy="355" r="5" fill="#6A82A0"/><text class="co" x="300" y="371" text-anchor="middle">Cohere (payer PA)</text>
+        </g>
+      </svg>
+      </div>
+      <div>
+        <div class="card card--accent" style="margin-bottom:14px;">
+          <h3 style="color:var(--teal);">Our differentiation</h3>
+          <p style="font-size:14px;color:var(--ink-soft);">Cross-channel revenue recovery <strong>orchestration</strong> — selecting and executing the best action across <strong>EDI, API, FHIR, portal, voice and humans</strong>.</p>
+        </div>
+        <div class="card">
+          <h3>Competitors focus on a slice</h3>
+          <ul class="clean muted-dots" style="gap:6px;font-size:12.5px;">
+            <li><span class="muted">System of record / infra:</span> Waystar, athenahealth, Experian</li>
+            <li><span class="muted">Voice automation:</span> Infinitus, SuperDial, Prosper AI</li>
+            <li><span class="muted">Autonomous coding:</span> Fathom, CodaMetrix, Nym, AKASA</li>
+            <li><span class="muted">Broad RCM AI:</span> Adonis, Candid, QuickIntell</li>
+            <li><span class="muted">Payer intel / prior auth:</span> Anomaly, Rivet, Cohere</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <p class="note">Positioning reflects each company's public framing as of mid-2026; placement is illustrative, not a claim about specific missing features. Sources: company sites &amp; trade press (FierceHealthcare, MobiHealthNews, HIT Consultant).</p>
+  </div>
+  <div class="ghostnum">18</div>
+</section>
+
+<!-- ============ SLIDE 19 — WHY WE WIN ============ -->
+<section class="slide" id="s19">
+  <div class="slide__meta"><span class="brand"><span class="dot"></span> AI Revenue Recovery OS</span><span class="slide__num">19 · Defensibility</span></div>
+  <div class="slide-inner">
+    <div class="kicker">Why We Win</div>
+    <h2 class="head">Five layers of <span class="accent">defensibility</span></h2>
+    <div class="grid" style="grid-template-columns:repeat(5,1fr);gap:14px;margin:26px 0 24px;">
+      <div class="card"><div class="stat plain" style="margin-bottom:8px;"><div class="n" style="font-size:24px;color:var(--teal);">01</div></div><h3 style="font-size:15px;">Payer intelligence</h3><p>Operational knowledge of payer workflows &amp; behavior.</p></div>
+      <div class="card"><div class="stat plain" style="margin-bottom:8px;"><div class="n" style="font-size:24px;color:var(--teal);">02</div></div><h3 style="font-size:15px;">Cross-channel orchestration</h3><p>EDI + API + FHIR + portal + voice + humans.</p></div>
+      <div class="card"><div class="stat plain" style="margin-bottom:8px;"><div class="n" style="font-size:24px;color:var(--teal);">03</div></div><h3 style="font-size:15px;">Workflow intelligence</h3><p>Understanding what should happen next.</p></div>
+      <div class="card"><div class="stat plain" style="margin-bottom:8px;"><div class="n" style="font-size:24px;color:var(--teal);">04</div></div><h3 style="font-size:15px;">Outcome data</h3><p>Recovery outcomes improve future decisions.</p></div>
+      <div class="card"><div class="stat plain" style="margin-bottom:8px;"><div class="n" style="font-size:24px;color:var(--teal);">05</div></div><h3 style="font-size:15px;">Integration depth</h3><p>Deep RCM-workflow integration → switching costs.</p></div>
+    </div>
+    <div class="pullquote" style="max-width:94ch;">
+      The moat is <span class="accent">workflow intelligence, payer intelligence, integrations and outcome data</span> — not the underlying language model.
+    </div>
+  </div>
+  <div class="ghostnum">19</div>
+</section>
+
+<!-- ============ SLIDE 20 — CUSTOMER ============ -->
+<section class="slide" id="s20">
+  <div class="slide__meta"><span class="brand"><span class="dot"></span> AI Revenue Recovery OS</span><span class="slide__num">20 · Customer</span></div>
+  <div class="slide-inner">
+    <div class="kicker">Who We Sell To</div>
+    <h2 class="head">Start where the <span class="accent">ROI is measurable</span></h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:22px 0;">
+      <div class="card card--accent">
+        <div class="tag tag--teal" style="margin-bottom:14px;">Primary beachhead</div>
+        <h3 style="font-size:19px;">Medical Billing / RCM / BPO Companies</h3>
+        <ul class="clean" style="margin-top:12px;gap:7px;">
+          <li>Large, repetitive workloads</li>
+          <li>Direct labor economics</li>
+          <li>Clear AR pain &amp; measurable ROI</li>
+          <li>Existing operational maturity &amp; KPIs</li>
+          <li>Faster pilot environments</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="tag" style="margin-bottom:14px;">Secondary</div>
+        <h3 style="font-size:19px;">Provider organizations</h3>
+        <ul class="clean muted-dots" style="margin-top:12px;gap:7px;">
+          <li>Physician groups</li>
+          <li>Specialty practices</li>
+          <li>Hospitals</li>
+          <li>Health systems &amp; ambulatory orgs</li>
+        </ul>
+      </div>
+    </div>
+    <div class="eyebrow" style="margin-bottom:12px;">Expansion path</div>
+    <div class="flowline">
+      <span class="node" style="border-color:rgba(49,225,196,.4);color:var(--teal);">RCM / BPO</span><span class="arrow">→</span>
+      <span class="node">Provider organizations</span><span class="arrow">→</span>
+      <span class="node">Health systems</span>
+    </div>
+  </div>
+  <div class="ghostnum">20</div>
+</section>
+
+<!-- ============ SLIDE 21 — BEACHHEAD ============ -->
+<section class="slide" id="s21">
+  <div class="slide__meta"><span class="brand"><span class="dot"></span> AI Revenue Recovery OS</span><span class="slide__num">21 · Beachhead</span></div>
+  <div class="slide-inner">
+    <div class="kicker">The Wedge</div>
+    <h2 class="head">Start with <span class="accent">AI Claim Status + AR Follow-up</span></h2>
+    <p class="lead" style="margin-bottom:24px;">The single highest-volume, most repetitive, most measurable workflow — and it doesn't require ripping out the core RCM system.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1.4fr;gap:28px;align-items:center;">
+      <div class="card">
+        <h3>Why this workflow</h3>
+        <ul class="clean" style="gap:7px;">
+          <li>High volume &amp; repetitive</li>
+          <li>Measurable, clear ROI</li>
+          <li>Human-heavy today</li>
+          <li>Well-suited to automation</li>
+          <li>No core-system replacement required</li>
+        </ul>
+      </div>
+      <div>
+        <div class="eyebrow" style="margin-bottom:12px;">The first product does eight things well</div>
+        <div class="flowline">
+          <span class="node">1 · Ingest AR queue</span><span class="arrow">→</span>
+          <span class="node">2 · Prioritize claims</span><span class="arrow">→</span>
+          <span class="node">3 · Check EDI / API / portal</span><span class="arrow">→</span>
+          <span class="node">4 · Call payer if required</span>
+        </div>
+        <div class="flowline" style="margin-top:10px;">
+          <span class="node">5 · Capture structured result</span><span class="arrow">→</span>
+          <span class="node">6 · Update workflow</span><span class="arrow">→</span>
+          <span class="node">7 · Schedule follow-up</span><span class="arrow">→</span>
+          <span class="node" style="border-color:rgba(155,140,255,.4);color:var(--violet);">8 · Escalate exceptions</span>
+        </div>
+        <div class="pullquote" style="margin-top:22px;">Win the queue everyone hates. <span class="accent">Then expand.</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="ghostnum">21</div>
+</section>
+
+<!-- ============ SLIDE 22 — PRODUCT ROADMAP ============ -->
+<section class="slide" id="s22">
+  <div class="slide__meta"><span class="brand"><span class="dot"></span> AI Revenue Recovery OS</span><span class="slide__num">22 · Roadmap</span></div>
+  <div class="slide-inner">
+    <div class="kicker">Product Roadmap</div>
+    <h2 class="head">From a workflow to an <span class="accent">operating system</span></h2>
+    <div class="svgwrap" style="margin-top:20px;">
+    <svg viewBox="0 0 1145 320" width="1145" height="320" role="img" aria-label="Seven-phase roadmap staircase of increasing platform depth">
+      <style>
+        .ph{fill:#EAF1F9;font-family:var(--font);font-weight:700;font-size:13px;}
+        .phs{fill:#8AA0BC;font-family:var(--font);font-size:11px;}
+        .pn{fill:#31E1C4;font-family:var(--mono);font-size:11px;font-weight:700;}
+      </style>
+      <!-- staircase: 7 steps rising -->
+      <!-- each step a rounded rect -->
+      <g>
+        <rect x="20"  y="250" width="150" height="52" rx="8" fill="#0F2138" stroke="#274a72"/><text class="pn" x="34" y="270">P1</text><text class="ph" x="34" y="288" font-size="12">AI AR + Status</text>
+        <rect x="180" y="212" width="150" height="90" rx="8" fill="#0F2138" stroke="#274a72"/><text class="pn" x="194" y="232">P2</text><text class="ph" x="194" y="250" font-size="12">Portal + EDI /</text><text class="ph" x="194" y="265" font-size="12">API / FHIR</text>
+        <rect x="340" y="174" width="150" height="128" rx="8" fill="#0F2138" stroke="#274a72"/><text class="pn" x="354" y="194">P3</text><text class="ph" x="354" y="212" font-size="12">Denial</text><text class="ph" x="354" y="227" font-size="12">Intelligence</text>
+        <rect x="500" y="136" width="150" height="166" rx="8" fill="#0F2138" stroke="#31507a"/><text class="pn" x="514" y="156">P4</text><text class="ph" x="514" y="174" font-size="12">Appeal</text><text class="ph" x="514" y="189" font-size="12">Automation</text>
+        <rect x="660" y="98" width="150" height="204" rx="8" fill="#0E2436" stroke="#2f7a8c"/><text class="pn" x="674" y="118">P5</text><text class="ph" x="674" y="136" font-size="12">Payment &amp;</text><text class="ph" x="674" y="151" font-size="12">Underpayment</text>
+        <rect x="820" y="60" width="150" height="242" rx="8" fill="#0E2834" stroke="#1FBFA6"/><text class="pn" x="834" y="80">P6</text><text class="ph" x="834" y="98" font-size="12">Pre-claim</text><text class="ph" x="834" y="113" font-size="12">Revenue Risk</text>
+        <rect x="980" y="22" width="150" height="280" rx="8" fill="rgba(49,225,196,.14)" stroke="#31E1C4" stroke-width="1.5"/><text class="pn" x="994" y="42">P7</text><text class="ph" x="994" y="60" font-size="12" fill="#31E1C4">Autonomous</text><text class="ph" x="994" y="75" font-size="12" fill="#31E1C4">Recovery OS</text>
+      </g>
+      <text x="575" y="316" text-anchor="middle" class="phs">Increasing platform depth  →</text>
+    </svg>
+    </div>
+  </div>
+  <div class="ghostnum">22</div>
+</section>
+
+<!-- ============ SLIDE 23 — BUSINESS MODEL ============ -->
+<section class="slide" id="s23">
+  <div class="slide__meta"><span class="brand"><span class="dot"></span> AI Revenue Recovery OS</span><span class="slide__num">23 · Business Model</span></div>
+  <div class="slide-inner">
+    <div class="kicker">Business Model</div>
+    <h2 class="head">Priced on <span class="accent">operational value</span> — not AI minutes</h2>
+    <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:26px;margin:22px 0;">
+      <div>
+        <div class="eyebrow" style="margin-bottom:12px;">Primary — Platform + Usage</div>
+        <div class="grid" style="grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="card" style="padding:18px;"><h3 style="font-size:15px;">Platform subscription</h3><p>Base access, workflow engine, security.</p></div>
+          <div class="card" style="padding:18px;"><h3 style="font-size:15px;">Per workflow / claim</h3><p>Usage-based automation of worked claims.</p></div>
+          <div class="card" style="padding:18px;"><h3 style="font-size:15px;">AI voice usage</h3><p>Metered where voice is actually invoked.</p></div>
+          <div class="card" style="padding:18px;"><h3 style="font-size:15px;">Enterprise integrations</h3><p>Deep EHR / RCM / clearinghouse connectivity.</p></div>
+        </div>
+      </div>
+      <div>
+        <div class="card card--accent" style="margin-bottom:14px;">
+          <div class="tag tag--teal" style="margin-bottom:10px;">Optional</div>
+          <h3 style="color:var(--teal);">Performance model</h3>
+          <p>Recovery-based pricing for selected workflows — aligning our upside with recovered dollars.</p>
+        </div>
+        <div class="card" style="padding:18px;">
+          <h3 style="font-size:15px;">Premium analytics &amp; security</h3>
+          <p>Advanced reporting, audit, and governance tiers.</p>
+        </div>
+      </div>
+    </div>
+    <div class="pullquote">We monetize against <span class="accent">operational value and recovered revenue</span> — not AI minutes.</div>
+    <p class="note"><b>Illustrative</b> — pricing structures shown are directional and to be validated through pilots; no numbers here are final.</p>
+  </div>
+  <div class="ghostnum">23</div>
+</section>
+
+<!-- ============ SLIDE 24 — ROI ============ -->
+<section class="slide" id="s24">
+  <div class="slide__meta"><span class="brand"><span class="dot"></span> AI Revenue Recovery OS</span><span class="slide__num">24 · ROI</span></div>
+  <div class="slide-inner">
+    <div class="kicker">Illustrative ROI</div>
+    <h2 class="head">The economics of an <span class="accent">AI-augmented AR team</span></h2>
+    <p class="note" style="margin:0 0 18px;color:var(--amber);"><b>Illustrative scenario — not actual customer results.</b> Inputs are assumptions to be validated in pilot.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:26px;">
+      <div class="card">
+        <div class="eyebrow" style="margin-bottom:14px;">Model inputs (assumed)</div>
+        <table style="width:100%;border-collapse:collapse;font-size:13.5px;">
+          <tbody>
+            <tr style="border-bottom:1px solid var(--line-soft);"><td style="padding:9px 0;color:var(--muted);">AR team size</td><td style="text-align:right;color:#fff;font-weight:650;">25 FTEs</td></tr>
+            <tr style="border-bottom:1px solid var(--line-soft);"><td style="padding:9px 0;color:var(--muted);">Claims worked / FTE / day</td><td style="text-align:right;color:#fff;font-weight:650;">40</td></tr>
+            <tr style="border-bottom:1px solid var(--line-soft);"><td style="padding:9px 0;color:var(--muted);">Monthly claim volume</td><td style="text-align:right;color:#fff;font-weight:650;">~22,000</td></tr>
+            <tr style="border-bottom:1px solid var(--line-soft);"><td style="padding:9px 0;color:var(--muted);">Eligible for automation</td><td style="text-align:right;color:#fff;font-weight:650;">60%</td></tr>
+            <tr><td style="padding:9px 0;color:var(--muted);">Human intervention rate</td><td style="text-align:right;color:#fff;font-weight:650;">20%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card card--accent">
+        <div class="eyebrow" style="margin-bottom:14px;color:var(--teal);">Illustrative outcomes</div>
+        <div class="grid" style="grid-template-columns:1fr 1fr;gap:18px;">
+          <div class="stat"><div class="n">~48%</div><div class="l">automation rate on eligible claims</div></div>
+          <div class="stat"><div class="n">2–3×</div><div class="l">effective throughput per FTE</div></div>
+          <div class="stat"><div class="n">↓ cost</div><div class="l">lower cost per claim worked</div></div>
+          <div class="stat"><div class="n">faster</div><div class="l">reduced days in AR</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:20px;">
+      <span class="eyebrow" style="width:100%;margin-bottom:2px;">KPIs we hold ourselves to</span>
+      <span class="chip">Claims worked / day</span><span class="chip">Cost per claim</span><span class="chip">Automation rate</span>
+      <span class="chip">Human intervention rate</span><span class="chip">Avg resolution time</span><span class="chip">Denial overturn rate</span>
+      <span class="chip">Days in AR</span><span class="chip">Underpayment recovery</span><span class="chip">Recovered dollars</span>
+    </div>
+  </div>
+  <div class="ghostnum">24</div>
+</section>
+
+<!-- ============ SLIDE 25 — GO-TO-MARKET ============ -->
+<section class="slide" id="s25">
+  <div class="slide__meta"><span class="brand"><span class="dot"></span> AI Revenue Recovery OS</span><span class="slide__num">25 · Go-to-Market</span></div>
+  <div class="slide-inner">
+    <div class="kicker">Go-to-Market</div>
+    <h2 class="head">Land narrow. <span class="accent">Expand across the revenue cycle.</span></h2>
+    <div class="svgwrap" style="margin-top:20px;">
+    <svg viewBox="0 0 1120 260" width="1120" height="260" role="img" aria-label="Seven-stage land and expand go-to-market">
+      <defs>
+        <linearGradient id="gtm" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3B93E6"/><stop offset="1" stop-color="#31E1C4"/></linearGradient>
+        <marker id="agtm" markerWidth="10" markerHeight="10" refX="6" refY="5" orient="auto"><path d="M0,0 L8,5 L0,10 Z" fill="#1FBFA6"/></marker>
+      </defs>
+      <line x1="40" y1="130" x2="1080" y2="130" stroke="url(#gtm)" stroke-width="2.5" marker-end="url(#agtm)" opacity=".6"/>
+      <style>.st{fill:#EAF1F9;font-family:var(--font);font-weight:650;font-size:12px;} .stn{fill:#31E1C4;font-family:var(--mono);font-size:11px;font-weight:700;} .std{fill:#8AA0BC;font-size:10.5px;font-family:var(--font);}</style>
+      <g text-anchor="middle">
+        <!-- alternating above/below -->
+        <circle cx="90" cy="130" r="6" fill="#31E1C4"/><text class="stn" x="90" y="72">1</text><text class="st" x="90" y="90">Founder-led sales</text><text class="std" x="90" y="105">to RCM / BPO ops</text>
+        <circle cx="245" cy="130" r="6" fill="#31E1C4"/><text class="stn" x="245" y="165">2</text><text class="st" x="245" y="183">Design-partner</text><text class="std" x="245" y="198">pilots</text>
+        <circle cx="400" cy="130" r="6" fill="#31E1C4"/><text class="stn" x="400" y="72">3</text><text class="st" x="400" y="90">Prove ROI</text>
+        <circle cx="555" cy="130" r="6" fill="#31E1C4"/><text class="stn" x="555" y="165">4</text><text class="st" x="555" y="183">Case studies</text>
+        <circle cx="710" cy="130" r="6" fill="#31E1C4"/><text class="stn" x="710" y="72">5</text><text class="st" x="710" y="90">Expand across AR</text>
+        <circle cx="865" cy="130" r="6" fill="#31E1C4"/><text class="stn" x="865" y="165">6</text><text class="st" x="865" y="183">Cross-sell denial,</text><text class="std" x="865" y="198">appeals, payments</text>
+        <circle cx="1020" cy="130" r="7" fill="#31E1C4" stroke="#fff" stroke-width="1.3"/><text class="stn" x="1020" y="72">7</text><text class="st" x="1020" y="90" fill="#31E1C4">Provider &amp;</text><text class="st" x="1020" y="105" fill="#31E1C4">health system</text>
+      </g>
+    </svg>
+    </div>
+    <div class="pullquote" style="margin-top:14px;">A land-and-expand motion: <span class="accent">one workflow in, the whole revenue cycle over time.</span></div>
+  </div>
+  <div class="ghostnum">25</div>
+</section>
+
+<!-- ============ SLIDE 26 — 90-DAY PILOT ============ -->
+<section class="slide" id="s26">
+  <div class="slide__meta"><span class="brand"><span class="dot"></span> AI Revenue Recovery OS</span><span class="slide__num">26 · Pilot</span></div>
+  <div class="slide-inner">
+    <div class="kicker">The 90-Day Pilot</div>
+    <h2 class="head">Narrow, measurable, <span class="accent">ROI-validated</span></h2>
+    <div class="grid" style="grid-template-columns:repeat(3,1fr);gap:16px;margin:24px 0;">
+      <div class="card">
+        <div class="tag tag--teal" style="margin-bottom:12px;">Days 0–30</div>
+        <h3 style="font-size:15px;">Foundation</h3>
+        <ul class="clean" style="gap:6px;margin-top:8px;">
+          <li>Workflow discovery</li>
+          <li>Integration</li>
+          <li>Security review</li>
+          <li>Baseline metrics</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="tag" style="margin-bottom:12px;color:var(--cyan);border-color:rgba(90,184,255,.4);">Days 31–60</div>
+        <h3 style="font-size:15px;">Controlled deployment</h3>
+        <ul class="clean" style="gap:6px;margin-top:8px;">
+          <li>AI AR live on a scoped queue</li>
+          <li>Human-in-the-loop review</li>
+          <li>Confidence &amp; accuracy tuning</li>
+        </ul>
+      </div>
+      <div class="card card--accent">
+        <div class="tag tag--teal" style="margin-bottom:12px;">Days 61–90</div>
+        <h3 style="font-size:15px;">Scale &amp; validate</h3>
+        <ul class="clean" style="gap:6px;margin-top:8px;">
+          <li>Scale volume</li>
+          <li>Measure &amp; optimize</li>
+          <li>ROI validation</li>
+        </ul>
+      </div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;">
+      <span class="eyebrow" style="width:100%;margin-bottom:2px;">Success metrics — agreed up front</span>
+      <span class="chip">Automation %</span><span class="chip">Accuracy %</span><span class="chip">Human escalation %</span>
+      <span class="chip">Claims processed</span><span class="chip">Resolution rate</span><span class="chip">Avg resolution time</span>
+      <span class="chip">Recovered dollars</span><span class="chip">Cost savings</span>
+    </div>
+  </div>
+  <div class="ghostnum">26</div>
+</section>
+
+<!-- ============ SLIDE 27 — TECHNOLOGY ARCHITECTURE ============ -->
+<section class="slide" id="s27">
+  <div class="slide__meta"><span class="brand"><span class="dot"></span> AI Revenue Recovery OS</span><span class="slide__num">27 · Architecture</span></div>
+  <div class="slide-inner">
+    <div class="kicker">Technology Architecture</div>
+    <h2 class="head">Production-grade, <span class="accent">governed by design</span></h2>
+    <div class="svgwrap" style="margin-top:16px;">
+    <svg viewBox="0 0 1120 420" width="1120" height="420" role="img" aria-label="Layered production architecture from customer systems to integration, event bus, AI decision engine, policy engine and human oversight">
+      <defs><marker id="a27" markerWidth="9" markerHeight="9" refX="6" refY="4.5" orient="auto"><path d="M0,0 L7,4.5 L0,9 Z" fill="#33507a"/></marker></defs>
+      <style>
+        .L{fill:#0F2138;stroke:#1E3A5F;stroke-width:1.1;} .La{fill:#0E2834;stroke:#31E1C4;stroke-width:1.3;}
+        .Lv{fill:#12122a;stroke:#9B8CFF;stroke-width:1.2;}
+        .Lt{fill:#EAF1F9;font-size:13px;font-weight:650;font-family:var(--font);}
+        .Ls{fill:#8AA0BC;font-size:10.5px;font-family:var(--font);}
+        .Lm{fill:#5AB8FF;font-size:11px;font-weight:700;font-family:var(--mono);}
+        .Lc{stroke:#33507a;stroke-width:1.3;fill:none;marker-end:url(#a27);}
+        .lay{fill:#5C7ba3;font-size:10px;font-family:var(--mono);letter-spacing:.1em;}
+      </style>
+      <!-- layer bands -->
+      <text class="lay" x="20" y="34">SOURCE</text>
+      <rect class="L" x="120" y="16" width="880" height="40" rx="8"/><text class="Lt" x="560" y="41" text-anchor="middle">Customer Systems — EHR / PM / RCM / Clearinghouse</text>
+      <path class="Lc" d="M560,56 L560,70"/>
+      <text class="lay" x="20" y="94">INGEST</text>
+      <rect class="L" x="120" y="72" width="880" height="46" rx="8"/><text class="Lt" x="560" y="92" text-anchor="middle">Integration Layer</text>
+      <text class="Lm" x="560" y="109" text-anchor="middle">EDI · FHIR · REST · Portal Automation · Voice</text>
+      <path class="Lc" d="M560,118 L560,132"/>
+      <text class="lay" x="20" y="154">ORCHESTRATE</text>
+      <rect class="L" x="120" y="134" width="880" height="44" rx="8"/><text class="Lt" x="560" y="161" text-anchor="middle">Event Bus / Workflow Engine</text>
+      <path class="Lc" d="M560,178 L560,192"/>
+      <text class="lay" x="20" y="220">REASON</text>
+      <rect class="La" x="120" y="194" width="430" height="70" rx="8"/><text class="Lt" x="335" y="222" text-anchor="middle" fill="#31E1C4">AI Decision Engine</text><text class="Ls" x="335" y="240" text-anchor="middle">risk · claim · AR · denial · payer models</text>
+      <rect class="L" x="570" y="194" width="430" height="70" rx="8"/><text class="Lt" x="785" y="222" text-anchor="middle">Rules + Policy Engine</text><text class="Ls" x="785" y="240" text-anchor="middle">confidence thresholds · guardrails · approvals</text>
+      <path class="Lc" d="M335,264 L335,278"/><path class="Lc" d="M785,264 L785,278"/>
+      <text class="lay" x="20" y="300">EXECUTE</text>
+      <rect class="L" x="120" y="280" width="880" height="46" rx="8"/><text class="Lt" x="560" y="300" text-anchor="middle">Action Orchestrator → AI Workforce</text><text class="Ls" x="560" y="316" text-anchor="middle">selects channel · executes · captures evidence · validates</text>
+      <path class="Lc" d="M560,326 L560,340"/>
+      <!-- governance + human oversight side rail -->
+      <rect class="Lv" x="120" y="342" width="560" height="60" rx="8"/><text class="Lt" x="400" y="368" text-anchor="middle" fill="#9B8CFF">Human Exception &amp; Oversight</text><text class="Ls" x="400" y="385" text-anchor="middle">escalation on low confidence, high value, sensitivity</text>
+      <rect class="L" x="700" y="342" width="300" height="60" rx="8" stroke="#2f7a8c"/><text class="Lt" x="850" y="362" text-anchor="middle">Security &amp; Compliance</text><text class="Ls" x="850" y="380" text-anchor="middle">tenant isolation · audit trail · HIPAA-aligned governance</text>
+    </svg>
+    </div>
+    <p class="note">Every automated action carries a confidence score, an evidence trail and a policy gate — with human oversight and tenant-isolated, HIPAA-aligned data governance throughout.</p>
+  </div>
+  <div class="ghostnum">27</div>
+</section>
+
+<!-- ============ SLIDE 28 — CLOSING ============ -->
+<section class="slide" id="s28" style="justify-content:center;">
+  <div class="slide__meta"><span class="brand"><span class="dot"></span> AI Revenue Recovery OS</span><span class="slide__num">Thank You</span></div>
+  <div class="slide-inner" style="text-align:center;">
+    <div class="kicker" style="justify-content:center;">The Intelligence &amp; Execution Layer</div>
+    <h2 class="head" style="font-size:46px;">Existing RCM software <span class="muted">manages</span> the revenue cycle.<br/>AI Revenue Recovery OS <span class="accent">actively works it.</span></h2>
+    <div style="font-size:18px;font-weight:600;letter-spacing:.02em;margin:28px 0 10px;">
+      <span class="teal">Predict.</span> <span class="cyan">Prevent.</span> <span style="color:#fff;">Work.</span> <span class="teal">Resolve.</span> <span class="cyan">Recover.</span>
+    </div>
+    <p class="subhead" style="margin:0 auto;text-align:center;">The intelligence and execution layer for autonomous healthcare revenue recovery.</p>
+  </div>
+</section>
+
+</main>
+
+<script>
+(function(){
+  var slides=[].slice.call(document.querySelectorAll('.slide'));
+  var dotnav=document.getElementById('dotnav');
+  var progress=document.getElementById('progress');
+  slides.forEach(function(s,i){
+    var b=document.createElement('button');
+    b.title='Slide '+(i+1);
+    b.addEventListener('click',function(){s.scrollIntoView({behavior:'smooth'});});
+    dotnav.appendChild(b);
+  });
+  var dots=[].slice.call(dotnav.children);
+  function onScroll(){
+    var y=window.scrollY, h=document.body.scrollHeight-window.innerHeight;
+    progress.style.width=(h>0?(y/h*100):0)+'%';
+    var idx=0,center=y+window.innerHeight/2;
+    slides.forEach(function(s,i){ if(s.offsetTop<=center) idx=i; });
+    dots.forEach(function(d,i){ d.classList.toggle('active',i===idx); });
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  window.addEventListener('resize',onScroll);
+  onScroll();
+  function go(dir){
+    var y=window.scrollY+window.innerHeight/2,cur=0;
+    slides.forEach(function(s,i){ if(s.offsetTop<=y) cur=i; });
+    var next=Math.max(0,Math.min(slides.length-1,cur+dir));
+    slides[next].scrollIntoView({behavior:'smooth'});
+  }
+  document.addEventListener('keydown',function(e){
+    if(e.key==='ArrowDown'||e.key==='PageDown'||e.key==='j'||e.key==='J'||(e.key===' '&&!e.shiftKey)){e.preventDefault();go(1);}
+    else if(e.key==='ArrowUp'||e.key==='PageUp'||e.key==='k'||e.key==='K'){e.preventDefault();go(-1);}
+    else if(e.key==='Home'){e.preventDefault();slides[0].scrollIntoView({behavior:'smooth'});}
+    else if(e.key==='End'){e.preventDefault();slides[slides.length-1].scrollIntoView({behavior:'smooth'});}
+  });
+})();
+</script>
+</body>
+</html>
