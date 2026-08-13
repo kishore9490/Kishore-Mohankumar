@@ -1,6 +1,6 @@
 # AI Revenue Recovery OS — Investor Pitch Deck
 
-A self-contained, 28-slide investor pitch deck for **AI Revenue Recovery OS** — the
+A self-contained, 22-slide investor pitch deck for **AI Revenue Recovery OS** — the
 intelligence and execution layer for autonomous healthcare revenue cycle management (RCM).
 
 ## View it
@@ -14,14 +14,16 @@ JavaScript and diagrams are inline and self-contained.
 
 ## Slides
 
-1. Cover · 2. The Problem · 3. The Current RCM Machine · 4. The Human Bottleneck ·
-5. Why Existing Software Isn't Enough · 6. Why Now · 7. The 2026–2027 Interoperability
-Inflection · 8. The Solution (architecture) · 9. How One Claim Is Worked · 10. AI AR
-Workforce · 11. AI Payer Calling · 12. Revenue Risk Engine · 13. Denial Intelligence ·
-14. Payer Intelligence Graph · 15. The Platform Loop · 16. Market Opportunity · 17. AI
-RCM Market Growth · 18. Competitive Landscape · 19. Why We Win · 20. Customer ·
-21. Beachhead · 22. Product Roadmap · 23. Business Model · 24. ROI · 25. Go-to-Market ·
-26. 90-Day Pilot · 27. Technology Architecture · 28. Closing
+1. Cover · 2. The Problem · 3. The Status Quo *(RCM machine + human bottleneck)* ·
+4. Why Existing Software Isn't Enough · 5. Why Now · 6. The 2026–2027 Interoperability
+Inflection · 7. The Solution (architecture) · 8. How One Claim Is Worked · 9. AI AR
+Workforce · 10. AI Payer Calling · 11. Intelligence Engines *(Revenue Risk + Denial)* ·
+12. Payer Intelligence Graph · 13. The Platform Loop · 14. Market *(opportunity +
+growth)* · 15. Competitive Landscape · 16. Why We Win · 17. Customer & Beachhead ·
+18. Product Roadmap · 19. Business Model & ROI · 20. Go-to-Market & Pilot ·
+21. Technology Architecture · 22. Closing
+
+*Compressed from an earlier 28-slide cut by merging six related pairs (marked above).*
 
 ## Sourcing & accuracy notes
 
