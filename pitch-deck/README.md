@@ -3,6 +3,17 @@
 A self-contained, 22-slide investor pitch deck for **AI Revenue Recovery OS** — the
 intelligence and execution layer for autonomous healthcare revenue cycle management (RCM).
 
+## Files
+
+- **`index.html`** — the interactive source deck (navigable, self-contained)
+- **`AI-Revenue-Recovery-OS-Deck.pptx`** — PowerPoint export, one slide per page
+- **`AI-Revenue-Recovery-OS-Deck.pdf`** — PDF export, one slide per page
+
+The PPTX and PDF are rendered from the HTML at 2× resolution (2560×1800 px per slide),
+so they match the web deck pixel-for-pixel. To regenerate them after editing
+`index.html`, re-run the capture-and-build steps (Playwright screenshots → Pillow for
+PDF, python-pptx for PPTX).
+
 ## View it
 
 Open `index.html` in any modern browser. No build step, no dependencies — all CSS,
