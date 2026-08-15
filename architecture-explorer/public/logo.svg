@@ -1,0 +1,15 @@
+<!--
+  PLACEHOLDER MARK — NOT THE AUTHORITATIVE BID TRUST LOGO.
+
+  The official logo was referenced as an attachment but did not arrive with the
+  brief, so this stands in. It follows the established brand direction only:
+  navy ground, green verification check.
+
+  TO SWAP IN THE REAL LOGO: replace this file's contents with the official SVG
+  (keep the filename). Nothing else needs to change — src/brand/Logo.tsx renders
+  this file everywhere the mark appears.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="BID Trust">
+  <rect width="32" height="32" rx="8" fill="#1DB954"/>
+  <path d="M8.5 16.6 L13.6 21.5 L23.5 10.8" fill="none" stroke="#06220F" stroke-width="3.1" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
