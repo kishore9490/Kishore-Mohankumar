@@ -1,0 +1,16 @@
+key,value,unit,confidence,notes
+payment_gateway_rate,0.020,fraction,ESTIMATE,Blended MDR across cards/UPI/netbanking - negotiate down at volume
+infra_cost_per_verification,8.00,INR,ESTIMATE,Compute + storage + evidence retention amortised per verification
+support_cost_per_verification,25.00,INR,ESTIMATE,Blended support incl. assisted vendor onboarding - HIGH UNCERTAINTY
+ops_review_cost_per_verification,15.00,INR,ESTIMATE,Allocation for exception handling and QA sampling
+reuse_rate_year_1,0.10,fraction,ASSUMPTION,Share of checks served from valid cached results - low while network is sparse
+reuse_rate_year_2,0.35,fraction,ASSUMPTION,Improves with entity density
+reuse_rate_year_3,0.55,fraction,ASSUMPTION,Target at regional density
+target_gross_margin,0.70,fraction,TARGET,Minimum acceptable blended gross margin on consumption lines
+cac_mid_market,250000,INR,ASSUMPTION,Founder-led sales - fully loaded cost per closed mid-market account
+cac_enterprise,900000,INR,ASSUMPTION,Longer cycle - fully loaded cost per closed enterprise account
+monthly_churn_mid_market,0.015,fraction,ASSUMPTION,Logo churn per month
+sales_cycle_days_mid_market,75,days,ASSUMPTION,First contact to signed contract
+sales_cycle_days_enterprise,180,days,ASSUMPTION,First contact to signed contract
+vendor_completion_rate,0.80,fraction,TARGET,Share of invited vendors completing verification within 7 days
+credit_breakage_rate,0.05,fraction,ASSUMPTION,Unused prepaid credits expiring - validate before relying on it

@@ -1,0 +1,31 @@
+check_code,check_name,source_class,provider_cost_inr,internal_cost_inr,failure_retry_rate,cost_confidence,notes
+CORPORATE_IDENTITY,Corporate identity (MCA),S1,15.00,1.00,0.03,PLACEHOLDER,Requires quotation from authorised data provider
+PAN_VERIFICATION,PAN name-match verification,S1,5.00,0.50,0.02,PLACEHOLDER,Requires quotation
+GST_REGISTRATION,GST registration status,S1,8.00,0.50,0.02,PLACEHOLDER,Requires GSP quotation
+GST_FILING_HISTORY,GST filing behaviour,S1,15.00,1.00,0.04,PLACEHOLDER,Availability varies by channel
+UDYAM_REGISTRATION,Udyam / MSME registration,S1,5.00,0.50,0.03,PLACEHOLDER,Requires quotation
+REGISTERED_ADDRESS,Registered address (derived),S1,0.00,1.00,0.01,DERIVED,Derived from MCA/GST responses - no separate call
+BANK_ACCOUNT_OWNERSHIP,Bank account ownership (credit-into-account),S3,8.00,1.00,0.06,PLACEHOLDER,Failure rate driven by name-mismatch reruns
+TURNOVER_VERIFICATION,Turnover corroboration,S2,25.00,8.00,0.10,PLACEHOLDER,May require analyst review
+DIRECTORS,Directors / partners listing,S1,12.00,1.00,0.03,PLACEHOLDER,Requires quotation
+DIRECTOR_DISQUALIFICATION,Director disqualification check,S1,10.00,1.00,0.03,PLACEHOLDER,Requires quotation
+BENEFICIAL_OWNERSHIP,Beneficial ownership analysis,S1,30.00,25.00,0.12,PLACEHOLDER,Analyst time dominates for layered structures
+SANCTIONS_SCREENING,Sanctions screening,S3,6.00,4.00,0.02,PLACEHOLDER,Internal cost includes false-positive disposition
+PEP_SCREENING,PEP screening,S3,6.00,4.00,0.02,PLACEHOLDER,Internal cost includes disposition
+LITIGATION_SCREENING,Litigation / court record screening,S3,45.00,20.00,0.15,PLACEHOLDER,High false-positive rate drives review cost
+ADVERSE_MEDIA,Adverse media screening,S3,25.00,15.00,0.10,PLACEHOLDER,Requires human review
+DOCUMENT_AUTHENTICITY,Document anomaly detection,INTERNAL,2.00,3.00,0.05,ESTIMATE,Mostly internal compute plus review sampling
+ISO_CERT_VERIFICATION,Certification body confirmation,S4,60.00,35.00,0.20,PLACEHOLDER,Semi-manual - issuer response times vary
+PHYSICAL_ADDRESS_VERIFICATION,Physical / field address verification,S5,350.00,50.00,0.12,PLACEHOLDER,Field agent network cost - varies by geography
+IDENTITY_VERIFICATION_PERSON,Individual identity verification,S1,20.00,2.00,0.04,PLACEHOLDER,Compliant document-based route
+ADDRESS_VERIFICATION_DIGITAL,Individual address verification (digital),S3,30.00,3.00,0.06,PLACEHOLDER,Requires quotation
+EPFO_EMPLOYMENT_HISTORY,Statutory employment history (UAN),S1,40.00,5.00,0.08,PLACEHOLDER,Covers formal EPF-covered employment only
+EMPLOYMENT_VERIFICATION,Previous employer confirmation,S5,200.00,60.00,0.25,PLACEHOLDER,Manual - high non-response rate drives cost
+EDUCATION_VERIFICATION,Institution / degree confirmation,S4,250.00,70.00,0.22,PLACEHOLDER,Manual - institutional response times vary
+COURT_RECORD_CHECK,Individual court record check,S3,120.00,40.00,0.18,PLACEHOLDER,Coverage uneven - review required
+PROFESSIONAL_LICENCE,Professional licence verification,S4,80.00,25.00,0.12,PLACEHOLDER,Varies by regulator
+REFERENCE_CHECK,Structured reference check,S5,150.00,60.00,0.30,PLACEHOLDER,Manual - high non-response
+SAFETY_CERTIFICATION,Safety / skill certification check,S4,60.00,20.00,0.15,PLACEHOLDER,Issuer-dependent
+EMPLOYMENT_LINK_CHECK,Worker-to-contractor employment link,S1,40.00,10.00,0.10,PLACEHOLDER,EPFO/ESIC based where available
+MEDICAL_FITNESS,Medical fitness record check,S6,25.00,15.00,0.10,PLACEHOLDER,Document-based
+DIRECTORSHIP_SEARCH,Directorship / interests search,S1,35.00,20.00,0.08,PLACEHOLDER,For executive-level BGV
