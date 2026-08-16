@@ -59,7 +59,7 @@ body{
   display:none;position:relative;
   aspect-ratio:16/9;min-height:520px;
   background:var(--navy-900);border:1px solid var(--line);border-radius:16px;
-  padding:44px 52px;overflow:hidden;
+  padding:38px 48px;overflow:hidden;
   box-shadow:0 30px 70px -30px rgba(0,0,0,.8);
 }
 .slide.active{display:flex;flex-direction:column}
@@ -84,9 +84,9 @@ body{
   font-size:10.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
   color:var(--brand);margin:0 0 12px;
 }
-h2{font-size:clamp(24px,3.1vw,38px);line-height:1.1;letter-spacing:-.022em;font-weight:700;margin:0 0 14px;text-wrap:balance}
+h2{font-size:clamp(23px,2.95vw,35px);line-height:1.1;letter-spacing:-.022em;font-weight:700;margin:0 0 11px;text-wrap:balance}
 h3{font-size:15px;font-weight:700;margin:0 0 8px;letter-spacing:-.01em}
-.sub{font-size:15px;line-height:1.55;color:var(--ink-2);max-width:78ch;margin:0 0 20px}
+.sub{font-size:14.5px;line-height:1.5;color:var(--ink-2);max-width:80ch;margin:0 0 15px}
 .slide.light .sub{color:var(--paper-dim)}
 p{margin:0 0 10px}
 strong{font-weight:700}
@@ -95,7 +95,7 @@ em{font-style:normal;color:var(--brand)}
 
 /* ── layout helpers ──────────────────────────────────────── */
 .body{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center}
-.cols{display:grid;gap:16px}
+.cols{display:grid;gap:13px}
 .c2{grid-template-columns:1fr 1fr}
 .c3{grid-template-columns:repeat(3,1fr)}
 .c4{grid-template-columns:repeat(4,1fr)}
@@ -106,7 +106,7 @@ em{font-style:normal;color:var(--brand)}
 .center{text-align:center}
 
 .card{
-  background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:11px;padding:14px 16px;
+  background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:11px;padding:12px 14px;
 }
 .slide.light .card{background:#fff;border-color:var(--paper-line);box-shadow:0 1px 2px rgba(10,42,94,.05)}
 .card.brand{background:rgba(46,155,245,.10);border-color:rgba(46,155,245,.38)}
@@ -148,8 +148,8 @@ ul.plain.v li::before{background:var(--verify)}
 ul.plain.c li::before{background:var(--caution)}
 ul.plain.a li::before{background:var(--adverse)}
 
-table{border-collapse:collapse;width:100%;font-size:12px}
-th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line)}
+table{border-collapse:collapse;width:100%;font-size:11.5px}
+th,td{text-align:left;padding:5.5px 9px;border-bottom:1px solid var(--line)}
 .slide.light th,.slide.light td{border-color:var(--paper-line)}
 th{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);font-weight:700}
 .slide.light th{color:#8296AD}
@@ -209,6 +209,75 @@ td b,th b{color:var(--ink)}
 .prow{display:flex;justify-content:space-between;font-size:11.5px;padding:2.5px 0;color:var(--paper-dim)}
 .prow b{color:#0E7A34;font-weight:600}
 
+/* ── approved BID Digital Card + public profile ─────────────── */
+.bidapp{display:inline-flex;align-items:center;gap:7px}
+.bidwm{display:inline-flex;align-items:flex-end;font-weight:800;letter-spacing:-.02em;line-height:1}
+.bidchk{margin-left:-.14em;flex:none}
+.biddesc{font-size:6.5px;font-weight:700;line-height:1.3;letter-spacing:.02em;opacity:.8}
+
+.nc{border-radius:14px;padding:15px 16px 13px;position:relative;overflow:hidden;
+  background:linear-gradient(150deg,#143257 0%,#0F2440 45%,#0A1B31 100%);
+  box-shadow:0 18px 40px -16px rgba(0,0,0,.8);border:1px solid rgba(255,255,255,.09)}
+.nc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.nc-vb{flex:none;background:#16A34A;color:#fff;border-radius:6px;padding:4px 9px;font-size:8.5px;font-weight:800;letter-spacing:.05em}
+.nc-id{display:flex;align-items:center;gap:11px;margin-top:16px}
+.nc-avatar{width:50px;height:50px;border-radius:50%;background:#fff;display:grid;place-items:center;flex:none}
+.nc-avatar b{color:#0F2440;font-size:16px;letter-spacing:-.02em}
+.nc-name{display:block;font-size:14px;font-weight:800;line-height:1.2;color:#fff}
+.nc-idlbl{display:block;font-size:7.5px;color:rgba(255,255,255,.5);margin-top:6px;letter-spacing:.05em}
+.nc-idval{display:block;font-size:13px;font-weight:800;color:#22C55E;letter-spacing:-.01em}
+.nc-checks{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;margin-top:11px}
+.nc-chk{display:flex;gap:7px;align-items:flex-start}
+.nc-chk i{width:16px;height:16px;border-radius:4px;background:rgba(22,163,74,.18);display:grid;place-items:center;flex:none;margin-top:1px}
+.nc-chk b{display:block;font-size:8.5px;font-weight:500;color:rgba(255,255,255,.82);line-height:1.2}
+.nc-chk s{display:block;text-decoration:none;font-size:9px;font-weight:700;color:#22C55E;line-height:1.25;margin-top:1px}
+.nc-foot{margin-top:11px;padding-top:10px;border-top:1px solid rgba(255,255,255,.12);
+  display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.nc-verified b{display:block;font-size:11.5px;font-weight:800;color:#22C55E;letter-spacing:.02em}
+.nc-verified span{display:block;font-size:7.5px;color:rgba(255,255,255,.6);margin-top:2px}
+.nc-qr{width:46px;height:46px;background:#fff;border-radius:5px;padding:3px;flex:none}
+
+.np{background:#F4F7FA;border:1px solid #DCE5EF;border-radius:11px;overflow:hidden}
+.np-nav{background:#0F2440;padding:7px 11px;display:flex;align-items:center;gap:10px}
+.np-search{flex:1;max-width:150px;background:#fff;border-radius:5px;padding:3.5px 8px;font-size:7.5px;color:#94A3B8}
+.np-links{margin-left:auto;display:flex;gap:9px;font-size:7.5px;color:rgba(255,255,255,.85);align-items:center}
+.np-login{border:1px solid #16A34A;color:#22C55E;border-radius:5px;padding:2.5px 9px;font-weight:600}
+.np-hero{background:linear-gradient(100deg,#0F2440 0%,#143257 55%,#1B4272 100%);padding:12px;display:flex;gap:11px;align-items:flex-start}
+.np-logo{width:44px;height:44px;border-radius:7px;background:#fff;display:grid;place-items:center;flex:none}
+.np-logo b{color:#0F2440;font-size:14px;letter-spacing:-.02em;display:block}
+.np-logo i{display:block;height:2px;width:18px;background:#F59E0B;border-radius:2px;margin:2px auto 0}
+.np-badge{display:inline-flex;align-items:center;gap:4px;background:#16A34A;color:#fff;border-radius:4px;padding:2.5px 7px;font-size:7.5px;font-weight:800;letter-spacing:.04em}
+.np-title{display:flex;font-size:14px;font-weight:800;color:#fff;margin-top:5px;display:flex;align-items:center;gap:6px;line-height:1.2}
+.np-bid{display:block;font-size:8.5px;color:rgba(255,255,255,.85);margin-top:3px}
+.np-meta{display:flex;gap:11px;margin-top:6px;font-size:7px;color:rgba(255,255,255,.72)}
+.np-tabs{display:flex;gap:11px;background:#fff;padding:6px 11px 0;border-bottom:1px solid #E5EAF0;overflow:hidden}
+.np-tab{font-size:7px;font-weight:800;letter-spacing:.05em;color:#8296AD;padding-bottom:6px;border-bottom:1.5px solid transparent;white-space:nowrap}
+.np-tab.on{color:#16A34A;border-color:#16A34A}
+.np-body{display:grid;grid-template-columns:minmax(0,1fr) 132px;gap:7px;padding:7px}
+.np-card{background:#fff;border:1px solid #E5EAF0;border-radius:7px;padding:8px}
+.np-card h5{font-size:9px;font-weight:800;color:#0F2440;margin:0 0 6px}
+.np-sum{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.np-chip{border:1px solid #E5EAF0;border-radius:6px;padding:4px 3px;text-align:center}
+.np-chip i{width:16px;height:16px;border-radius:5px;background:#E8F5ED;display:grid;place-items:center;margin:0 auto 3px}
+.np-chip b{display:block;font-size:7px;font-weight:700;color:#0F2440;line-height:1.2}
+.np-chip s{display:block;text-decoration:none;font-size:6.5px;color:#16A34A;margin-top:1px}
+.np-creds{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.np-cred{border:1px solid #E5EAF0;border-radius:6px;padding:5px}
+.np-cred i{width:15px;height:15px;border-radius:4px;display:grid;place-items:center;margin-bottom:4px}
+.np-cred b{display:block;font-size:7px;font-weight:700;color:#0F2440;line-height:1.2}
+.np-cred span{display:block;font-size:6px;color:#8296AD;margin-top:2px}
+.np-status{align-self:start;background:#fff;border:1px solid #E5EAF0;border-radius:7px;padding:9px}
+.np-status .lbl{font-size:6.5px;font-weight:800;letter-spacing:.07em;color:#0F2440;display:flex;justify-content:space-between;align-items:center}
+.np-verified{display:flex;align-items:center;gap:7px;margin:8px 0}
+.np-verified b{font-size:13px;font-weight:800;color:#16A34A;line-height:1;display:block}
+.np-verified span{font-size:6.5px;color:#5A6E88;display:block;margin-top:3px}
+.np-dates{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:7px}
+.np-dates span{display:block;font-size:6px;color:#8296AD}
+.np-dates b{display:block;font-size:8px;font-weight:800;color:#0F2440}
+.np-active{display:inline-block;background:#E8F5ED;color:#16A34A;border-radius:4px;padding:2px 6px;font-size:6.5px;font-weight:800}
+.np-btn{width:100%;background:#0F2440;color:#fff;border-radius:6px;padding:6px;font-size:7.5px;font-weight:700;text-align:center;margin-top:8px}
+.np-foot{background:#E8F5ED;color:#2F6B47;padding:6px 11px;font-size:7px;display:flex;align-items:center;gap:5px}
+
 /* ── 2x2 matrix ──────────────────────────────────────────── */
 .matrix{position:relative;height:100%;min-height:300px;border-left:1.5px solid var(--line-2);border-bottom:1.5px solid var(--line-2);margin:8px 0 0 8px}
 .matrix .q{position:absolute;font-size:9.5px;color:var(--ink-3);letter-spacing:.1em;text-transform:uppercase}
@@ -229,10 +298,10 @@ body.shownotes .notes{display:block}
 .notes .qa .a{font-size:12.5px;line-height:1.6;color:var(--ink-2);margin:0 0 10px}
 
 /* ── appendix ────────────────────────────────────────────── */
-.hardq{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.hardq .item{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:9px;padding:11px 13px}
-.hardq .q{font-size:11.5px;font-weight:700;color:#F6C46B;margin-bottom:4px}
-.hardq .a{font-size:11px;line-height:1.5;color:var(--ink-2)}
+.hardq{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.hardq .item{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:8px;padding:7px 9px}
+.hardq .q{font-size:10px;font-weight:700;color:#F6C46B;margin-bottom:3px;line-height:1.3}
+.hardq .a{font-size:9px;line-height:1.4;color:var(--ink-2)}
 
 .footnote{font-size:10px;color:var(--ink-3);line-height:1.5;margin-top:10px}
 .footnote a{color:var(--ink-3)}
@@ -794,59 +863,91 @@ body.shownotes .notes{display:block}
 </section>
 
 <!-- ══════════════ 11 · IDENTITY LAYER ══════════════ -->
-<section class="slide light">
+<section class="slide">
   <p class="eyebrow">The visible layer</p>
   <h2>BID ID, Digital Card and public profile.</h2>
-  <p class="sub">The card is not the product. It is the visible surface of the trust infrastructure underneath — and every card shared is a distribution event.</p>
+  <p class="sub" style="margin-bottom:10px">The card is not the product — it is the visible identity layer.</p>
   <div class="body">
-    <div class="cols c3" style="gap:16px;align-items:start">
-      <div class="bidcard">
-        <div style="display:flex;align-items:center;gap:7px">
-          <svg class="bidmark" data-h="18" viewBox="0 0 104 104" width="18" height="18"><path d="M28 24 L84 24 L84 58 C84 79 69 92 56 99 C43 92 28 79 28 58 Z" fill="#DCE6F0"/><path d="M33 29 L79 29 L79 58 C79 76 66 87 56 93 C46 87 33 76 33 58 Z" fill="#0A2148"/><path d="M42 58 L53 70 L96 14" fill="none" stroke="#2E9BF5" stroke-width="12"/></svg>
-          <span style="font-size:9px;font-weight:800;letter-spacing:.2em">BID <span style="color:var(--ink-3)">TRUST</span></span>
+    <div class="cols" style="grid-template-columns:296px 1fr;gap:18px;align-items:start">
+
+      <!-- Digital Card -->
+      <div>
+        <div class="nc">
+          <div class="nc-top"><span class="bidapp"><span class="bidwm" style="font-size:15px;color:#fff">BID<svg class="bidchk" viewBox="0 0 24 24" width="8" height="8"><circle cx="12" cy="12" r="11" fill="#16A34A"/><path d="M6.6 12.3 L10.2 15.8 L17.4 8.4" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="biddesc" style="color:rgba(255,255,255,.78)">BUSINESS IDENTITY &amp;<br>DUE DILIGENCE</span></span><span class="nc-vb">VERIFIED BUSINESS</span></div>
+          <div class="nc-id">
+            <span class="nc-avatar"><b>abc</b></span>
+            <span>
+              <span class="nc-name">ABC Engineering<br>Private Limited</span>
+              <span class="nc-idlbl">BID ID</span>
+              <span class="nc-idval">BID-BUS-100821</span>
+            </span>
+          </div>
+          <div class="nc-checks"><span class="nc-chk"><i><svg viewBox="0 0 24 24" width="9" height="9"><path d="M5 12.5 L10 17.5 L19 6.5" fill="none" stroke="#22C55E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></i><span><b>Legal Identity</b><s>Verified</s></span></span><span class="nc-chk"><i><svg viewBox="0 0 24 24" width="9" height="9"><path d="M5 12.5 L10 17.5 L19 6.5" fill="none" stroke="#22C55E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></i><span><b>GST Status</b><s>Verified</s></span></span><span class="nc-chk"><i><svg viewBox="0 0 24 24" width="9" height="9"><path d="M5 12.5 L10 17.5 L19 6.5" fill="none" stroke="#22C55E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></i><span><b>Bank Ownership</b><s>Verified</s></span></span><span class="nc-chk"><i><svg viewBox="0 0 24 24" width="9" height="9"><path d="M5 12.5 L10 17.5 L19 6.5" fill="none" stroke="#22C55E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></i><span><b>Compliance</b><s>Verified</s></span></span><span class="nc-chk"><i><svg viewBox="0 0 24 24" width="9" height="9"><path d="M5 12.5 L10 17.5 L19 6.5" fill="none" stroke="#22C55E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></i><span><b>Documents</b><s>Verified</s></span></span><span class="nc-chk"><i><svg viewBox="0 0 24 24" width="9" height="9"><path d="M5 12.5 L10 17.5 L19 6.5" fill="none" stroke="#22C55E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></i><span><b>Risk Screening</b><s>Clear</s></span></span></div>
+          <div class="nc-foot">
+            <span>
+              <span style="display:flex;align-items:center;gap:7px"><svg viewBox="0 0 48 48" width="22" height="22" style="flex:none"><path d="M24 3 L42 10 V24 C42 34.5 34.2 42.4 24 45.5 C13.8 42.4 6 34.5 6 24 V10 Z" fill="#16A34A"/><path d="M15.5 24.2 L21.4 30.4 L33 17.6" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span class="nc-verified"><b>BID VERIFIED</b><span>Currently Verified • Valid Till 14 Aug 2027</span></span>
+              </span>
+              <span style="display:block;font-size:7px;color:rgba(255,255,255,.42);margin-top:7px">Verified on: 15 Aug 2026</span>
+            </span>
+            <span class="nc-qr"><svg viewBox="0 0 21 21" width="40" height="40" shape-rendering="crispEdges"><rect width="21" height="21" fill="#fff"/><g fill="#0F2440"><path d="M0 0h7v7H0zM14 0h7v7h-7zM0 14h7v7H0z"/><path d="M1 1h5v5H1zM15 1h5v5h-5zM1 15h5v5H1z" fill="#fff"/><path d="M2 2h3v3H2zM16 2h3v3h-3zM2 16h3v3H2z"/><path d="M9 0h1v1H9zM11 1h1v1h-1zM9 3h2v1H9zM12 4h1v1h-1zM9 5h1v2H9zM11 6h1v1h-1z"/><path d="M0 9h1v1H0zM2 9h2v1H2zM5 10h1v1H5zM1 11h2v1H1zM4 12h1v1H4zM6 9h1v2H6z"/><path d="M14 9h1v1h-1zM16 10h2v1h-2zM19 9h1v2h-1zM15 12h2v1h-2zM18 13h1v1h-1zM20 12h1v2h-1z"/><path d="M9 9h2v2H9zM12 10h1v2h-1zM14 13h2v1h-2zM9 12h1v2H9zM11 14h2v1h-2zM13 16h1v2h-1z"/><path d="M9 16h1v1H9zM11 17h2v1h-2zM15 15h1v2h-1zM17 16h2v1h-2zM9 19h2v1H9zM12 19h1v2h-1z"/><path d="M15 19h2v1h-2zM18 18h1v2h-1zM20 17h1v2h-1z"/></g></svg></span>
+          </div>
         </div>
-        <div class="nm">XYZ HR Consultants</div>
-        <div class="id">BID-BUS-00231</div>
-        <div class="vbadge">
-          <span class="tick"><svg viewBox="0 0 12 12" width="9" height="9"><path d="M1.6 6.2 4.4 8.9 10.4 3.1" fill="none" stroke="#062B12" stroke-width="2.2" stroke-linecap="round"/></svg></span>
-          <span><b style="font-size:11px;letter-spacing:.08em">BID VERIFIED</b><br><span style="font-size:9.5px;color:var(--ink-2)">Level L3 · Corroborated</span></span>
-        </div>
-        <div style="margin-top:11px">
-          <div class="checkrow"><span class="k">Identity</span><span class="v"><i class="dot"></i>Verified</span></div>
-          <div class="checkrow"><span class="k">GST</span><span class="v"><i class="dot"></i>Verified</span></div>
-          <div class="checkrow"><span class="k">Compliance</span><span class="v"><i class="dot"></i>Verified</span></div>
-          <div class="checkrow"><span class="k">Risk</span><span class="v"><i class="dot"></i>Clear</span></div>
-        </div>
-        <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.1);display:flex;justify-content:space-between;align-items:flex-end">
-          <span style="font-size:9px;color:var(--ink-3);line-height:1.6">Verified 15 Aug 2026<br>Valid to 15 Aug 2027<br>bidtrust.in/BID-BUS-00231</span>
-          <span class="qr"><svg viewBox="0 0 12 12" width="30" height="30"><rect width="12" height="12" fill="#fff"/><g fill="#0A2A5E"><rect x="0" y="0" width="4" height="4"/><rect x="1" y="1" width="2" height="2" fill="#fff"/><rect x="8" y="0" width="4" height="4"/><rect x="9" y="1" width="2" height="2" fill="#fff"/><rect x="0" y="8" width="4" height="4"/><rect x="1" y="9" width="2" height="2" fill="#fff"/><rect x="5" y="1" width="1" height="1"/><rect x="6" y="3" width="1" height="1"/><rect x="5" y="5" width="2" height="1"/><rect x="8" y="6" width="1" height="2"/><rect x="10" y="7" width="1" height="1"/><rect x="6" y="9" width="1" height="2"/><rect x="9" y="10" width="2" height="1"/></g></svg></span>
-        </div>
+        <p class="tiny center" style="margin-top:7px">Tap or Scan to Verify</p>
       </div>
 
-      <div class="browser" style="grid-column:span 2">
-        <div class="urlbar"><span style="width:7px;height:7px;border-radius:50%;background:#CBD5E1"></span>bidtrust.in/BID-BUS-00231
-          <span style="margin-left:auto;background:rgba(29,185,84,.1);border:1px solid rgba(29,185,84,.35);color:#0E7A34;border-radius:999px;padding:2px 8px;font-size:9px;font-weight:800;letter-spacing:.08em">BID VERIFIED</span>
+      <!-- Public profile -->
+      <div class="np">
+        <div class="np-nav">
+          <span class="bidapp"><span class="bidwm" style="font-size:13px;color:#fff">BID<svg class="bidchk" viewBox="0 0 24 24" width="7" height="7"><circle cx="12" cy="12" r="11" fill="#16A34A"/><path d="M6.6 12.3 L10.2 15.8 L17.4 8.4" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="biddesc" style="color:rgba(255,255,255,.78)">BUSINESS IDENTITY &amp;<br>DUE DILIGENCE</span></span>
+          <span class="np-search">Search BID ID or Business</span>
+          <span class="np-links"><span>Verify Now</span><span>Solutions</span><span>Resources</span>
+            <span>How BID Works</span><span class="np-login">Login</span></span>
         </div>
-        <div class="panel-v">
-          <p class="plabel" style="color:#0E7A34">BID-Verified Information</p>
-          <p class="tiny" style="margin-bottom:7px">Verified by BID against authoritative sources through authorized channels.</p>
-          <div class="prow"><span>Legal entity</span><b>Verified · 15 Aug 2026</b></div>
-          <div class="prow"><span>GST registration</span><b>Active · 15 Aug 2026</b></div>
-          <div class="prow"><span>Business status</span><b>Active</b></div>
-          <div class="prow"><span>Required certifications</span><b>Verified</b></div>
-          <div class="prow"><span>Verification level / validity</span><b>L3 · valid to 15 Aug 2027</b></div>
+        <div class="np-hero">
+          <span class="np-logo"><b>abc</b><i></i></span>
+          <span style="min-width:0">
+            <span class="np-badge"><svg viewBox="0 0 24 24" width="8" height="8" style="flex:none"><circle cx="12" cy="12" r="11" fill="#16A34A"/><path d="M6.6 12.3 L10.2 15.8 L17.4 8.4" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg> BID VERIFIED BUSINESS</span>
+            <span class="np-title">ABC Engineering Private Limited <svg viewBox="0 0 24 24" width="12" height="12" style="flex:none"><circle cx="12" cy="12" r="11" fill="#16A34A"/><path d="M6.6 12.3 L10.2 15.8 L17.4 8.4" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="np-bid">BID ID: <b>BID-BUS-100821</b></span>
+            <span class="np-meta"><span>◦ Noida, Uttar Pradesh, India</span><span>◦ www.abcepl.com</span>
+              <span>◦ Incorporated: 12 Jan 2016</span></span>
+          </span>
         </div>
-        <div class="panel-c">
-          <p class="plabel" style="color:#8A6A28">Company-Provided Information</p>
-          <p class="tiny" style="margin-bottom:7px">Supplied by the company. Not verified by BID unless individually marked.</p>
-          <p style="font-size:11.5px;color:var(--paper-dim);margin:0">Staffing, recruitment and HR advisory for mid-market technology firms. Established 2014.</p>
+        <div class="np-tabs"><span class="np-tab on">OVERVIEW</span><span class="np-tab">VERIFICATION SUMMARY</span><span class="np-tab">BUSINESS DETAILS</span><span class="np-tab">DOCUMENTS</span><span class="np-tab">RISK &amp; COMPLIANCE</span><span class="np-tab">BID CREDENTIALS</span></div>
+        <div class="np-body">
+          <div style="display:flex;flex-direction:column;gap:8px;min-width:0">
+            <div class="np-card">
+              <h5>Verification Summary</h5>
+              <div class="np-sum"><span class="np-chip"><i><svg viewBox="0 0 24 24" width="9" height="9"><path d="M5 12.5 L10 17.5 L19 6.5" fill="none" stroke="#16A34A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></i><b>Business Identity</b><s>Verified</s></span><span class="np-chip"><i><svg viewBox="0 0 24 24" width="9" height="9"><path d="M5 12.5 L10 17.5 L19 6.5" fill="none" stroke="#16A34A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></i><b>GST Status</b><s>Verified</s></span><span class="np-chip"><i><svg viewBox="0 0 24 24" width="9" height="9"><path d="M5 12.5 L10 17.5 L19 6.5" fill="none" stroke="#16A34A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></i><b>Bank Ownership</b><s>Verified</s></span><span class="np-chip"><i><svg viewBox="0 0 24 24" width="9" height="9"><path d="M5 12.5 L10 17.5 L19 6.5" fill="none" stroke="#16A34A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></i><b>Address Verification</b><s>Verified</s></span><span class="np-chip"><i><svg viewBox="0 0 24 24" width="9" height="9"><path d="M5 12.5 L10 17.5 L19 6.5" fill="none" stroke="#16A34A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></i><b>Compliance</b><s>Verified</s></span><span class="np-chip"><i><svg viewBox="0 0 24 24" width="9" height="9"><path d="M5 12.5 L10 17.5 L19 6.5" fill="none" stroke="#16A34A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></i><b>Risk Screening</b><s>Clear</s></span></div>
+              <p style="font-size:6.5px;color:#5A6E88;margin:6px 0 0;padding-top:5px;border-top:1px solid #E5EAF0">
+                All checks completed as per Standard Supplier Verification Policy v2.1</p>
+            </div>
+            <div class="np-card">
+              <h5>BID Credentials</h5>
+              <div class="np-creds"><span class="np-cred"><i style="background:#E8F5ED"><svg viewBox="0 0 24 24" width="9" height="9"><path d="M5 12.5 L10 17.5 L19 6.5" fill="none" stroke="#16A34A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></i><b>Business Verified</b><span>Level 2</span><span>Valid Till: 14 Aug 2027</span></span><span class="np-cred"><i style="background:#E8F0FE"><svg viewBox="0 0 24 24" width="9" height="9"><path d="M5 12.5 L10 17.5 L19 6.5" fill="none" stroke="#2563EB" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></i><b>Financial Verified</b><span>Level 2</span><span>Valid Till: 14 Aug 2027</span></span><span class="np-cred"><i style="background:#F1EBFD"><svg viewBox="0 0 24 24" width="9" height="9"><path d="M5 12.5 L10 17.5 L19 6.5" fill="none" stroke="#7C3AED" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></i><b>Compliance Verified</b><span>Level 2</span><span>Valid Till: 14 Aug 2027</span></span><span class="np-cred"><i style="background:#FEF3E2"><svg viewBox="0 0 24 24" width="9" height="9"><path d="M5 12.5 L10 17.5 L19 6.5" fill="none" stroke="#D97706" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></i><b>Supplier Verified</b><span>Level 2</span><span>Valid Till: 14 Aug 2027</span></span></div>
+            </div>
+          </div>
+          <div class="np-status">
+            <span class="lbl">BID VERIFICATION STATUS <span style="color:#5A6E88;font-weight:500">● Live</span></span>
+            <span class="np-verified"><svg viewBox="0 0 48 48" width="26" height="26" style="flex:none"><path d="M24 3 L42 10 V24 C42 34.5 34.2 42.4 24 45.5 C13.8 42.4 6 34.5 6 24 V10 Z" fill="#16A34A"/><path d="M15.5 24.2 L21.4 30.4 L33 17.6" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span><b>VERIFIED</b><span>Verified by BID</span></span></span>
+            <div class="np-dates">
+              <span><span>Last Verified</span><b>15 Aug 2026</b></span>
+              <span><span>Valid Till</span><b>14 Aug 2027</b></span>
+            </div>
+            <span class="np-active">ACTIVE</span>
+            <div class="np-btn">View Authorized Verification</div>
+          </div>
         </div>
+        <div class="np-foot">Information on this page is provided by BID based on verified data from authorized sources.</div>
       </div>
     </div>
-    <div class="card" style="margin-top:14px;background:#fff;border-color:rgba(255,107,112,.3)">
-      <p style="color:#B32D33"><strong>The rule that protects the whole proposition:</strong> company-provided and
-      BID-verified information are separated structurally, always. If that line is ever blurred, the platform's
-      value — the claim that verified means verified — is gone.</p>
+
+    <div class="card adverse" style="margin-top:11px;padding:9px 13px">
+      <p style="color:#FFB3B6;font-size:12px"><strong>The rule that protects the whole proposition:</strong>
+      BID-verified and company-provided information are separated structurally, always, and no adverse
+      risk finding ever appears on a public page.</p>
     </div>
   </div>
   <span class="snum">11</span>
