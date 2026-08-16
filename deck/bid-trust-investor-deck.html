@@ -1,0 +1,1518 @@
+<title>BID Trust Investor Deck</title>
+<style>
+:root{
+  --navy-950:#040F26;
+  --navy-900:#061A3C;
+  --navy-850:#0A2A5E;
+  --navy-800:#0E3268;
+  --line:rgba(255,255,255,.10);
+  --line-2:rgba(255,255,255,.18);
+  --ink:#F2F7FC;
+  --ink-2:#A9BFD6;
+  --ink-3:#6E88A6;
+  --brand:#2E9BF5;
+  --brand-2:#1560D8;
+  --brand-deep:#0A2E6E;
+  --silver:#DCE6F0;
+  --verify:#1DB954;
+  --verify-2:#48D183;
+  --caution:#F5A623;
+  --adverse:#FF6B70;
+  --paper:#FFFFFF;
+  --paper-ink:#0A2A5E;
+  --paper-dim:#5A6E88;
+  --paper-line:#E3EAF2;
+  --sans:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--navy-950);color:var(--ink);
+  font-family:var(--sans);-webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+
+/* ── deck chrome ─────────────────────────────────────────── */
+.deck{max-width:1220px;margin:0 auto;padding:20px 20px 140px}
+.topbar{
+  position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:14px;
+  padding:12px 4px;margin-bottom:14px;background:linear-gradient(var(--navy-950) 72%,transparent);
+}
+.brandlock{display:flex;align-items:center;gap:9px}
+.wm{display:flex;flex-direction:column;line-height:1}
+.wm b{font-size:13px;font-weight:800;letter-spacing:-.01em}
+.wm span{font-size:6.5px;letter-spacing:.34em;color:var(--ink-3);font-weight:600;margin-top:2px}
+.topbar .sep{width:1px;height:20px;background:var(--line-2)}
+.topbar .lbl{font-size:12px;color:var(--ink-3)}
+.ctrls{margin-left:auto;display:flex;align-items:center;gap:8px}
+.btn{
+  background:rgba(255,255,255,.06);border:1px solid var(--line-2);color:var(--ink-2);
+  border-radius:8px;padding:7px 12px;font-size:12px;font-family:var(--sans);cursor:pointer;
+  transition:background .15s,color .15s;
+}
+.btn:hover{background:rgba(255,255,255,.12);color:#fff}
+.btn.on{background:var(--brand);border-color:var(--brand);color:#04203F;font-weight:600}
+.count{font-family:var(--mono);font-size:12px;color:var(--ink-3);min-width:58px;text-align:center}
+
+/* ── slide frame ─────────────────────────────────────────── */
+.slide{
+  display:none;position:relative;
+  aspect-ratio:16/9;min-height:520px;
+  background:var(--navy-900);border:1px solid var(--line);border-radius:16px;
+  padding:44px 52px;overflow:hidden;
+  box-shadow:0 30px 70px -30px rgba(0,0,0,.8);
+}
+.slide.active{display:flex;flex-direction:column}
+.slide.light{background:#F7F9FC;color:var(--paper-ink);border-color:#D7E1EC}
+.slide.light .eyebrow{color:var(--brand-2)}
+.slide.light h2{color:var(--paper-ink)}
+.slide.light .sub{color:var(--paper-dim)}
+.slide::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(680px 300px at 92% -12%,rgba(46,155,245,.13),transparent 66%);
+}
+.slide.light::after{background:radial-gradient(680px 300px at 92% -12%,rgba(46,155,245,.09),transparent 66%)}
+.slide>*{position:relative;z-index:1}
+.snum{
+  position:absolute;right:22px;bottom:16px;font-family:var(--mono);font-size:11px;
+  color:var(--ink-3);z-index:2;
+}
+.slide.light .snum{color:#93A6BC}
+.slidemark{position:absolute;left:22px;bottom:14px;opacity:.5;z-index:2}
+
+.eyebrow{
+  font-size:10.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--brand);margin:0 0 12px;
+}
+h2{font-size:clamp(24px,3.1vw,38px);line-height:1.1;letter-spacing:-.022em;font-weight:700;margin:0 0 14px;text-wrap:balance}
+h3{font-size:15px;font-weight:700;margin:0 0 8px;letter-spacing:-.01em}
+.sub{font-size:15px;line-height:1.55;color:var(--ink-2);max-width:78ch;margin:0 0 20px}
+.slide.light .sub{color:var(--paper-dim)}
+p{margin:0 0 10px}
+strong{font-weight:700}
+em{font-style:normal;color:var(--brand)}
+.slide.light em{color:var(--brand-2)}
+
+/* ── layout helpers ──────────────────────────────────────── */
+.body{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center}
+.cols{display:grid;gap:16px}
+.c2{grid-template-columns:1fr 1fr}
+.c3{grid-template-columns:repeat(3,1fr)}
+.c4{grid-template-columns:repeat(4,1fr)}
+.c23{grid-template-columns:1.1fr 1fr}
+.c32{grid-template-columns:1.6fr 1fr}
+.stack{display:flex;flex-direction:column;gap:10px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.center{text-align:center}
+
+.card{
+  background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:11px;padding:14px 16px;
+}
+.slide.light .card{background:#fff;border-color:var(--paper-line);box-shadow:0 1px 2px rgba(10,42,94,.05)}
+.card.brand{background:rgba(46,155,245,.10);border-color:rgba(46,155,245,.38)}
+.card.verify{background:rgba(29,185,84,.10);border-color:rgba(29,185,84,.38)}
+.card.caution{background:rgba(245,166,35,.09);border-color:rgba(245,166,35,.35)}
+.card.adverse{background:rgba(255,107,112,.08);border-color:rgba(255,107,112,.32)}
+.card h3{font-size:13.5px}
+.card p{font-size:12.5px;line-height:1.5;color:var(--ink-2);margin:0}
+.slide.light .card p{color:var(--paper-dim)}
+
+.kpi{font-family:var(--mono);font-size:clamp(20px,2.6vw,30px);font-weight:700;letter-spacing:-.02em;line-height:1}
+.kpi.b{color:var(--brand)}
+.kpi.v{color:var(--verify-2)}
+.tiny{font-size:11px;color:var(--ink-3);line-height:1.5}
+.slide.light .tiny{color:#8296AD}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+.pill{
+  display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 11px;
+  font-size:11.5px;font-weight:600;border:1px solid;
+}
+.pill.b{background:rgba(46,155,245,.14);border-color:rgba(46,155,245,.4);color:#8FCBFF}
+.pill.v{background:rgba(29,185,84,.14);border-color:rgba(29,185,84,.42);color:var(--verify-2)}
+.pill.c{background:rgba(245,166,35,.13);border-color:rgba(245,166,35,.4);color:#F6C46B}
+.pill.n{background:rgba(255,255,255,.06);border-color:var(--line-2);color:var(--ink-2)}
+.slide.light .pill.b{background:rgba(21,96,216,.09);border-color:rgba(21,96,216,.3);color:var(--brand-2)}
+.slide.light .pill.v{background:rgba(29,185,84,.1);border-color:rgba(29,185,84,.35);color:#0E7A34}
+.slide.light .pill.n{background:#EEF3F9;border-color:#DCE5EF;color:var(--paper-dim)}
+
+ul{margin:0;padding-left:16px}
+li{font-size:12.5px;line-height:1.6;color:var(--ink-2);margin-bottom:4px}
+.slide.light li{color:var(--paper-dim)}
+li::marker{color:var(--brand)}
+ul.v li::marker{color:var(--verify)}
+ul.plain{list-style:none;padding:0}
+ul.plain li{display:flex;gap:8px;align-items:flex-start}
+ul.plain li::before{content:"";flex:none;width:5px;height:5px;border-radius:50%;background:var(--brand);margin-top:7px}
+ul.plain.v li::before{background:var(--verify)}
+ul.plain.c li::before{background:var(--caution)}
+ul.plain.a li::before{background:var(--adverse)}
+
+table{border-collapse:collapse;width:100%;font-size:12px}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line)}
+.slide.light th,.slide.light td{border-color:var(--paper-line)}
+th{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);font-weight:700}
+.slide.light th{color:#8296AD}
+td{color:var(--ink-2);font-variant-numeric:tabular-nums}
+.slide.light td{color:var(--paper-dim)}
+td b,th b{color:var(--ink)}
+.slide.light td b{color:var(--paper-ink)}
+
+/* ── flow / diagram bits ─────────────────────────────────── */
+.flow{display:flex;flex-direction:column;gap:6px;align-items:stretch}
+.fnode{
+  border:1px solid var(--line-2);border-radius:9px;padding:9px 14px;text-align:center;
+  font-size:12.5px;font-weight:600;background:rgba(255,255,255,.05);
+}
+.fnode.b{background:rgba(46,155,245,.13);border-color:rgba(46,155,245,.42);color:#9AD2FF}
+.fnode.v{background:rgba(29,185,84,.12);border-color:rgba(29,185,84,.42);color:var(--verify-2)}
+.fnode.hi{background:var(--brand-2);border-color:var(--brand-2);color:#fff}
+.fnode.dash{border-style:dashed;color:var(--ink-3);background:transparent}
+.farrow{text-align:center;color:var(--ink-3);font-size:12px;line-height:1}
+.slide.light .fnode{background:#fff;border-color:var(--paper-line);color:var(--paper-ink)}
+.slide.light .fnode.b{background:rgba(21,96,216,.08);border-color:rgba(21,96,216,.3);color:var(--brand-2)}
+.slide.light .farrow{color:#A8B8CA}
+
+.chain{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.chain .step{
+  flex:1;min-width:88px;border:1px solid var(--line);border-radius:9px;padding:9px 8px;text-align:center;
+  background:rgba(255,255,255,.04);
+}
+.chain .step .n{font-family:var(--mono);font-size:9.5px;color:var(--brand);display:block;margin-bottom:3px}
+.chain .step .t{font-size:11px;font-weight:600;line-height:1.25}
+.chain .arr{color:var(--ink-3);font-size:13px}
+
+/* ── mockups ─────────────────────────────────────────────── */
+.bidcard{
+  background:linear-gradient(155deg,#123464,#0A2148 60%,#061631);
+  border:1px solid rgba(255,255,255,.16);border-radius:13px;padding:16px 18px;
+  box-shadow:0 16px 34px -14px rgba(0,0,0,.75);
+}
+.bidcard .nm{font-size:15px;font-weight:700;margin-top:12px}
+.bidcard .id{font-family:var(--mono);font-size:11px;color:var(--ink-2);margin-top:3px}
+.vbadge{
+  margin-top:12px;background:rgba(29,185,84,.14);border:1px solid rgba(29,185,84,.34);
+  border-radius:8px;padding:8px 11px;display:flex;align-items:center;gap:9px;
+}
+.tick{width:16px;height:16px;border-radius:50%;background:var(--verify);display:grid;place-items:center;flex:none}
+.checkrow{display:flex;justify-content:space-between;font-size:11.5px;padding:3px 0}
+.checkrow .k{color:var(--ink-2)}
+.checkrow .v{color:var(--verify-2);display:flex;align-items:center;gap:5px}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--verify)}
+.qr{width:44px;height:44px;background:#fff;border-radius:6px;display:grid;place-items:center;flex:none}
+
+.browser{background:#fff;border:1px solid var(--paper-line);border-radius:11px;overflow:hidden}
+.urlbar{background:#F1F5FA;border-bottom:1px solid var(--paper-line);padding:7px 12px;font-family:var(--mono);font-size:10.5px;color:var(--paper-dim);display:flex;align-items:center;gap:8px}
+.panel-v{background:linear-gradient(180deg,rgba(29,185,84,.07),transparent);padding:12px 14px;border-bottom:1px solid var(--paper-line)}
+.panel-c{background:#FEFCF7;padding:12px 14px}
+.plabel{font-size:9.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;margin-bottom:3px}
+.prow{display:flex;justify-content:space-between;font-size:11.5px;padding:2.5px 0;color:var(--paper-dim)}
+.prow b{color:#0E7A34;font-weight:600}
+
+/* ── 2x2 matrix ──────────────────────────────────────────── */
+.matrix{position:relative;height:100%;min-height:300px;border-left:1.5px solid var(--line-2);border-bottom:1.5px solid var(--line-2);margin:8px 0 0 8px}
+.matrix .q{position:absolute;font-size:9.5px;color:var(--ink-3);letter-spacing:.1em;text-transform:uppercase}
+.mitem{
+  position:absolute;transform:translate(-50%,-50%);border-radius:7px;padding:4px 9px;font-size:11px;
+  background:rgba(255,255,255,.07);border:1px solid var(--line-2);white-space:nowrap;
+}
+.mitem.us{background:var(--brand-2);border-color:#6FC4FF;color:#fff;font-weight:700;box-shadow:0 0 0 4px rgba(46,155,245,.18)}
+.axlabel{font-size:10px;color:var(--ink-3);letter-spacing:.08em;text-transform:uppercase}
+
+/* ── speaker notes ───────────────────────────────────────── */
+.notes{display:none;margin-top:14px;background:#0A1C36;border:1px solid var(--line);border-radius:12px;padding:18px 22px}
+body.shownotes .notes{display:block}
+.notes h4{font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--brand);margin:0 0 8px}
+.notes p{font-size:13px;line-height:1.62;color:var(--ink-2);margin:0 0 10px;max-width:92ch}
+.notes .qa{border-left:2px solid var(--caution);padding-left:12px;margin-top:12px}
+.notes .qa .q{font-size:12.5px;font-weight:700;color:#F6C46B;margin-bottom:4px}
+.notes .qa .a{font-size:12.5px;line-height:1.6;color:var(--ink-2);margin:0 0 10px}
+
+/* ── appendix ────────────────────────────────────────────── */
+.hardq{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hardq .item{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:9px;padding:11px 13px}
+.hardq .q{font-size:11.5px;font-weight:700;color:#F6C46B;margin-bottom:4px}
+.hardq .a{font-size:11px;line-height:1.5;color:var(--ink-2)}
+
+.footnote{font-size:10px;color:var(--ink-3);line-height:1.5;margin-top:10px}
+.footnote a{color:var(--ink-3)}
+.slide.light .footnote{color:#8296AD}
+
+/* ── print → PDF ─────────────────────────────────────────── */
+@media print{
+  body{background:#fff}
+  .topbar,.nav{display:none!important}
+  .deck{max-width:none;padding:0}
+  .slide{display:flex!important;flex-direction:column;page-break-after:always;break-after:page;
+    border-radius:0;border:none;box-shadow:none;margin:0;min-height:auto;height:100vh}
+  .notes{display:block!important;page-break-before:avoid;background:#fff;border:none;color:#000}
+  .notes p,.notes .qa .a{color:#333}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ── bottom nav ──────────────────────────────────────────── */
+.nav{
+  position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:60;
+  display:flex;align-items:center;gap:6px;background:rgba(6,26,60,.92);
+  border:1px solid var(--line-2);border-radius:999px;padding:6px 8px;
+  backdrop-filter:blur(8px);
+}
+.nav button{
+  background:none;border:none;color:var(--ink-2);cursor:pointer;font-size:15px;
+  padding:4px 10px;border-radius:999px;line-height:1;
+}
+.nav button:hover{background:rgba(255,255,255,.1);color:#fff}
+.dots{display:flex;gap:3px;padding:0 6px;max-width:340px;flex-wrap:wrap}
+.dots i{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.22);cursor:pointer;display:block}
+.dots i.on{background:var(--brand);transform:scale(1.3)}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+
+@media (max-width:900px){
+  .slide{aspect-ratio:auto;min-height:auto;padding:26px 22px}
+  .c2,.c3,.c4,.c23,.c32{grid-template-columns:1fr}
+  .hardq{grid-template-columns:1fr}
+  h2{font-size:23px}
+  .dots{display:none}
+}
+</style>
+
+<div class="deck">
+  <div class="topbar">
+    <span class="brandlock">
+      <svg viewBox="0 0 104 104" width="30" height="30" aria-label="BID Trust">
+        <defs>
+          <linearGradient id="sv" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFF"/><stop offset="38%" stop-color="#DCE6F0"/><stop offset="62%" stop-color="#9DB0C4"/><stop offset="100%" stop-color="#E8EFF6"/></linearGradient>
+          <linearGradient id="bl" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#2E9BF5"/><stop offset="55%" stop-color="#1560D8"/><stop offset="100%" stop-color="#0A2E6E"/></linearGradient>
+          <linearGradient id="dp" x1="0" y1="0" x2=".6" y2="1"><stop offset="0%" stop-color="#12325F"/><stop offset="100%" stop-color="#061A3C"/></linearGradient>
+          <linearGradient id="rb" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stop-color="#1B6FE0"/><stop offset="60%" stop-color="#2E9BF5"/><stop offset="100%" stop-color="#6FC4FF"/></linearGradient>
+        </defs>
+        <g><rect x="30" y="12" width="6" height="6" fill="#1560D8"/><rect x="21" y="19" width="7" height="7" fill="#2E9BF5"/><rect x="12" y="16" width="5" height="5" fill="#123A78"/><rect x="22" y="30" width="5" height="5" fill="#EDF3FA"/><rect x="13" y="27" width="6" height="6" fill="#1560D8"/><rect x="4" y="24" width="5" height="5" fill="#0E2E63"/><rect x="14" y="38" width="6" height="6" fill="#2E9BF5"/><rect x="6" y="35" width="4" height="4" fill="#123A78"/><rect x="19" y="47" width="4" height="4" fill="#1560D8"/><rect x="9" y="45" width="5" height="5" fill="#0E2E63"/></g>
+        <path d="M28 24 L84 24 L84 58 C84 79 69 92 56 99 C43 92 28 79 28 58 Z" fill="url(#sv)"/>
+        <path d="M33 29 L79 29 L79 58 C79 76 66 87 56 93 C46 87 33 76 33 58 Z" fill="url(#dp)"/>
+        <path d="M33 29 L38 29 L38 58 C38 71 46 80 56 86 L56 93 C46 87 33 76 33 58 Z" fill="url(#bl)" opacity=".9"/>
+        <path d="M42 58 L53 70 L96 14" fill="none" stroke="url(#rb)" stroke-width="12" stroke-linejoin="miter"/>
+        <path d="M55.5 66.5 L94 12.5" fill="none" stroke="#BFE2FF" stroke-width="1.6" opacity=".75"/>
+      </svg>
+      <span class="wm"><b>BID<sup style="font-size:6px;color:var(--ink-3)">™</sup></b><span>TRUST</span></span>
+    </span>
+    <span class="sep"></span>
+    <span class="lbl">Investor Deck · Seed</span>
+    <span class="ctrls">
+      <button class="btn" id="notesBtn">Speaker notes</button>
+      <button class="btn" id="allBtn">All slides</button>
+      <button class="btn" onclick="window.print()">PDF</button>
+    </span>
+  </div>
+
+<!-- ══════════════ 1 · TITLE ══════════════ -->
+<section class="slide active">
+  <div class="body center" style="align-items:center;text-align:center">
+    <svg viewBox="0 0 104 104" width="76" height="76" style="margin:0 auto 22px">
+      <g><rect x="30" y="12" width="6" height="6" fill="#1560D8"/><rect x="21" y="19" width="7" height="7" fill="#2E9BF5"/><rect x="12" y="16" width="5" height="5" fill="#123A78"/><rect x="22" y="30" width="5" height="5" fill="#EDF3FA"/><rect x="13" y="27" width="6" height="6" fill="#1560D8"/><rect x="4" y="24" width="5" height="5" fill="#0E2E63"/><rect x="14" y="38" width="6" height="6" fill="#2E9BF5"/><rect x="6" y="35" width="4" height="4" fill="#123A78"/><rect x="19" y="47" width="4" height="4" fill="#1560D8"/><rect x="9" y="45" width="5" height="5" fill="#0E2E63"/></g>
+      <path d="M28 24 L84 24 L84 58 C84 79 69 92 56 99 C43 92 28 79 28 58 Z" fill="url(#sv)"/>
+      <path d="M33 29 L79 29 L79 58 C79 76 66 87 56 93 C46 87 33 76 33 58 Z" fill="url(#dp)"/>
+      <path d="M33 29 L38 29 L38 58 C38 71 46 80 56 86 L56 93 C46 87 33 76 33 58 Z" fill="url(#bl)" opacity=".9"/>
+      <path d="M42 58 L53 70 L96 14" fill="none" stroke="url(#rb)" stroke-width="12" stroke-linejoin="miter"/>
+      <path d="M55.5 66.5 L94 12.5" fill="none" stroke="#BFE2FF" stroke-width="1.6" opacity=".75"/>
+    </svg>
+    <h2 style="font-size:clamp(34px,5vw,58px);margin-bottom:6px">BID Trust</h2>
+    <p style="font-size:14px;letter-spacing:.26em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin-bottom:20px">
+      Business Identity &amp; Due Diligence
+    </p>
+    <p style="font-size:clamp(17px,2vw,22px);color:var(--brand);font-weight:600;margin-bottom:26px">
+      Trust, backed by verification.
+    </p>
+    <p class="sub" style="max-width:62ch;margin:0 auto;font-size:16px">
+      An industry-agnostic trust, verification and due-diligence infrastructure
+      for modern business relationships.
+    </p>
+    <div class="row" style="justify-content:center;margin-top:26px">
+      <span class="pill n">bidtrust.in</span>
+      <span class="pill b">Seed round</span>
+      <span class="pill n">India-first, category-neutral</span>
+    </div>
+  </div>
+  <span class="snum">01</span>
+  <div class="notes">
+    <h4>What to say</h4>
+    <p>Open with the sentence, not the company: <em>“Every business relationship starts with one question — can I trust who I'm dealing with?”</em> Then: we are building the infrastructure that answers it. Do not open with features. Do not say “KYC”, “KYB” or “BGV” in the first two minutes — those words will anchor the investor into a commoditised category and you will spend the rest of the meeting climbing out.</p>
+    <h4>Why it matters</h4>
+    <p>The single biggest risk in this pitch is being mentally filed as “another verification vendor”. Category framing is decided in the first 60 seconds. The words that must land early are <strong>infrastructure</strong>, <strong>orchestration</strong> and <strong>network</strong>.</p>
+    <div class="qa">
+      <div class="q">“So you're a KYC company?”</div>
+      <p class="a">No — and the distinction is the whole business. KYC and KYB companies sell checks. We sell the layer above them: the policy that decides what needs checking, the orchestration that routes it, the evidence record that survives an audit, and the monitoring that keeps it true. We buy from those companies; we don't compete with them. Slide 5 shows exactly where we sit.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ 2 · BIG IDEA ══════════════ -->
+<section class="slide">
+  <p class="eyebrow">The big idea</p>
+  <h2>Every company answers the same question, over and over,<br>about a different counterparty.</h2>
+  <div class="body">
+    <div class="card brand center" style="padding:22px;margin-bottom:22px">
+      <p style="font-size:clamp(19px,2.4vw,27px);font-weight:700;color:#fff;margin:0">
+        “Can I trust this business or person enough to work with them?”
+      </p>
+    </div>
+    <div class="cols c4">
+      <div class="card"><h3>The counterparty changes</h3><p>Supplier, contractor, candidate, distributor, consultant, partner, service provider.</p></div>
+      <div class="card"><h3>The work does not</h3><p>Collect documents, chase the counterparty, verify, judge, file the evidence, repeat in twelve months.</p></div>
+      <div class="card"><h3>Nobody owns the record</h3><p>Verification produces a decision, not a defensible, sourced, timestamped record.</p></div>
+      <div class="card"><h3>It goes stale immediately</h3><p>A vendor verified in January can be struck off by March. Almost nobody re-checks.</p></div>
+    </div>
+    <p class="sub" style="margin-top:22px;margin-bottom:0">
+      BID connects <em>identity + relationships + verification + evidence + assessment + credentials + monitoring</em>
+      into one trust layer — so that question gets answered once, properly, and stays answered.
+    </p>
+  </div>
+  <span class="snum">02</span>
+  <div class="notes">
+    <h4>What to say</h4>
+    <p>Land the universality first. This is not a procurement problem or an HR problem — it is the same problem wearing different clothes in every function of every company. Then land the four failures: repeated work, no durable record, no owner, immediate decay. The fourth is the one that becomes recurring revenue.</p>
+    <h4>Why it matters</h4>
+    <p>If the investor accepts that this is one problem rather than several, the horizontal platform thesis follows naturally. If they see it as several problems, they will ask why you aren't picking one vertical — and the domain-agnostic story starts to sound like a lack of focus rather than an architectural choice.</p>
+    <div class="qa">
+      <div class="q">“Isn't this just procurement software?”</div>
+      <p class="a">Procurement software manages the commercial relationship — POs, catalogues, invoices, performance. It answers what you buy and for how much. It does not answer whether the counterparty is who they claim to be, and it does not keep that answer current. We integrate with those suites rather than replacing them; that is a deliberate strategic choice, covered on slide 17.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ 3 · PROBLEM ══════════════ -->
+<section class="slide light">
+  <p class="eyebrow">The problem</p>
+  <h2>Trusting a third party is still a fragmented process.</h2>
+  <div class="body">
+    <div class="cols c23">
+      <div>
+        <p class="tiny" style="font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:9px">What companies do today</p>
+        <div class="row">
+          <span class="pill n">Supplier documents</span><span class="pill n">Email threads</span>
+          <span class="pill n">Excel trackers</span><span class="pill n">Manual review</span>
+          <span class="pill n">Agency A</span><span class="pill n">Agency B</span>
+          <span class="pill n">KYB API</span><span class="pill n">BGV vendor</span>
+          <span class="pill n">HRMS</span><span class="pill n">Procurement suite</span>
+          <span class="pill n">Shared drive</span><span class="pill n">Periodic checks</span>
+          <span class="pill n">Audit scramble</span>
+        </div>
+        <p class="sub" style="margin-top:16px;font-size:13.5px">
+          Thirteen tools and no system of record. When an auditor asks how a supplier was
+          verified in 2024, somebody searches an inbox.
+        </p>
+      </div>
+      <div class="stack">
+        <div class="card"><h3 style="color:#B32D33">Consequences</h3></div>
+        <div class="cols c2" style="gap:8px">
+          <div class="card"><p><b>Slow onboarding</b><br>Weeks per counterparty</p></div>
+          <div class="card"><p><b>Duplicate verification</b><br>Same supplier, twenty buyers</p></div>
+          <div class="card"><p><b>Inconsistent standards</b><br>Depth varies by who did it</p></div>
+          <div class="card"><p><b>No visibility</b><br>Which vendors are still valid?</p></div>
+          <div class="card"><p><b>Stale verification</b><br>Point-in-time, never refreshed</p></div>
+          <div class="card"><p><b>Compliance exposure</b><br>Decisions you cannot evidence</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="card caution" style="margin-top:18px">
+      <p style="color:#8A5A05"><strong>The most telling question to ask a prospect:</strong>
+      “What percentage of your vendor base has been re-verified in the last twelve months?”
+      Most organisations genuinely do not know. That moment is where the deal starts.</p>
+    </div>
+  </div>
+  <span class="snum">03</span>
+  <div class="notes">
+    <h4>What to say</h4>
+    <p>Walk the pill cloud left to right and let the visual do the work — the point is the sprawl, not any individual item. Then hit the consequences. Close on the re-verification question; it is the single best discovery question in the sales motion and it demonstrates you know how these buyers actually think.</p>
+    <h4>Why it matters</h4>
+    <p>This slide has to establish that the incumbent is not a competitor product — it is a manual process with no owner. That reframes the competitive question later: we mostly displace spreadsheets and agencies, not Certa or Aravo.</p>
+    <div class="qa">
+      <div class="q">“Why can't companies just do this themselves?”</div>
+      <p class="a">They already are — that is the thirteen-tool picture. What they cannot build internally is the provider relationships, the normalisation layer across incompatible provider responses, the tamper-evident evidence architecture, and the network of already-verified entities. Teams that try end up with a document-collection portal and still call the same agencies. They also inherit the data-protection obligations of handling this data themselves, which under the DPDP rules is now a board-level concern.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ 4 · SOLUTION ══════════════ -->
+<section class="slide">
+  <p class="eyebrow">The solution</p>
+  <h2>One trust layer for every business relationship.</h2>
+  <p class="sub">Eight primitives, one platform. Every business relationship in any industry is expressible as a combination of these.</p>
+  <div class="body">
+    <div class="cols c4" style="gap:12px">
+      <div class="card"><h3 style="color:var(--brand)">Organization</h3><p>The primary entity. Not a “vendor”, not a “customer” — an organization.</p></div>
+      <div class="card"><h3 style="color:var(--brand)">Person</h3><p>Employee, candidate, contractor worker, director — consent-gated throughout.</p></div>
+      <div class="card"><h3 style="color:var(--brand)">Relationship</h3><p>Carries the purpose. Purpose is what makes data collection lawful and proportionate.</p></div>
+      <div class="card"><h3 style="color:var(--brand)">Policy</h3><p>What “verified” means for <em>this</em> relationship. Configurable, versioned, immutable.</p></div>
+      <div class="card"><h3 style="color:var(--verify-2)">Verification</h3><p>Executed through authorized providers. Orchestrated, not owned.</p></div>
+      <div class="card"><h3 style="color:var(--verify-2)">Evidence</h3><p>Immutable, hashed, classified at capture. What survives an audit.</p></div>
+      <div class="card"><h3 style="color:var(--verify-2)">Assessment</h3><p>Deterministic and explainable. Never an opaque score.</p></div>
+      <div class="card"><h3 style="color:var(--verify-2)">Credential + Monitoring</h3><p>Reusable, expiring, continuously watched. Trust that stays true.</p></div>
+    </div>
+    <div class="card brand center" style="margin-top:18px">
+      <p style="color:#fff;font-size:14px">
+        The same eight primitives serve a pharma supplier, a site contractor and a candidate.
+        <strong>Only the policy changes.</strong>
+      </p>
+    </div>
+  </div>
+  <span class="snum">04</span>
+  <div class="notes">
+    <h4>What to say</h4>
+    <p>Do not read the eight boxes. Say: “These eight primitives compose into every third-party relationship there is.” Then give one concrete recomposition — a pharma supplier and a candidate BGV use identical machinery with different policy. That single sentence is the domain-agnostic proof in miniature.</p>
+    <h4>Why it matters</h4>
+    <p>This is the architectural claim underneath the whole business. If the primitives are right, one codebase serves sixteen industries and every new sector is configuration. If they are wrong, you are building sixteen products.</p>
+    <div class="qa">
+      <div class="q">“Isn't ‘horizontal’ just a way of avoiding focus?”</div>
+      <p class="a">Horizontal in architecture, focused in go-to-market. We sell one wedge — vendor and supplier onboarding, to Indian mid-market — and we do not chase the other fifteen. But we refuse to bake that wedge into the data model, because the second workflow inside an existing customer is the cheapest revenue in the business, and a vertical schema would make it a rewrite.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ 5 · THE KEY SLIDE ══════════════ -->
+<section class="slide">
+  <p class="eyebrow">The most important slide in this deck</p>
+  <h2>BID does not replace verification providers.<br>BID is the layer above them.</h2>
+  <div class="body">
+    <div class="cols c23" style="gap:26px;align-items:center">
+      <div class="flow">
+        <div class="fnode hi">Enterprise</div>
+        <div class="farrow">↓</div>
+        <div class="fnode b">BID Trust</div>
+        <div class="farrow">↓</div>
+        <div class="row" style="gap:6px">
+          <div class="fnode b" style="flex:1">Policy</div>
+          <div class="fnode b" style="flex:1">Orchestration</div>
+        </div>
+        <div class="farrow">↓</div>
+        <div class="fnode dash">Existing verification providers</div>
+        <div class="farrow">↓</div>
+        <div class="row" style="gap:6px">
+          <div class="fnode v" style="flex:1">Evidence</div>
+          <div class="fnode v" style="flex:1">Assessment</div>
+        </div>
+        <div class="farrow">↓</div>
+        <div class="fnode hi">Enterprise decision</div>
+        <div class="farrow">↓</div>
+        <div class="fnode v">Continuous monitoring</div>
+      </div>
+      <div>
+        <h3 style="font-size:16px;margin-bottom:10px">Provider-neutral trust orchestration</h3>
+        <p class="sub" style="font-size:13.5px">
+          Specialist providers keep doing what they are good at. BID routes to them,
+          normalizes what comes back, stores the evidence and keeps the record alive.
+        </p>
+        <p class="tiny" style="font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin:16px 0 8px">Categories BID can orchestrate</p>
+        <div class="row">
+          <span class="pill n">KYB</span><span class="pill n">BGV</span><span class="pill n">Identity</span>
+          <span class="pill n">GST data</span><span class="pill n">MCA-derived data</span><span class="pill n">Bank verification</span>
+          <span class="pill n">Education</span><span class="pill n">Employment</span><span class="pill n">Address</span>
+          <span class="pill n">Risk / AML</span><span class="pill n">Document verification</span>
+        </div>
+        <div class="card verify" style="margin-top:16px">
+          <p style="color:var(--verify-2)"><strong>Why this matters commercially:</strong> it converts the largest
+          incumbents from competitors into suppliers — and, plausibly, into channel partners.</p>
+        </div>
+        <p class="footnote">No company is claimed as a BID partner. Categories shown are illustrative of what the orchestration layer is designed to route to.</p>
+      </div>
+    </div>
+  </div>
+  <span class="snum">05</span>
+  <div class="notes">
+    <h4>What to say</h4>
+    <p>Slow down here. This is the slide that decides whether you are a vendor or infrastructure. Say it plainly: <em>“We are not trying to out-verify AuthBridge or IDfy. We buy from companies like them.”</em> Then trace the stack top to bottom with a finger. The investor should leave with one sentence: BID sits above the providers.</p>
+    <h4>Why it matters</h4>
+    <p>It defuses the two hardest objections at once — “this is crowded” and “the incumbents will crush you”. If BID is a customer of the incumbents rather than a rival, incumbency stops being a threat and starts being supply.</p>
+    <div class="qa">
+      <div class="q">“Why won't the existing BGV/KYB providers just build this themselves?”</div>
+      <p class="a">Some will try. Three things make it hard. First, culture: API and services businesses are optimised for volume and price per call, not for enterprise workflow depth — moving up-stack means a different product organisation and a different sales motion. Second, neutrality: a provider that builds an orchestration layer will always route to itself, and buyers know it, so the layer is worth less in their hands than in ours. Third, the network: our reuse advantage comes from entities verified across many buyers, which no single provider can assemble without the buyer-side relationships. That said — I would not claim this is a durable technical moat. It is a head start, and slide 18 is honest about which parts compound and which do not.</p>
+    </div>
+    <div class="qa">
+      <div class="q">“What happens if a provider cuts you off or raises prices?”</div>
+      <p class="a">It is a real dependency and we treat it as a first-order risk. Mitigation is structural: at least two qualified routes for every check that a signed customer policy marks as required, a router that fails over automatically, and a cost ledger per call so we see margin erosion the week it starts rather than at quarter end. The deeper commercial point is that we must secure caching and reuse rights in every provider contract — if reuse is contractually forbidden, our margin-expansion path disappears. That is the single most important term in our supplier agreements, and we negotiate it from the first contract, not the tenth.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ 6 · HOW IT WORKS ══════════════ -->
+<section class="slide light">
+  <p class="eyebrow">How it works</p>
+  <h2>Twelve steps, one platform.</h2>
+  <p class="sub">Written for a non-technical reader. Everything from “who is this?” to “is it still true?”.</p>
+  <div class="body">
+    <div class="chain" style="margin-bottom:12px">
+      <div class="step"><span class="n">01</span><span class="t">Identify</span></div><span class="arr">→</span>
+      <div class="step"><span class="n">02</span><span class="t">Define relationship</span></div><span class="arr">→</span>
+      <div class="step"><span class="n">03</span><span class="t">Select policy</span></div><span class="arr">→</span>
+      <div class="step"><span class="n">04</span><span class="t">Request verification</span></div><span class="arr">→</span>
+      <div class="step"><span class="n">05</span><span class="t">Obtain consent</span></div><span class="arr">→</span>
+      <div class="step"><span class="n">06</span><span class="t">Orchestrate</span></div>
+    </div>
+    <div class="chain">
+      <div class="step"><span class="n">07</span><span class="t">Normalize results</span></div><span class="arr">→</span>
+      <div class="step"><span class="n">08</span><span class="t">Store evidence</span></div><span class="arr">→</span>
+      <div class="step"><span class="n">09</span><span class="t">Assess</span></div><span class="arr">→</span>
+      <div class="step"><span class="n">10</span><span class="t">Issue credentials</span></div><span class="arr">→</span>
+      <div class="step"><span class="n">11</span><span class="t">Monitor</span></div><span class="arr">→</span>
+      <div class="step"><span class="n">12</span><span class="t">Audit</span></div>
+    </div>
+    <div class="cols c3" style="margin-top:22px">
+      <div class="card"><h3>Steps 1–3 are the product</h3><p>Most competitors start at step 6. Identity, relationship and policy are where the defensibility lives.</p></div>
+      <div class="card"><h3>Steps 5 and 8 are the licence to operate</h3><p>Consent and evidence are what make this defensible to a regulator, an auditor and a court.</p></div>
+      <div class="card"><h3>Steps 11–12 are the business model</h3><p>Monitoring and audit convert a one-time transaction into recurring revenue.</p></div>
+    </div>
+  </div>
+  <span class="snum">06</span>
+  <div class="notes">
+    <h4>What to say</h4>
+    <p>Do not narrate all twelve. Point at the three summary cards instead — they carry the argument. The line to deliver: <em>“Most of this market starts at step six. The value is in steps one to three and eleven to twelve.”</em></p>
+    <h4>Why it matters</h4>
+    <p>It shows the investor exactly which parts of the value chain are commoditised (the middle) and which are not (the ends). That framing also explains the gross-margin story later.</p>
+    <div class="qa">
+      <div class="q">“How much of this is built?”</div>
+      <p class="a">Be exact and do not inflate. Give the real state of the MVP (slide 19), what is designed and specified versus what is running, and what the first paying pilot needs. Investors forgive an early product; they do not forgive discovering later that “built” meant “designed”.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ 7 · ORGANIZATION MODEL ══════════════ -->
+<section class="slide">
+  <p class="eyebrow">The architectural insight</p>
+  <h2>Organizations are not permanently vendors, customers or suppliers.</h2>
+  <p class="sub">Roles are relationships, not entity types. This one decision is what makes BID domain-agnostic — and what makes verification reusable.</p>
+  <div class="body">
+    <div class="cols c23" style="gap:26px;align-items:center">
+      <div class="center">
+        <div class="fnode hi" style="display:inline-block;padding:12px 26px;font-size:14px">XYZ HR Consultants</div>
+        <p class="mono tiny" style="margin-top:6px">BID-BUS-00231 · one record</p>
+        <div class="cols c2" style="margin-top:18px;gap:8px">
+          <div class="card"><p><b style="color:var(--brand)">Vendor</b><br>to ABC Technologies</p></div>
+          <div class="card"><p><b style="color:var(--brand)">Customer</b><br>of LMN Components</p></div>
+          <div class="card"><p><b style="color:var(--brand)">Supplier</b><br>to OPQ Logistics</p></div>
+          <div class="card"><p><b style="color:var(--brand)">Employer</b><br>of Ravi Kumar</p></div>
+          <div class="card"><p><b style="color:var(--verify-2)">Verification requester</b><br>of its own network</p></div>
+          <div class="card"><p><b style="color:var(--verify-2)">BID customer</b><br>paying subscriber</p></div>
+        </div>
+      </div>
+      <div>
+        <div class="card adverse">
+          <h3 style="color:var(--adverse)">The mistake most platforms make</h3>
+          <p>Modelling “vendor” and “customer” as entity types. The same company then exists as
+          three records, reuse becomes impossible, and the network effect can never be built.</p>
+        </div>
+        <div class="card verify" style="margin-top:12px">
+          <h3 style="color:var(--verify-2)">What this unlocks</h3>
+          <ul class="plain v" style="margin-top:6px">
+            <li>One company, one record, regardless of how many parties transact with it</li>
+            <li>The same vendor can be “Standard” for one buyer and “Critical” for another, with no conflict</li>
+            <li>A verified subject today can be a paying requester tomorrow — with no migration</li>
+            <li>Purpose limitation becomes technically enforceable, because purpose lives on the relationship</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <span class="snum">07</span>
+  <div class="notes">
+    <h4>What to say</h4>
+    <p>This is the slide for the technical investor or the operator on the panel. Frame it as a decision with consequences, not a schema: “We refuse to store a company as a vendor, because within eighteen months it will also be a customer, and we would have two records and no reuse.” Then connect it forward — this is precisely why XYZ can flip from verified subject to paying customer on slide 9 without any migration.</p>
+    <h4>Why it matters</h4>
+    <p>It is the load-bearing decision under both the domain-agnostic claim and the flywheel. Without it, neither works.</p>
+    <div class="qa">
+      <div class="q">“Is that not just a database design detail?”</div>
+      <p class="a">It is a database design detail that determines whether the business model is possible. If a company exists as three records, one buyer's verification cannot be reused by the next — and reuse is where the margin expansion and the network effect both come from. It is also the difference between adding a second workflow inside a customer as configuration versus as a rewrite.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ 8 · DOMAIN AGNOSTIC + POLICY ══════════════ -->
+<section class="slide light">
+  <p class="eyebrow">Domain-agnostic by architecture</p>
+  <h2>Core engine + configurable policy = industry workflow.</h2>
+  <div class="body">
+    <div class="cols" style="grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:14px;margin-bottom:20px">
+      <div class="card center"><h3>CORE BID ENGINE</h3><p>Identity · Relationships · Verification · Evidence · Consent · Monitoring</p><p class="tiny" style="margin-top:6px">identical for every industry</p></div>
+      <div style="font-size:24px;color:#A8B8CA">+</div>
+      <div class="card center" style="border-color:rgba(21,96,216,.4);background:rgba(21,96,216,.05)">
+        <h3 style="color:var(--brand-2)">VERIFICATION POLICY</h3><p>What “verified” means for this relationship</p><p class="tiny" style="margin-top:6px">configuration, not code</p></div>
+      <div style="font-size:24px;color:#A8B8CA">=</div>
+      <div class="card center" style="background:var(--navy-900);border-color:var(--navy-900)">
+        <h3 style="color:#fff">INDUSTRY WORKFLOW</h3><p style="color:var(--ink-2)">Zero new services. Zero forks.</p></div>
+    </div>
+    <div class="cols c2" style="gap:20px">
+      <div>
+        <p class="tiny" style="font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px">Sixteen industries, one codebase</p>
+        <div class="row">
+          <span class="pill n">Manufacturing</span><span class="pill n">Healthcare</span><span class="pill n">IT</span>
+          <span class="pill n">BPO/KPO</span><span class="pill n">Construction</span><span class="pill n">Logistics</span>
+          <span class="pill n">Education</span><span class="pill n">Retail</span><span class="pill n">Hospitality</span>
+          <span class="pill n">Pharma</span><span class="pill n">Jewellery</span><span class="pill n">Real Estate</span>
+          <span class="pill n">Professional Services</span><span class="pill n">Facility Management</span>
+          <span class="pill n">Recruitment</span><span class="pill n">Staffing</span>
+        </div>
+        <table style="margin-top:14px">
+          <tr><td><b>Manufacturing</b></td><td>Critical Supplier Policy</td></tr>
+          <tr><td><b>Healthcare</b></td><td>Healthcare Vendor Policy</td></tr>
+          <tr><td><b>IT</b></td><td>Employee BGV Policy</td></tr>
+          <tr><td><b>Construction</b></td><td>Critical Contractor Policy</td></tr>
+          <tr><td><b>Recruitment</b></td><td>Candidate BGV Policy</td></tr>
+        </table>
+      </div>
+      <div class="card" style="background:#fff">
+        <p class="tiny" style="font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--brand-2);margin-bottom:8px">Policy: Critical Supplier</p>
+        <table>
+          <tr><th>Section</th><th>Checks</th></tr>
+          <tr><td><b>Identity</b></td><td>GST · PAN · MCA</td></tr>
+          <tr><td><b>Financial</b></td><td>Bank ownership · Turnover</td></tr>
+          <tr><td><b>Compliance</b></td><td>Certifications · Licences</td></tr>
+          <tr><td><b>Risk</b></td><td>AML · Sanctions · Litigation</td></tr>
+          <tr><td><b>Monitoring</b></td><td>Quarterly re-verification</td></tr>
+        </table>
+        <p class="tiny" style="margin-top:10px">Customers author this themselves. Versioned and immutable once active — an auditor asking “what was your standard in March 2026?” gets an unaltered object.</p>
+      </div>
+    </div>
+  </div>
+  <span class="snum">08</span>
+  <div class="notes">
+    <h4>What to say</h4>
+    <p>Deliver the equation as a single sentence, then show the policy card as proof it is real and not a slogan. The strongest line: <em>“A new industry is a configuration exercise, not an engineering project.”</em> If you have the live architecture explorer available, this is the moment to show the policy builder — editing a policy in front of an investor is far more convincing than a bullet.</p>
+    <h4>Why it matters</h4>
+    <p>Horizontal platforms are usually punished by investors as unfocused. This slide converts horizontal from a market claim into an architectural one, which is defensible.</p>
+    <div class="qa">
+      <div class="q">“Won't every enterprise want customisation you can't support?”</div>
+      <p class="a">That is what the policy engine exists to absorb. The customisation enterprises actually ask for is which checks, at what depth, with what thresholds, expiry and approval routing — all of which is configuration. We ship a curated template library so nobody starts from a blank page, because a blank policy screen produces either an unusable policy or an abandoned trial. Where a customer genuinely needs something outside the model, we would rather lose that deal early than fork the product.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ 9 · THE STORY ══════════════ -->
+<section class="slide">
+  <p class="eyebrow">The core business story</p>
+  <h2>How an invited company becomes a paying customer.</h2>
+  <div class="body">
+    <div class="cols c3" style="gap:14px">
+      <div class="stack">
+        <span class="pill b">Act I · The invitation</span>
+        <div class="card"><p><b>ABC Technologies</b> wants to onboard <b>XYZ HR Consultants</b>. ABC creates a verification request under its Critical Supplier policy.</p></div>
+        <div class="card"><p>XYZ receives an invitation, claims <span class="mono" style="color:var(--brand)">BID-BUS-00231</span> and completes exactly what ABC's policy requires.</p></div>
+        <div class="card verify"><p style="color:var(--verify-2)">BID returns status, level, evidence-backed results, assessment, date, freshness and audit trail. ABC approves.</p></div>
+        <div class="card"><p><b>XYZ becomes a FREE BID MEMBER.</b><br><span class="tiny">Not a customer. Pays ₹0. Owns its own record.</span></p></div>
+      </div>
+      <div class="stack">
+        <span class="pill b">Act II · The realisation</span>
+        <div class="card"><p>XYZ notices it has <b>200 suppliers of its own</b> it needs to verify — and it has just experienced how the process should work, from the other side.</p></div>
+        <div class="card brand"><p style="color:#fff"><b>XYZ clicks “Verify My Own Network”.</b></p></div>
+        <div class="card"><p>XYZ selects a policy, starts verification, and purchases a subscription plus verification credits.</p></div>
+        <div class="card verify"><p style="color:var(--verify-2)"><b>XYZ becomes a PAYING BID CUSTOMER.</b><br><span class="tiny" style="color:var(--ink-2)">Simultaneously a verified subject for ABC and a requester for its own network.</span></p></div>
+      </div>
+      <div class="stack">
+        <span class="pill b">Act III · The compounding</span>
+        <div class="card"><p>XYZ invites <b>LMN Components</b>. LMN becomes a BID member — free, permanent, its own record.</p></div>
+        <div class="card"><p>Some of LMN's checks are <b>reused</b> from its existing verified attributes under consent and freshness rules.</p></div>
+        <div class="card"><p>Later, LMN may become a requester itself. Then OPQ. Then RST.</p></div>
+        <div class="card brand center"><p style="color:#fff;font-size:14px"><b>ABC → XYZ → LMN → OPQ → RST</b></p></div>
+      </div>
+    </div>
+    <div class="card center" style="margin-top:16px;background:rgba(29,185,84,.08);border-color:rgba(29,185,84,.3)">
+      <p style="color:var(--verify-2);font-size:14px">
+        <strong>The critical distinction:</strong> the first invitee is <em>not</em> automatically a customer.
+        They become a member for free — and a customer only when they want to verify someone themselves.
+      </p>
+    </div>
+  </div>
+  <span class="snum">09</span>
+  <div class="notes">
+    <h4>What to say</h4>
+    <p>Tell this as a story, in three acts, without touching the product. It is the most memorable ninety seconds in the deck — most investors will retell your company using this story, so make it clean. The beat that must land hardest is the end of Act I: <strong>XYZ pays nothing.</strong> Pause there.</p>
+    <h4>Why it matters</h4>
+    <p>It answers customer acquisition, network effects and the free-versus-paid boundary in one narrative rather than three slides of assertion. It also shows the acquisition cost of the second generation of members is borne by the first generation of customers, not by us.</p>
+    <div class="qa">
+      <div class="q">“Why would an invited company bother joining?”</div>
+      <p class="a">Because their customer asked them to, and because the alternative is emailing a document pack. The pull is that the profile is reusable — submit once rather than twenty times, get advance warning of your own expiring licences, and carry a credential into the next tender. But I would not oversell this: vendor completion rate is the metric that decides whether the entire network thesis works, and it is the first number we will prove in pilots. Our design target is above 80% completion within seven days, and if we cannot hit that, the flywheel does not start.</p>
+    </div>
+    <div class="qa">
+      <div class="q">“Why would they ever pay?”</div>
+      <p class="a">They do not pay to be verified — ever. They pay when they switch sides and want to verify their own counterparties. That is a completely different budget, a different internal owner, and a value proposition they have just personally experienced from the receiving end. It is the warmest possible lead: a company that has already used the product and understood it before any salesperson called.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ 10 · FLYWHEEL ══════════════ -->
+<section class="slide">
+  <p class="eyebrow">Network effect</p>
+  <h2>Customers fund the acquisition of the next generation of members.</h2>
+  <div class="body">
+    <div class="cols c23" style="gap:30px;align-items:center">
+      <div class="flow" style="max-width:340px;margin:0 auto">
+        <div class="fnode hi">Enterprise customer</div><div class="farrow">↓</div>
+        <div class="fnode">Invites its network</div><div class="farrow">↓</div>
+        <div class="fnode b">BID members (free)</div><div class="farrow">↓</div>
+        <div class="fnode v">Verified organizations</div><div class="farrow">↓</div>
+        <div class="fnode b">Some become requesters</div><div class="farrow">↓</div>
+        <div class="fnode">They invite their network</div><div class="farrow">↓</div>
+        <div class="fnode b">More members</div><div class="farrow">↓</div>
+        <div class="fnode v">More customers</div><div class="farrow">↓</div>
+        <div class="fnode hi">Stronger network ↻</div>
+      </div>
+      <div>
+        <div class="card verify">
+          <h3 style="color:var(--verify-2)">The economics of density</h3>
+          <p>The second time an entity is verified, most attributes are already current and disclosable
+          under consent. Marginal provider cost falls sharply. <strong>Price does not fall proportionally.</strong>
+          That gap is the business.</p>
+        </div>
+        <div class="card caution" style="margin-top:12px">
+          <h3 style="color:#F6C46B">The honest constraint</h3>
+          <p>A network is worth nothing until it is dense. We assume <strong>no network value for the first
+          12–18 months</strong> and the product must win standalone on workflow, evidence, audit trail and
+          monitoring. Density beats breadth: 500 verified suppliers in one region and a few adjacent
+          categories is worth more than 5,000 scattered nationally, because reuse only fires when two
+          buyers want the <em>same</em> entity.</p>
+        </div>
+        <div class="card" style="margin-top:12px">
+          <h3>Where reuse actually applies</h3>
+          <p>Business-registry checks reuse well across buyers. Manual person-side checks largely do not —
+          for consent, validity and ethical reasons. <strong>The network effect is mostly a
+          business-verification phenomenon</strong>, and we plan on that basis.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <span class="snum">10</span>
+  <div class="notes">
+    <h4>What to say</h4>
+    <p>Run the loop once, then immediately volunteer the two constraints. Volunteering the cold-start problem before the investor raises it is worth more than any claim on the slide — it signals you have modelled this rather than drawn it.</p>
+    <h4>Why it matters</h4>
+    <p>Every investor has seen a flywheel diagram that was really a wish. The credibility comes from the caveats: no network value for 12–18 months, density over breadth, and reuse being a business-side phenomenon rather than a universal one.</p>
+    <div class="qa">
+      <div class="q">“How do you actually get network effects rather than just drawing them?”</div>
+      <p class="a">Three preconditions, all measurable. One: vendor completion rate above 80%, or nothing downstream happens. Two: regional and category density, so two buyers genuinely want the same supplier — which is why we saturate Karnataka manufacturing before expanding. Three: buyer willingness to accept network-sourced evidence under their own policy, which we are testing directly in discovery conversations right now. If that third one comes back negative across the board, reuse collapses into an internal cost saving rather than a customer benefit — still valuable, but a materially different business, and we would tell you.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ 11 · IDENTITY LAYER ══════════════ -->
+<section class="slide light">
+  <p class="eyebrow">The visible layer</p>
+  <h2>BID ID, Digital Card and public profile.</h2>
+  <p class="sub">The card is not the product. It is the visible surface of the trust infrastructure underneath — and every card shared is a distribution event.</p>
+  <div class="body">
+    <div class="cols c3" style="gap:16px;align-items:start">
+      <div class="bidcard">
+        <div style="display:flex;align-items:center;gap:7px">
+          <svg viewBox="0 0 104 104" width="18" height="18"><path d="M28 24 L84 24 L84 58 C84 79 69 92 56 99 C43 92 28 79 28 58 Z" fill="#DCE6F0"/><path d="M33 29 L79 29 L79 58 C79 76 66 87 56 93 C46 87 33 76 33 58 Z" fill="#0A2148"/><path d="M42 58 L53 70 L96 14" fill="none" stroke="#2E9BF5" stroke-width="12"/></svg>
+          <span style="font-size:9px;font-weight:800;letter-spacing:.2em">BID <span style="color:var(--ink-3)">TRUST</span></span>
+        </div>
+        <div class="nm">XYZ HR Consultants</div>
+        <div class="id">BID-BUS-00231</div>
+        <div class="vbadge">
+          <span class="tick"><svg viewBox="0 0 12 12" width="9" height="9"><path d="M1.6 6.2 4.4 8.9 10.4 3.1" fill="none" stroke="#062B12" stroke-width="2.2" stroke-linecap="round"/></svg></span>
+          <span><b style="font-size:11px;letter-spacing:.08em">BID VERIFIED</b><br><span style="font-size:9.5px;color:var(--ink-2)">Level L3 · Corroborated</span></span>
+        </div>
+        <div style="margin-top:11px">
+          <div class="checkrow"><span class="k">Identity</span><span class="v"><i class="dot"></i>Verified</span></div>
+          <div class="checkrow"><span class="k">GST</span><span class="v"><i class="dot"></i>Verified</span></div>
+          <div class="checkrow"><span class="k">Compliance</span><span class="v"><i class="dot"></i>Verified</span></div>
+          <div class="checkrow"><span class="k">Risk</span><span class="v"><i class="dot"></i>Clear</span></div>
+        </div>
+        <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.1);display:flex;justify-content:space-between;align-items:flex-end">
+          <span style="font-size:9px;color:var(--ink-3);line-height:1.6">Verified 15 Aug 2026<br>Valid to 15 Aug 2027<br>bidtrust.in/BID-BUS-00231</span>
+          <span class="qr"><svg viewBox="0 0 12 12" width="30" height="30"><rect width="12" height="12" fill="#fff"/><g fill="#0A2A5E"><rect x="0" y="0" width="4" height="4"/><rect x="1" y="1" width="2" height="2" fill="#fff"/><rect x="8" y="0" width="4" height="4"/><rect x="9" y="1" width="2" height="2" fill="#fff"/><rect x="0" y="8" width="4" height="4"/><rect x="1" y="9" width="2" height="2" fill="#fff"/><rect x="5" y="1" width="1" height="1"/><rect x="6" y="3" width="1" height="1"/><rect x="5" y="5" width="2" height="1"/><rect x="8" y="6" width="1" height="2"/><rect x="10" y="7" width="1" height="1"/><rect x="6" y="9" width="1" height="2"/><rect x="9" y="10" width="2" height="1"/></g></svg></span>
+        </div>
+      </div>
+
+      <div class="browser" style="grid-column:span 2">
+        <div class="urlbar"><span style="width:7px;height:7px;border-radius:50%;background:#CBD5E1"></span>bidtrust.in/BID-BUS-00231
+          <span style="margin-left:auto;background:rgba(29,185,84,.1);border:1px solid rgba(29,185,84,.35);color:#0E7A34;border-radius:999px;padding:2px 8px;font-size:9px;font-weight:800;letter-spacing:.08em">BID VERIFIED</span>
+        </div>
+        <div class="panel-v">
+          <p class="plabel" style="color:#0E7A34">BID-Verified Information</p>
+          <p class="tiny" style="margin-bottom:7px">Verified by BID against authoritative sources through authorized channels.</p>
+          <div class="prow"><span>Legal entity</span><b>Verified · 15 Aug 2026</b></div>
+          <div class="prow"><span>GST registration</span><b>Active · 15 Aug 2026</b></div>
+          <div class="prow"><span>Business status</span><b>Active</b></div>
+          <div class="prow"><span>Required certifications</span><b>Verified</b></div>
+          <div class="prow"><span>Verification level / validity</span><b>L3 · valid to 15 Aug 2027</b></div>
+        </div>
+        <div class="panel-c">
+          <p class="plabel" style="color:#8A6A28">Company-Provided Information</p>
+          <p class="tiny" style="margin-bottom:7px">Supplied by the company. Not verified by BID unless individually marked.</p>
+          <p style="font-size:11.5px;color:var(--paper-dim);margin:0">Staffing, recruitment and HR advisory for mid-market technology firms. Established 2014.</p>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:14px;background:#fff;border-color:rgba(255,107,112,.3)">
+      <p style="color:#B32D33"><strong>The rule that protects the whole proposition:</strong> company-provided and
+      BID-verified information are separated structurally, always. If that line is ever blurred, the platform's
+      value — the claim that verified means verified — is gone.</p>
+    </div>
+  </div>
+  <span class="snum">11</span>
+  <div class="notes">
+    <h4>What to say</h4>
+    <p>Say “the card is not the product” before anything else, or the investor will file you as a badge company. Then make the point about distribution: every card in a tender, invoice footer or email signature is a warm lead on both sides — the unverified supplier who sees it, and the buyer who receives it.</p>
+    <h4>Why it matters</h4>
+    <p>It makes the acquisition loop tangible and shows product discipline: BID controls the authenticity of verification status, while the company controls its own descriptive content, and the two are never mixed.</p>
+    <div class="qa">
+      <div class="q">“Isn't a verified badge easy to fake?”</div>
+      <p class="a">A screenshot proves nothing, and we say so in the UI. Cards are generated server-side with a signed payload, and only QR resolution to the live profile is authoritative — so an expired verification resolves to an expired profile. There is no way to freeze a favourable historical state, and we monitor for forged card images because someone will try.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ 12 · AUTHORITY ══════════════ -->
+<section class="slide">
+  <p class="eyebrow">The credibility question</p>
+  <h2>Who gives BID the authority to verify?</h2>
+  <div class="body">
+    <div class="card adverse center" style="padding:18px;margin-bottom:18px">
+      <p style="font-size:clamp(17px,2.2vw,23px);font-weight:700;color:#fff;margin:0">
+        Nobody. BID is <em style="color:var(--adverse)">not</em> a government authority — and never claims to be.
+      </p>
+    </div>
+    <div class="cols c2" style="gap:20px">
+      <div>
+        <h3>What BID actually is</h3>
+        <p class="sub" style="font-size:13.5px">An independent private verification and trust platform that
+        verifies information against sources it is lawfully permitted to use, and records exactly how.</p>
+        <p class="tiny" style="font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin:14px 0 8px">Sources BID uses</p>
+        <ul class="plain">
+          <li>Official and authorized data sources where available</li>
+          <li>Authorized verification providers and regulated intermediaries</li>
+          <li>Licensed commercial verification providers</li>
+          <li>Direct issuer and employer confirmations</li>
+          <li>Entity-provided evidence, with consent</li>
+        </ul>
+      </div>
+      <div>
+        <div class="card verify">
+          <h3 style="color:var(--verify-2)">For every single verification, BID records:</h3>
+          <div class="row" style="margin-top:10px">
+            <span class="pill v">WHAT was checked</span><span class="pill v">SOURCE</span><span class="pill v">METHOD</span>
+            <span class="pill v">WHEN</span><span class="pill v">RESULT</span><span class="pill v">SCOPE</span><span class="pill v">FRESHNESS</span>
+          </div>
+        </div>
+        <div class="card brand" style="margin-top:14px;text-align:center;padding:18px">
+          <p style="font-size:clamp(16px,2vw,21px);font-weight:700;color:#fff;margin:0">
+            “Don't trust the badge.<br>Verify the verification.”
+          </p>
+        </div>
+        <p class="tiny" style="margin-top:12px">
+          BID never says “this company is trustworthy”. It says: verified against source X, by method Y,
+          on date Z, to scope S. The decision stays with the enterprise — and so does the defensible record.
+        </p>
+      </div>
+    </div>
+  </div>
+  <span class="snum">12</span>
+  <div class="notes">
+    <h4>What to say</h4>
+    <p>Answer the question before it is asked, and answer it against yourself. “Nobody gives us authority. We are not a government body and we never imply it.” Then flip it into the strength: authority comes from transparency, not from a claim. Deliver the tagline slowly — it is the philosophical core of the company.</p>
+    <h4>Why it matters</h4>
+    <p>Verification businesses die from overclaiming. An investor who has seen a competitor get into regulatory or defamation trouble will be listening hard for whether you understand the line. This slide proves you do, and it is also the ethical spine of the product.</p>
+    <div class="qa">
+      <div class="q">“What is your liability if a verification is wrong and a customer relies on it?”</div>
+      <p class="a">It is a genuine exposure and we manage it three ways. Architecturally: we report evidence with its source, method, timestamp and scope, never conclusions, so the customer's decision remains theirs and the record shows exactly what they relied on. Operationally: adverse findings are never auto-concluded — screening produces potential matches that require human disposition with a recorded reason. Commercially: bounded liability in contract plus professional indemnity cover. It is also on our open legal-items list — final terms need counsel before launch, and I would not want to give you a confident answer I cannot stand behind.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ 13 · PRIVACY + SECURITY ══════════════ -->
+<section class="slide light">
+  <p class="eyebrow">Data &amp; privacy model</p>
+  <h2>Trust without unnecessary disclosure.</h2>
+  <p class="sub">Minimum necessary disclosure is an architectural principle, not a policy document. The buyer gets what they need to make and defend a decision — and nothing beyond it.</p>
+  <div class="body">
+    <div class="cols c2" style="gap:20px">
+      <div>
+        <div class="cols c2" style="gap:10px">
+          <div class="card" style="border-color:rgba(255,107,112,.35)">
+            <p class="tiny" style="font-weight:700;color:#B32D33;letter-spacing:.1em;margin-bottom:6px">INSTEAD OF EXPOSING</p>
+            <p style="font-size:12.5px">Exact turnover:<br><b>₹18.4 crore</b></p>
+          </div>
+          <div class="card" style="border-color:rgba(29,185,84,.4);background:rgba(29,185,84,.04)">
+            <p class="tiny" style="font-weight:700;color:#0E7A34;letter-spacing:.1em;margin-bottom:6px">BID DISCLOSES</p>
+            <p style="font-size:12.5px">Required turnover threshold:<br><b style="color:#0E7A34">VERIFIED</b></p>
+          </div>
+          <div class="card" style="border-color:rgba(255,107,112,.35)">
+            <p class="tiny" style="font-weight:700;color:#B32D33;letter-spacing:.1em;margin-bottom:6px">INSTEAD OF EXPOSING</p>
+            <p style="font-size:12.5px">Entire employment record with dates, salaries and reasons for leaving</p>
+          </div>
+          <div class="card" style="border-color:rgba(29,185,84,.4);background:rgba(29,185,84,.04)">
+            <p class="tiny" style="font-weight:700;color:#0E7A34;letter-spacing:.1em;margin-bottom:6px">BID DISCLOSES</p>
+            <p style="font-size:12.5px">Required employment history:<br><b style="color:#0E7A34">VERIFIED</b></p>
+          </div>
+        </div>
+        <div class="card caution" style="margin-top:12px;background:#FEFCF7">
+          <p style="color:#8A5A05"><strong>Regulatory context:</strong> India's DPDP Rules were notified on
+          14 November 2025. Consent-manager provisions take effect 13 November 2026 and the substantive
+          compliance obligations from 13 May 2027, with penalties up to ₹250 crore.
+          <strong>This is a dated, non-speculative tailwind</strong> — but final implementation requires
+          qualified counsel, and we make no legal guarantees.</p>
+        </div>
+      </div>
+      <div>
+        <p class="tiny" style="font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px">Privacy principles, enforced in code</p>
+        <div class="row" style="margin-bottom:14px">
+          <span class="pill v">Consent</span><span class="pill v">Purpose limitation</span><span class="pill v">Access control</span>
+          <span class="pill v">Data minimization</span><span class="pill v">Audit</span><span class="pill v">Retention</span>
+          <span class="pill v">Deletion</span><span class="pill v">Security</span>
+        </div>
+        <p class="tiny" style="font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px">Enterprise-grade security</p>
+        <div class="row">
+          <span class="pill n">Encryption</span><span class="pill n">MFA</span><span class="pill n">SSO</span>
+          <span class="pill n">RBAC</span><span class="pill n">ABAC</span><span class="pill n">Tenant isolation</span>
+          <span class="pill n">Audit logs</span><span class="pill n">Evidence integrity</span><span class="pill n">API security</span>
+          <span class="pill n">Incident response</span>
+        </div>
+        <div class="card" style="margin-top:14px;background:#fff;border-color:rgba(255,107,112,.3)">
+          <p style="color:#B32D33"><strong>Two things BID will never do:</strong> build a public or searchable
+          database of individuals' background information, or sell personal data. The moat must never
+          depend on either — that is both an ethical line and a commercial one.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <span class="snum">13</span>
+  <div class="notes">
+    <h4>What to say</h4>
+    <p>Lead with the two before/after pairs — they make an abstract principle concrete in five seconds. Then use the DPDP dates. Most founders say “privacy regulation is a tailwind” vaguely; you have a notification date, two commencement dates and a penalty ceiling. That specificity is the credibility.</p>
+    <h4>Why it matters</h4>
+    <p>Privacy is usually treated as a compliance cost. Here it is a moat: as obligations bite in May 2027, ad hoc verification via email and spreadsheets becomes an unacceptable practice, which pushes buyers toward governed platforms. That is a dated forcing function, not a hope.</p>
+    <div class="qa">
+      <div class="q">“How do you handle privacy, really?”</div>
+      <p class="a">Minimum necessary disclosure enforced at the authorization layer, not by policy. Every relationship carries a stated purpose, every disclosure beyond the public tier requires a specific, time-boxed, revocable consent artifact, and a person can see and dispute anything said about them. Our working position is that we are a processor for buyer-instructed verification and a fiduciary for the reusable profile — we build to the stricter reading, because dual-role compliance is expensive to retrofit and cheap to design in. The exact classification is on our legal open-items list.</p>
+    </div>
+    <div class="qa">
+      <div class="q">“Doesn't the network model require sharing personal data across buyers?”</div>
+      <p class="a">No, and this is a boundary we will not move. Business-entity data reuses across buyers under consent. A person's background result does not — it goes to the requesting employer under its stated purpose only, is never publicly resolvable, and is never reusable without fresh consent. That does constrain the network effect on the people side, and we plan on that basis rather than pretending otherwise.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ 14 · REVENUE MODEL ══════════════ -->
+<section class="slide">
+  <p class="eyebrow">Revenue model</p>
+  <h2>Recurring platform, consumption, and services.</h2>
+  <div class="body">
+    <div class="cols c32" style="gap:20px">
+      <div>
+        <div class="cols c4" style="gap:9px;margin-bottom:14px">
+          <div class="card center"><p class="tiny">STARTER</p><p class="kpi b" style="font-size:19px">₹9,999</p><p class="tiny">/month, from</p></div>
+          <div class="card center" style="border-color:rgba(46,155,245,.45)"><p class="tiny">GROWTH</p><p class="kpi b" style="font-size:19px">₹24,999</p><p class="tiny">/month, from</p></div>
+          <div class="card center"><p class="tiny">BUSINESS</p><p class="kpi b" style="font-size:19px">₹49,999</p><p class="tiny">/month, from</p></div>
+          <div class="card center"><p class="tiny">ENTERPRISE</p><p class="kpi b" style="font-size:19px">₹1,00,000</p><p class="tiny">/month, from</p></div>
+        </div>
+        <table>
+          <tr><th>Line</th><th>Starting price</th><th>Type</th></tr>
+          <tr><td><b>1 · Enterprise SaaS subscription</b></td><td>from ₹9,999/mo</td><td>Recurring</td></tr>
+          <tr><td><b>2 · Business verification</b></td><td>from ₹499/check</td><td>Consumption</td></tr>
+          <tr><td><b>3 · Re-verification</b></td><td>from ₹499</td><td>Consumption</td></tr>
+          <tr><td><b>4 · Continuous monitoring</b></td><td>from ₹49/entity/mo</td><td>Recurring</td></tr>
+          <tr><td><b>5 · Candidate BGV</b></td><td>from ₹499/package</td><td>Consumption</td></tr>
+          <tr><td><b>6 · Employee verification</b></td><td>from ₹499/package</td><td>Consumption</td></tr>
+          <tr><td><b>7 · Contractor verification</b></td><td>from ₹199/worker</td><td>Consumption</td></tr>
+          <tr><td><b>8 · Enhanced due diligence</b></td><td>from ₹999</td><td>Consumption</td></tr>
+          <tr><td><b>9 · API usage</b></td><td>from ₹14,999/mo + usage</td><td>Recurring</td></tr>
+          <tr><td><b>10 · Enterprise integration</b></td><td>from ₹2,00,000</td><td>One-time</td></tr>
+        </table>
+      </div>
+      <div>
+        <div class="card caution">
+          <p style="color:#F6C46B"><strong>Illustrative starting prices.</strong> Final pricing depends on scope,
+          provider costs, volume, SLA and enterprise requirements. These are not validated final market prices,
+          and we do not publish a price list until provider quotations are in.</p>
+        </div>
+        <div class="card" style="margin-top:12px">
+          <h3>Target mix at maturity</h3>
+          <p><b style="color:var(--brand)">~55%</b> recurring · <b style="color:var(--brand)">~35%</b> consumption ·
+          <b style="color:var(--brand)">~10%</b> services</p>
+          <p class="tiny" style="margin-top:6px">Services land accounts; they must never become the business.
+          A services-heavy mix destroys the multiple and consumes the engineering team.</p>
+        </div>
+        <div class="card verify" style="margin-top:12px">
+          <h3 style="color:var(--verify-2)">Illustrative unit economics</h3>
+          <table style="margin-top:6px">
+            <tr><td>Customer pays</td><td><b>₹999</b></td></tr>
+            <tr><td>Provider cost <span class="tiny">(assumed)</span></td><td>₹60</td></tr>
+            <tr><td>Internal + infra + support</td><td>₹58</td></tr>
+            <tr><td>Payment gateway</td><td>₹20</td></tr>
+            <tr><td><b>Gross contribution</b></td><td><b style="color:var(--verify-2)">₹861</b></td></tr>
+            <tr><td><b>Gross margin</b></td><td><b style="color:var(--verify-2)">~86%</b></td></tr>
+          </table>
+          <p class="tiny" style="margin-top:6px">All figures illustrative and assumption-based. No provider
+          cost here reflects a real quotation.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <span class="snum">14</span>
+  <div class="notes">
+    <h4>What to say</h4>
+    <p>Do not read ten lines. Say: three legs — recurring platform, consumption, services — targeting roughly 55/35/10. Then go straight to the caveat yourself. Then give the honest asymmetry: business verification runs at software margins; people verification runs at services margins because it is dominated by manual employer and institution checks. That distinction is the most useful thing on the slide.</p>
+    <h4>Why it matters</h4>
+    <p>Sophisticated investors will test whether you know your own cost structure. Volunteering that BGV is a thin-margin line — and that you therefore treat it as an expansion motion rather than a wedge — buys more credibility than a uniformly rosy table.</p>
+    <div class="qa">
+      <div class="q">“How do you make money, in one sentence?”</div>
+      <p class="a">A platform subscription for the workflow, plus consumption per verification, plus recurring monitoring per entity — and the entity being verified never pays, because charging them would kill the network at its root.</p>
+    </div>
+    <div class="qa">
+      <div class="q">“Are these margins real?”</div>
+      <p class="a">They are modelled, not measured, and every provider cost in them is a placeholder. Our financial model is code driven by assumption files, and the single most important near-term commercial task is replacing placeholders with real quotations. Two lines already fall below our 70% target under those assumptions — standard BGV and per-worker contractor checks — and we know why: manual checks and a fixed roughly ₹48 per-verification overhead that crushes low-priced packages. We would rather show you that now than discover it after pricing is public.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ 15 · EXPANSION ══════════════ -->
+<section class="slide light">
+  <p class="eyebrow">Customer expansion</p>
+  <h2>One customer, eight expansion steps.</h2>
+  <p class="sub">XYZ starts with a 10-vendor pilot. Expansion comes from more entities, more relationship types and more functions — never from renegotiating the subscription.</p>
+  <div class="body">
+    <div class="cols" style="grid-template-columns:repeat(8,1fr);gap:6px;align-items:end;margin-bottom:14px">
+      <div class="center"><div style="height:26px;background:#CBD8E6;border-radius:4px 4px 0 0"></div><p class="tiny" style="margin-top:5px"><b>10 vendors</b><br>₹60k</p></div>
+      <div class="center"><div style="height:52px;background:#A9C4E4;border-radius:4px 4px 0 0"></div><p class="tiny" style="margin-top:5px"><b>100 vendors</b><br>₹300k</p></div>
+      <div class="center"><div style="height:72px;background:#7FAEE0;border-radius:4px 4px 0 0"></div><p class="tiny" style="margin-top:5px"><b>+ Employee</b><br>₹420k</p></div>
+      <div class="center"><div style="height:92px;background:#5596DC;border-radius:4px 4px 0 0"></div><p class="tiny" style="margin-top:5px"><b>+ Candidate BGV</b><br>₹540k</p></div>
+      <div class="center"><div style="height:128px;background:#2E9BF5;border-radius:4px 4px 0 0"></div><p class="tiny" style="margin-top:5px"><b>+ Contractor</b><br>₹760k</p></div>
+      <div class="center"><div style="height:158px;background:#1DB954;border-radius:4px 4px 0 0"></div><p class="tiny" style="margin-top:5px"><b>+ Monitoring</b><br>₹940k</p></div>
+      <div class="center"><div style="height:188px;background:#16A34A;border-radius:4px 4px 0 0"></div><p class="tiny" style="margin-top:5px"><b>+ API</b><br>₹1.12M</p></div>
+      <div class="center"><div style="height:252px;background:#0A2A5E;border-radius:4px 4px 0 0"></div><p class="tiny" style="margin-top:5px"><b>Enterprise</b><br>₹1.5M</p></div>
+    </div>
+    <div class="cols c3" style="gap:12px">
+      <div class="card"><h3>Different budgets, not a bigger one</h3><p>Vendors sit with procurement. Workforce sits with operations and EHS. BGV sits with HR. Each expansion opens a new wallet inside the same account.</p></div>
+      <div class="card"><h3>Monitoring is the retention line</h3><p>A customer receiving useful alerts every month does not churn. Monitoring attach rate is our strongest predicted churn signal.</p></div>
+      <div class="card"><h3>Same engine, new policy</h3><p>Every one of these steps is configuration, not a new product. That is the commercial payoff of the domain-agnostic architecture.</p></div>
+    </div>
+    <p class="footnote">Illustrative annual contribution for a single mid-market account. Not a forecast.</p>
+  </div>
+  <span class="snum">15</span>
+  <div class="notes">
+    <h4>What to say</h4>
+    <p>The headline number is the shape, not the total: a 10-vendor pilot can become a ₹1.5M account without a single renegotiation, because each step opens a different budget holder. Connect it back to slide 8 — this expansion is only cheap because the architecture is horizontal.</p>
+    <h4>Why it matters</h4>
+    <p>Net revenue retention is what turns a modest ACV into a venture-scale business in enterprise software. This slide is the NRR argument, made concretely.</p>
+    <div class="qa">
+      <div class="q">“What's your land-and-expand evidence?”</div>
+      <p class="a">Right now it is a model, not evidence, and I will not dress it up. What we can commit to is the instrumentation: every pilot measures actual cost per verification and monitoring attach rate, and the first expansion we will prove is vendor into contractor workforce, because it sells to a different budget in the same building and nobody else serves it.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ 16 · MARKET ══════════════ -->
+<section class="slide">
+  <p class="eyebrow">Market opportunity</p>
+  <h2>BID sits at the intersection of categories that are each already funded.</h2>
+  <div class="body">
+    <div class="cols c32" style="gap:20px">
+      <div>
+        <table>
+          <tr><th>Category</th><th>Published market signal</th><th>Source</th></tr>
+          <tr><td><b>Third-party risk management</b></td><td>2025 estimates ranged <b>$6.8B–$9.3B</b>; CAGRs 14–18.5%</td><td class="tiny">Multiple analyst firms</td></tr>
+          <tr><td><b>Background check software (global)</b></td><td><b>$4.8B</b> (2025) → <b>$10.1B</b> (2033), ~9.9% CAGR</td><td class="tiny">Grand View Research</td></tr>
+          <tr><td><b>Identity verification (India)</b></td><td><b>~$451–494M</b> (2024) → <b>~$1.72B</b> (2033), ~15–16% CAGR</td><td class="tiny">UnivDatos</td></tr>
+          <tr><td><b>India company base</b></td><td><b>&gt;2 million</b> active registered companies</td><td class="tiny">MCA / Statista</td></tr>
+        </table>
+        <div class="card caution" style="margin-top:14px">
+          <h3 style="color:#F6C46B">We are deliberately not showing you a single TAM number</h3>
+          <p>Analyst estimates for the third-party risk management market in 2026 alone range from
+          roughly <b>$6.5B to $16.8B</b> depending on scope and methodology — a 2.5× spread.
+          Quoting one of them as if it were fact would tell you more about our slide-making than our market.
+          These figures are directional evidence that the categories are real and growing, nothing more.</p>
+        </div>
+      </div>
+      <div>
+        <div class="card brand">
+          <h3 style="color:#fff">Where BID sits</h3>
+          <p style="color:#DCE9F8">Not inside any one of these categories — across the workflow that
+          currently spans all of them.</p>
+        </div>
+        <div class="stack" style="margin-top:12px">
+          <div class="card"><p><b>KYB</b> · business identity checks</p></div>
+          <div class="card"><p><b>TPRM</b> · vendor and third-party risk</p></div>
+          <div class="card"><p><b>BGV</b> · people verification</p></div>
+          <div class="card"><p><b>Identity verification</b> · individual identity</p></div>
+          <div class="card"><p><b>Compliance &amp; monitoring</b> · continuous assurance</p></div>
+        </div>
+        <p class="tiny" style="margin-top:12px"><strong>The honest framing:</strong> BID does not create a new
+        market. It unifies fragmented trust workflows that enterprises already pay for across several
+        existing categories.</p>
+      </div>
+    </div>
+    <p class="footnote">
+      Sources: TPRM sizing per multiple analyst firms (Mordor Intelligence, DataM Intelligence, The Business Research Company, Research &amp; Markets — estimates diverge materially);
+      background check software per Grand View Research; India identity verification per UnivDatos;
+      India active company count per MCA data as reported by Statista. Figures accessed August 2026 and
+      not independently audited.
+    </p>
+  </div>
+  <span class="snum">16</span>
+  <div class="notes">
+    <h4>What to say</h4>
+    <p>Lead with the refusal: <em>“I'm not going to give you a single TAM number, and here's why.”</em> Then show the 2.5× spread between analyst estimates for the same market in the same year. This is counterintuitive and it works — most decks inflate here, and a founder who declines to reads as someone who will also tell the truth in a board meeting.</p>
+    <h4>Why it matters</h4>
+    <p>The real argument is not size, it is intersection: enterprises already pay across KYB, TPRM, BGV and monitoring, from different budgets, with no connective layer. Existing spend is a stronger argument than a projected number.</p>
+    <div class="qa">
+      <div class="q">“What's your actual addressable market in India?”</div>
+      <p class="a">Build it bottom-up rather than top-down. Over two million active registered companies; our qualifying profile is 200–5,000 employees with a real procurement or compliance function and either 50+ active vendors, 100+ contract workers, or 100+ annual hires. From there it is number of qualifying companies × realistic ACV, which our expansion model puts in the ₹6–15 lakh range for mid-market. I would rather defend that arithmetic than a borrowed billion-dollar figure, and the qualifying-company count is one of the things we are validating now.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ 17 · COMPETITION ══════════════ -->
+<section class="slide light">
+  <p class="eyebrow">Competitive landscape</p>
+  <h2>Specialists are deep. Nobody owns the layer between them.</h2>
+  <div class="body">
+    <div class="cols c23" style="gap:24px">
+      <div style="position:relative;min-height:330px">
+        <p class="axlabel" style="position:absolute;top:-4px;left:8px;color:#8296AD">↑ Trust infrastructure</p>
+        <div class="matrix" style="border-color:#C6D3E2">
+          <span class="mitem us" style="left:76%;top:20%">BID Trust</span>
+          <span class="mitem" style="left:26%;top:34%;background:#fff;border-color:#D7E1EC;color:#5A6E88">Certa</span>
+          <span class="mitem" style="left:24%;top:52%;background:#fff;border-color:#D7E1EC;color:#5A6E88">Aravo · Optro · Diligent</span>
+          <span class="mitem" style="left:30%;top:70%;background:#fff;border-color:#D7E1EC;color:#5A6E88">Procurement suites</span>
+          <span class="mitem" style="left:70%;top:80%;background:#fff;border-color:#D7E1EC;color:#5A6E88">IDfy · Signzy · HyperVerge</span>
+          <span class="mitem" style="left:74%;top:62%;background:#fff;border-color:#D7E1EC;color:#5A6E88">AuthBridge · Perfios</span>
+          <span class="mitem" style="left:64%;top:92%;background:#fff;border-color:#D7E1EC;color:#5A6E88">BGV agencies</span>
+        </div>
+        <p class="axlabel" style="position:absolute;bottom:-18px;left:8px;color:#8296AD">Vertical / point solution</p>
+        <p class="axlabel" style="position:absolute;bottom:-18px;right:0;color:#8296AD">Domain-agnostic →</p>
+      </div>
+      <div>
+        <div class="card"><h3>Global TPRM platforms</h3><p><b>Certa</b> (~$50.6M raised), <b>Aravo</b>, <b>Optro</b> and <b>Diligent</b> — the latter three named Leaders in the 2026 Gartner MQ for TPRM Tools. Deep enterprise workflow, global pricing, limited Indian data depth, and no coverage of people or contract workforce.</p></div>
+        <div class="card" style="margin-top:10px"><h3>Indian KYB / identity specialists</h3><p><b>IDfy</b> ($24.3M, Feb 2026), <b>Signzy</b> (~$38.7M total), <b>Perfios</b> (₹10,000 Cr valuation; acquired Karza for ~$80M), <b>HyperVerge</b>. Excellent data coverage. These are suppliers to BID, not rivals.</p></div>
+        <div class="card" style="margin-top:10px"><h3>BGV agencies</h3><p><b>AuthBridge</b>, <b>OnGrid</b>, <b>SpringVerify</b> and others. Operational scale and HR relationships; services economics, little policy configurability, no continuous monitoring.</p></div>
+        <div class="card adverse" style="margin-top:10px;background:#fff"><h3 style="color:#B32D33">The real incumbent</h3><p>Spreadsheets, email and a CA firm. It is free at the point of use, has no procurement cycle, and wins most deals. We displace a manual process far more often than we displace a product.</p></div>
+      </div>
+    </div>
+    <p class="footnote">Positioning is our assessment based on publicly available information as of August 2026; funding figures per Tracxn and press reports; Gartner MQ for Third-Party Risk Management Tools for Assurance Leaders published 6 April 2026. Not an endorsement by, or a partnership with, any company named. Independent validation recommended before external use.</p>
+  </div>
+  <span class="snum">17</span>
+  <div class="notes">
+    <h4>What to say</h4>
+    <p>Name the real players and be generous about them — investors already know these names and will trust you more for it. Two lines carry the slide. First: “The Indian specialists are our suppliers, not our competitors.” Second: “Our real incumbent is a spreadsheet.” Then place BID in the top-right and explain the axes rather than asserting the position.</p>
+    <h4>Why it matters</h4>
+    <p>Decks that claim no competition get discounted immediately. This slide proves you have done the work, and it reframes the largest funded players as supply rather than threat.</p>
+    <div class="qa">
+      <div class="q">“Why won't Google, or a large enterprise vendor, just build this?”</div>
+      <p class="a">This is not a technology problem, it is a trust and relationship problem in a specific regulatory geography. It requires provider contracts in India with caching and reuse rights, buyer-side workflow depth in procurement and compliance, and a two-sided position where both the buyer and the verified party trust you with sensitive data. Large platforms are structurally poor at businesses that require being trusted by both sides of a transaction while monetising only one. The more realistic threat is a well-capitalised Indian KYB provider moving up-stack, and that is the one we actively plan against.</p>
+    </div>
+    <div class="qa">
+      <div class="q">“What if a procurement suite adds real verification?”</div>
+      <p class="a">Most likely outcome is we become their verification layer rather than their competitor. Their ROI on building Indian data-source depth and provider orchestration is poor if we are already embedded, and integration is our stated strategy — we are not trying to be Ariba.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ 18 · MOAT ══════════════ -->
+<section class="slide">
+  <p class="eyebrow">Differentiation &amp; moat</p>
+  <h2>What is an advantage today, and what compounds later.</h2>
+  <div class="body">
+    <div class="cols c2" style="gap:22px">
+      <div>
+        <div class="card caution">
+          <h3 style="color:#F6C46B">Initial advantages — copyable</h3>
+          <p class="tiny" style="margin-bottom:8px">Real, useful, and not moats. We do not call these defensible.</p>
+          <div class="row">
+            <span class="pill c">Domain agnostic</span><span class="pill c">Organization-centric</span>
+            <span class="pill c">Relationship-centric</span><span class="pill c">Configurable policies</span>
+            <span class="pill c">Provider neutral</span><span class="pill c">Evidence-backed</span>
+            <span class="pill c">Consent-driven</span><span class="pill c">Explainable assessment</span>
+            <span class="pill c">API-first</span><span class="pill c">Business + people</span>
+          </div>
+        </div>
+        <div class="card verify" style="margin-top:14px">
+          <h3 style="color:var(--verify-2)">Compounding assets — the actual moat</h3>
+          <ul class="plain v" style="margin-top:8px">
+            <li><b>Evidence history</b> — years of timestamped, sourced verification records a competitor cannot backfill</li>
+            <li><b>Reusable credentials</b> — entities that are already verified, under consent, with live validity</li>
+            <li><b>Enterprise integrations</b> — embedded in ERP, HRMS and procurement workflows</li>
+            <li><b>The verification graph</b> — entities, relationships, policies and credentials at density</li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <p class="tiny" style="font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px">How the moat is built, in order</p>
+        <div class="flow">
+          <div class="fnode dash">Stage 1 · Workflow + provider orchestration</div><div class="farrow">↓</div>
+          <div class="fnode dash">Stage 2 · Policy engine + evidence history</div><div class="farrow">↓</div>
+          <div class="fnode b">Stage 3 · Reusable credentials</div><div class="farrow">↓</div>
+          <div class="fnode b">Stage 4 · Enterprise integrations</div><div class="farrow">↓</div>
+          <div class="fnode v">Stage 5 · Network effects</div><div class="farrow">↓</div>
+          <div class="fnode hi">Stage 6 · Verification graph / trust infrastructure</div>
+        </div>
+        <div class="card adverse" style="margin-top:14px">
+          <p style="color:#FFB3B6"><strong>Hard constraint:</strong> the moat must never depend on selling
+          personal data or on a searchable database of people. Both are ruled out permanently — which
+          removes an obvious monetisation path and is the correct trade.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <span class="snum">18</span>
+  <div class="notes">
+    <h4>What to say</h4>
+    <p>Open by separating the two columns explicitly: “Ten things differentiate us today. None of them is a moat.” Investors hear feature lists called moats constantly; refusing to do it is a differentiator in itself. Then walk the six stages and be clear that stages 1 and 2 are where we are, and 5 and 6 are the thesis.</p>
+    <h4>Why it matters</h4>
+    <p>It shows you can distinguish a head start from a defensible position — which is exactly the judgement an investor is underwriting when they back a seed-stage infrastructure company.</p>
+    <div class="qa">
+      <div class="q">“So what is the moat, in one line?”</div>
+      <p class="a">The accumulated graph of verified entities, their relationships, the evidence behind them and the enterprise workflows built on top — none of which a competitor can backfill, because evidence history is time-dependent and consent is not transferable. Today we do not have it. Stages 1 and 2 are what we are building now, and I would not ask you to underwrite stage 6 as if it already existed.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ 19 · ROADMAP + MVP ══════════════ -->
+<section class="slide light">
+  <p class="eyebrow">Roadmap &amp; MVP</p>
+  <h2>One wedge, built properly, before anything else.</h2>
+  <div class="body">
+    <div class="cols c4" style="gap:12px;margin-bottom:16px">
+      <div class="card" style="border-color:rgba(21,96,216,.45);background:rgba(21,96,216,.04)">
+        <h3 style="color:var(--brand-2)">Phase 1 · MVP</h3>
+        <ul class="plain" style="margin-top:6px"><li>Organization identity + BID ID</li><li>Invitations</li><li>Business verification</li><li>Policy engine</li><li>Verification workflow</li><li>BID profile + digital card</li><li>Reports, basic billing</li></ul>
+      </div>
+      <div class="card"><h3>Phase 2</h3><ul class="plain" style="margin-top:6px"><li>BGV + employee verification</li><li>Contractor verification</li><li>Continuous monitoring</li><li>Provider orchestration</li><li>Consent + advanced audit</li></ul></div>
+      <div class="card"><h3>Phase 3</h3><ul class="plain" style="margin-top:6px"><li>Public API</li><li>Enterprise integrations</li><li>Credentials + wallet</li><li>Advanced risk</li></ul></div>
+      <div class="card"><h3>Phase 4</h3><ul class="plain" style="margin-top:6px"><li>BID Network</li><li>Credential portability</li><li>Network analytics</li><li>Geographic expansion</li></ul></div>
+    </div>
+    <div class="card" style="background:#fff">
+      <p class="tiny" style="font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--brand-2);margin-bottom:10px">The MVP story we validate first</p>
+      <div class="chain">
+        <div class="step"><span class="t">ABC creates policy</span></div><span class="arr">→</span>
+        <div class="step"><span class="t">Invites XYZ</span></div><span class="arr">→</span>
+        <div class="step"><span class="t">XYZ joins BID</span></div><span class="arr">→</span>
+        <div class="step"><span class="t">Business verification</span></div><span class="arr">→</span>
+        <div class="step"><span class="t">Result + profile + card</span></div><span class="arr">→</span>
+        <div class="step"><span class="t">ABC approves</span></div><span class="arr">→</span>
+        <div class="step" style="border-color:rgba(29,185,84,.5);background:rgba(29,185,84,.06)"><span class="t">XYZ verifies its own vendor</span></div><span class="arr">→</span>
+        <div class="step" style="border-color:rgba(29,185,84,.5);background:rgba(29,185,84,.06)"><span class="t">XYZ pays</span></div>
+      </div>
+      <p class="tiny" style="margin-top:10px"><strong>Everything in Phase 1 exists to make the last two boxes happen.</strong>
+      If an invited member does not convert to a requester, the business is an enterprise SaaS tool with hard
+      unit economics — not a network. That conversion is the first thing we prove, not the last.</p>
+    </div>
+    <div class="cols c3" style="gap:12px;margin-top:14px">
+      <div class="card"><h3>Go-to-market wedge</h3><p>Vendor and supplier verification, Indian mid-market and enterprise. IT, manufacturing, healthcare, construction, logistics, BPO, professional services.</p></div>
+      <div class="card"><h3>Pilot ladder</h3><p>10 vendors → 50 → 100 → enterprise rollout. Paid pilots only — a free pilot has no internal owner and no urgency.</p></div>
+      <div class="card"><h3>Partner strategy</h3><p>BGV, KYB, identity, financial-data and document providers as ecosystem partners; HRMS, ERP, procurement, RPO and staffing firms as channels.</p></div>
+    </div>
+  </div>
+  <span class="snum">19</span>
+  <div class="notes">
+    <h4>What to say</h4>
+    <p>The line that matters: “Everything in Phase 1 exists to make the last two boxes happen.” Then the discipline point — we are deliberately not building BGV, monitoring or the API on day one, even though customers will ask, because a shallow version of all four beats nothing and loses to a deep version of one.</p>
+    <h4>Why it matters</h4>
+    <p>Seed investors underwrite sequencing judgement as much as vision. A founder who can name what they are refusing to build is more fundable than one whose roadmap is a wish list.</p>
+    <div class="qa">
+      <div class="q">“What's the first wedge, and why that one?”</div>
+      <p class="a">Vendor and supplier onboarding. It has a named budget owner in procurement or compliance, a pain the buyer can quantify in days, no category education required because they already do the work manually — and critically, it is the only wedge that generates vendor invitations. BGV is a bigger market but it is price-driven, thinner-margin, and it does not seed the network. We enter BGV later, from inside an existing account, rather than competing on price from outside.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ 20 · RISKS ══════════════ -->
+<section class="slide">
+  <p class="eyebrow">Risks</p>
+  <h2>What could break this — and what we are doing about it.</h2>
+  <div class="body">
+    <table>
+      <tr><th style="width:22%">Risk</th><th style="width:38%">Why it is real</th><th>Mitigation</th></tr>
+      <tr><td><b>Provider dependency</b></td><td>Our suppliers are also our most natural competitors, and pricing is outside our control.</td><td>Two qualified routes for every required check; automatic failover; per-call cost ledger; reuse rights negotiated in every contract from the first one.</td></tr>
+      <tr><td><b>Cold start</b></td><td>The network is worth nothing until dense; reuse only fires when two buyers want the same entity.</td><td>Product must win standalone for 12–18 months; regional and category density before breadth; anchor customers whose vendor base seeds the graph.</td></tr>
+      <tr><td><b>Vendor completion rate</b></td><td>If invited vendors do not finish, campaigns stall and the flywheel never starts.</td><td>Disproportionate investment in the vendor-side flow; assisted onboarding; regional languages; measured from campaign one against an &gt;80%/7-day target.</td></tr>
+      <tr><td><b>Verification costs</b></td><td>Every margin number rests on unvalidated provider pricing.</td><td>Quotations before any public price list; pass-through clauses; no multi-year fixed consumption pricing.</td></tr>
+      <tr><td><b>Regulatory complexity</b></td><td>Credit information, financial data and identity channels are each restricted differently.</td><td>Counsel engaged pre-launch; product designed to degrade gracefully if any single source is unavailable; never assume access.</td></tr>
+      <tr><td><b>Enterprise sales cycles</b></td><td>Long cycles can outrun runway.</td><td>Mid-market first; paid pilots; land-small motion; annual prepay.</td></tr>
+      <tr><td><b>False positives</b></td><td>Name-matching on court and sanctions data is unreliable; a wrong finding harms a real business or person.</td><td>Potential-match framing only; mandatory human disposition; dispute workflow; dismissed matches remembered so the same false positive is not re-raised.</td></tr>
+      <tr><td><b>Data privacy &amp; trust</b></td><td>A breach of background or relationship data would end the company.</td><td>Sensitive data segregated with independent keys; tenant isolation as the primary pen-test target; minimal retention; ISO 27001 and SOC 2 on the roadmap.</td></tr>
+    </table>
+  </div>
+  <span class="snum">20</span>
+  <div class="notes">
+    <h4>What to say</h4>
+    <p>Do not soften these and do not rush. Say: “I'd rather you hear these from me than find them in diligence.” Then pick the two you genuinely lose sleep over — provider reuse rights and vendor completion rate — and go deeper on those than the slide does.</p>
+    <h4>Why it matters</h4>
+    <p>Risk slides are usually theatre. A specific, quantified risk register with real mitigations signals operational maturity, and it front-runs the diligence process rather than being ambushed by it.</p>
+    <div class="qa">
+      <div class="q">“Which of these actually worries you most?”</div>
+      <p class="a">Two. First, provider caching and reuse rights — if we cannot contractually reuse results, the margin-expansion story disappears and we become a pass-through reseller. That is a commercial negotiation we must win early, from a position of low volume, which is the hardest time to win it. Second, vendor completion rate, because everything downstream depends on it and we have no data yet. Both are measurable within the next two quarters, which is exactly what this round funds.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ 21 · WHY NOW ══════════════ -->
+<section class="slide light">
+  <p class="eyebrow">Investment thesis</p>
+  <h2>Why now.</h2>
+  <div class="body">
+    <div class="cols c4" style="gap:12px">
+      <div class="card"><p class="kpi b" style="font-size:15px">01</p><h3 style="margin-top:6px">Third-party dependence is rising</h3><p>Enterprises run on suppliers, contractors and outsourced workforces. Exposure grows with every tier.</p></div>
+      <div class="card"><p class="kpi b" style="font-size:15px">02</p><h3 style="margin-top:6px">Verification is still fragmented</h3><p>Multiple agencies, APIs, spreadsheets and no system of record. The workflow layer is genuinely unowned.</p></div>
+      <div class="card"><p class="kpi b" style="font-size:15px">03</p><h3 style="margin-top:6px">API ecosystems have matured</h3><p>Verification is now programmatic for entities authorized to use each channel — orchestration became possible.</p></div>
+      <div class="card"><p class="kpi b" style="font-size:15px">04</p><h3 style="margin-top:6px">AI improves the workflow</h3><p>Document anomaly detection, extraction and analyst triage — used to flag and route, never to conclude.</p></div>
+      <div class="card verify" style="grid-column:span 2"><p class="kpi v" style="font-size:15px">05</p><h3 style="margin-top:6px;color:#0E7A34">Privacy regulation has a date on it</h3><p>India's DPDP Rules were notified 14 Nov 2025. Consent-manager provisions commence 13 Nov 2026; substantive obligations 13 May 2027; penalties up to ₹250 crore. Ad hoc verification over email and spreadsheets becomes an untenable practice — <b>a dated forcing function, not a hope.</b></p></div>
+      <div class="card"><p class="kpi b" style="font-size:15px">06</p><h3 style="margin-top:6px">Continuous risk is the new standard</h3><p>Point-in-time verification is increasingly seen as insufficient by auditors and large customers.</p></div>
+      <div class="card"><p class="kpi b" style="font-size:15px">07</p><h3 style="margin-top:6px">Specialists stay specialised</h3><p>The strongest players are deep in one check type. The layer between them is still open.</p></div>
+    </div>
+    <div class="card brand" style="margin-top:16px;background:var(--navy-900);border-color:var(--navy-900)">
+      <p style="color:#fff;font-size:14px"><strong>The window:</strong> the orchestration position is available for
+      a few years, not many. It closes when a well-capitalised specialist moves up-stack or a global TPRM platform
+      localises. Speed on the wedge and density in one region are the whole strategy.</p>
+    </div>
+    <p class="footnote">DPDP Rules dates per PIB and legal commentary, accessed August 2026. Regulatory interpretation requires qualified counsel; no legal guarantees are made.</p>
+  </div>
+  <span class="snum">21</span>
+  <div class="notes">
+    <h4>What to say</h4>
+    <p>Spend your time on point 5 and skim the rest. Most “why now” slides are seven soft assertions; you have one hard date with a penalty attached. Say the dates aloud — 13 November 2026 and 13 May 2027 — because specificity is what makes a tailwind believable. Close on the window: this position is available for a few years, not many.</p>
+    <h4>Why it matters</h4>
+    <p>“Why now” is where most seed decks are weakest. A dated regulatory forcing function plus a named closing window converts urgency from a sales tactic into an argument.</p>
+    <div class="qa">
+      <div class="q">“Isn't regulation just as likely to hurt you?”</div>
+      <p class="a">It cuts both ways and we plan for both. It raises our compliance cost and constrains which data sources we can use — several channels are restricted and we design assuming we may not get access. But it raises the cost of the alternative far more: a company running background checks through email attachments and a shared drive is now carrying a risk it cannot govern. Regulation is a tailwind for governed platforms and a headwind for ad hoc practice, and we are firmly the former.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ 22 · WHY BID WINS + CLOSE ══════════════ -->
+<section class="slide">
+  <p class="eyebrow">Why BID can win</p>
+  <h2>Become the easiest way for an organization to do seven things.</h2>
+  <div class="body">
+    <div class="cols" style="grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:24px">
+      <div class="card center"><p class="mono tiny" style="color:var(--brand)">01</p><p style="font-size:11.5px;margin-top:4px"><b>Identify</b><br>who it is dealing with</p></div>
+      <div class="card center"><p class="mono tiny" style="color:var(--brand)">02</p><p style="font-size:11.5px;margin-top:4px"><b>Define</b><br>what must be verified</p></div>
+      <div class="card center"><p class="mono tiny" style="color:var(--brand)">03</p><p style="font-size:11.5px;margin-top:4px"><b>Execute</b><br>through trusted providers</p></div>
+      <div class="card center"><p class="mono tiny" style="color:var(--brand)">04</p><p style="font-size:11.5px;margin-top:4px"><b>Understand</b><br>the evidence</p></div>
+      <div class="card center"><p class="mono tiny" style="color:var(--brand)">05</p><p style="font-size:11.5px;margin-top:4px"><b>Decide</b><br>and record why</p></div>
+      <div class="card center"><p class="mono tiny" style="color:var(--verify-2)">06</p><p style="font-size:11.5px;margin-top:4px"><b>Maintain</b><br>trust over time</p></div>
+      <div class="card center"><p class="mono tiny" style="color:var(--verify-2)">07</p><p style="font-size:11.5px;margin-top:4px"><b>Reuse</b><br>credentials where appropriate</p></div>
+    </div>
+
+    <div class="center" style="border-top:1px solid var(--line);padding-top:24px">
+      <svg viewBox="0 0 104 104" width="46" height="46" style="margin-bottom:14px">
+        <path d="M28 24 L84 24 L84 58 C84 79 69 92 56 99 C43 92 28 79 28 58 Z" fill="url(#sv)"/>
+        <path d="M33 29 L79 29 L79 58 C79 76 66 87 56 93 C46 87 33 76 33 58 Z" fill="url(#dp)"/>
+        <path d="M42 58 L53 70 L96 14" fill="none" stroke="url(#rb)" stroke-width="12" stroke-linejoin="miter"/>
+      </svg>
+      <p style="font-size:clamp(18px,2.4vw,26px);font-weight:700;line-height:1.35;max-width:34ch;margin:0 auto 16px">
+        Every business relationship begins with one question:<br>
+        <em>Can I trust who I'm dealing with?</em>
+      </p>
+      <p style="font-size:15px;color:var(--ink-2);margin-bottom:20px">BID is building the infrastructure to answer it.</p>
+      <div class="row" style="justify-content:center">
+        <span class="pill b">bidtrust.in</span>
+        <span class="pill v">Trust, backed by verification.</span>
+      </div>
+    </div>
+  </div>
+  <span class="snum">22</span>
+  <div class="notes">
+    <h4>What to say</h4>
+    <p>Read the seven quickly — they are a checklist, not an argument — then stop talking and let the closing question sit. Do not add anything after “BID is building the infrastructure to answer it.” The silence does more work than another sentence.</p>
+    <h4>Why it matters</h4>
+    <p>The close should return to the exact sentence you opened with. An investor who remembers one thing should remember that question, attached to your company.</p>
+    <div class="qa">
+      <div class="q">“What do you need from this round?”</div>
+      <p class="a">Have this ready with specifics: amount, runway in months, and the three things the money buys. For BID those should be — real provider quotations with reuse rights secured, three paid pilots that prove vendor completion rate and true cost per verification, and the legal clarity on data-source access that determines what can be built. Name the milestones that unlock the next round, not a list of hires.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ APPENDIX · HARD QUESTIONS ══════════════ -->
+<section class="slide">
+  <p class="eyebrow">Appendix</p>
+  <h2>Hard questions.</h2>
+  <p class="sub">The fifteen questions most likely to decide this investment — with the answers we actually believe, including where we are uncertain.</p>
+  <div class="body" style="overflow:auto">
+    <div class="hardq">
+      <div class="item"><div class="q">1 · Isn't this market crowded?</div><div class="a">Crowded with specialists, empty at the orchestration layer. The specialists are our suppliers. Our real incumbent is a spreadsheet, and it wins most deals today.</div></div>
+      <div class="item"><div class="q">2 · Why won't IDfy, Signzy or AuthBridge build this?</div><div class="a">Some will try. Moving up-stack requires enterprise workflow depth and a different sales motion; and a provider-owned orchestration layer is worth less to buyers because it will always route to itself. It is a head start, not a permanent barrier.</div></div>
+      <div class="item"><div class="q">3 · What authority do you have to verify?</div><div class="a">None, and we never claim any. We are a private platform. Authority comes from transparency — what was checked, from which source, by what method, when, to what scope, and how fresh.</div></div>
+      <div class="item"><div class="q">4 · Why would an invited company join?</div><div class="a">Their customer asked, and the alternative is a document pack over email. Reuse is the durable pull. Completion rate is the metric that proves it, and we have no data yet.</div></div>
+      <div class="item"><div class="q">5 · Why would they ever pay?</div><div class="a">They never pay to be verified. They pay when they switch sides and want to verify their own counterparties — a different budget, and a product they have already personally used.</div></div>
+      <div class="item"><div class="q">6 · How do you avoid becoming a BGV company?</div><div class="a">By never leading with BGV. It is price-driven, thin-margin and does not seed the network. We enter it from inside an existing vendor-verification account, on workflow and transparency rather than price.</div></div>
+      <div class="item"><div class="q">7 · What is the moat, honestly?</div><div class="a">Today, none — we have a head start. Over time: evidence history, reusable credentials, embedded integrations and the verification graph. We separate advantages from moats deliberately.</div></div>
+      <div class="item"><div class="q">8 · What if reuse is contractually forbidden?</div><div class="a">Then margin expansion disappears and we become a pass-through reseller. It is our single most important supplier term and we negotiate it from the first contract, not the tenth.</div></div>
+      <div class="item"><div class="q">9 · Enterprise sales cycles will kill you.</div><div class="a">Which is why we sell mid-market first, charge for pilots so they have an internal owner, land in one function, and expand into adjacent budgets rather than renegotiating.</div></div>
+      <div class="item"><div class="q">10 · Are your margins real?</div><div class="a">Modelled, not measured. Every provider cost is a placeholder. Two lines already fall below our 70% target under current assumptions and we can tell you exactly which and why.</div></div>
+      <div class="item"><div class="q">11 · How do you handle false positives?</div><div class="a">Screening produces potential matches, never conclusions. Human disposition is mandatory with a recorded reason, dismissed matches are remembered, and any entity can dispute a finding about itself.</div></div>
+      <div class="item"><div class="q">12 · What is your liability if you get it wrong?</div><div class="a">We report evidence with source, method, timestamp and scope — not conclusions — so the decision and the record stay with the customer. Plus bounded contractual liability and indemnity cover. Final terms need counsel.</div></div>
+      <div class="item"><div class="q">13 · Doesn't the network need personal data to work?</div><div class="a">No. Business data reuses under consent; a person's background result does not, ever. That genuinely limits network effects on the people side and we plan accordingly.</div></div>
+      <div class="item"><div class="q">14 · How does this scale technically?</div><div class="a">Event-driven and async by default, because issuer and human checks take days. Tenant isolation enforced in the data layer. The hard scaling problem is operations — exception handling and assisted onboarding — not compute.</div></div>
+      <div class="item"><div class="q">15 · What kills this company?</div><div class="a">A breach of background or relationship data, or a well-capitalised specialist moving up-stack before we reach density. The first is an engineering and governance problem; the second is a speed problem. Both are why this round exists.</div></div>
+      <div class="item"><div class="q">16 · What would make you shut it down?</div><div class="a">If pilots show vendor completion below roughly 50% and it cannot be moved, or if provider economics make ₹499-class pricing structurally loss-making at volume. Both are testable within two quarters.</div></div>
+    </div>
+  </div>
+  <span class="snum">A1</span>
+  <div class="notes">
+    <h4>How to use this appendix</h4>
+    <p>Do not present it. Keep it behind the close and jump to it when a question lands, which signals you anticipated it. Questions 8, 10 and 16 are the ones that most impress experienced investors, because each concedes something real — and a founder who volunteers a kill condition is far more credible than one who claims there isn't one.</p>
+    <h4>The general rule for the Q&amp;A</h4>
+    <p>Where you have data, give it. Where you have a model, say “modelled”. Where you have neither, say so and name the date by which you will. The fastest way to lose an experienced investor is a confident answer to a question you have not actually tested — they will find out in diligence, and then everything else you said is suspect too.</p>
+  </div>
+</section>
+
+</div>
+
+<div class="nav">
+  <button id="prev" aria-label="Previous slide">‹</button>
+  <span class="count" id="count">1 / 23</span>
+  <span class="dots" id="dots"></span>
+  <button id="next" aria-label="Next slide">›</button>
+</div>
+
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var i = 0, all = false;
+  var countEl = document.getElementById('count');
+  var dotsEl = document.getElementById('dots');
+
+  slides.forEach(function(_, n){
+    var d = document.createElement('i');
+    d.addEventListener('click', function(){ go(n); });
+    dotsEl.appendChild(d);
+  });
+  var dots = Array.prototype.slice.call(dotsEl.children);
+
+  function render(){
+    if (all) {
+      slides.forEach(function(s){ s.classList.add('active'); });
+      countEl.textContent = slides.length + ' slides';
+    } else {
+      slides.forEach(function(s, n){ s.classList.toggle('active', n === i); });
+      countEl.textContent = (i + 1) + ' / ' + slides.length;
+      window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
+    }
+    dots.forEach(function(d, n){ d.classList.toggle('on', !all && n === i); });
+  }
+  function go(n){ all = false; document.getElementById('allBtn').classList.remove('on');
+    i = Math.max(0, Math.min(slides.length - 1, n)); render(); }
+
+  document.getElementById('prev').addEventListener('click', function(){ go(i - 1); });
+  document.getElementById('next').addEventListener('click', function(){ go(i + 1); });
+
+  document.getElementById('notesBtn').addEventListener('click', function(){
+    document.body.classList.toggle('shownotes');
+    this.classList.toggle('on', document.body.classList.contains('shownotes'));
+  });
+  document.getElementById('allBtn').addEventListener('click', function(){
+    all = !all; this.classList.toggle('on', all); render();
+  });
+
+  document.addEventListener('keydown', function(e){
+    if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return;
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); go(i + 1); }
+    if (e.key === 'ArrowLeft'  || e.key === 'PageUp') { e.preventDefault(); go(i - 1); }
+    if (e.key === 'Home') { e.preventDefault(); go(0); }
+    if (e.key === 'End')  { e.preventDefault(); go(slides.length - 1); }
+    if (e.key.toLowerCase() === 'n') document.getElementById('notesBtn').click();
+    if (e.key.toLowerCase() === 'a') document.getElementById('allBtn').click();
+  });
+
+  render();
+})();
+</script>
