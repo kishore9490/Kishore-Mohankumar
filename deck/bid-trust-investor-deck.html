@@ -276,16 +276,19 @@ body.shownotes .notes{display:block}
 }
 </style>
 
+<svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;left:-9999px" id="bid-gradients">
+  <defs>
+    <linearGradient id="sv" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFF"/><stop offset="38%" stop-color="#DCE6F0"/><stop offset="62%" stop-color="#9DB0C4"/><stop offset="100%" stop-color="#E8EFF6"/></linearGradient>
+    <linearGradient id="bl" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#2E9BF5"/><stop offset="55%" stop-color="#1560D8"/><stop offset="100%" stop-color="#0A2E6E"/></linearGradient>
+    <linearGradient id="dp" x1="0" y1="0" x2=".6" y2="1"><stop offset="0%" stop-color="#12325F"/><stop offset="100%" stop-color="#061A3C"/></linearGradient>
+    <linearGradient id="rb" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stop-color="#1B6FE0"/><stop offset="60%" stop-color="#2E9BF5"/><stop offset="100%" stop-color="#6FC4FF"/></linearGradient>
+  </defs>
+</svg>
+
 <div class="deck">
   <div class="topbar">
     <span class="brandlock">
-      <svg viewBox="0 0 104 104" width="30" height="30" aria-label="BID Trust">
-        <defs>
-          <linearGradient id="sv" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFF"/><stop offset="38%" stop-color="#DCE6F0"/><stop offset="62%" stop-color="#9DB0C4"/><stop offset="100%" stop-color="#E8EFF6"/></linearGradient>
-          <linearGradient id="bl" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#2E9BF5"/><stop offset="55%" stop-color="#1560D8"/><stop offset="100%" stop-color="#0A2E6E"/></linearGradient>
-          <linearGradient id="dp" x1="0" y1="0" x2=".6" y2="1"><stop offset="0%" stop-color="#12325F"/><stop offset="100%" stop-color="#061A3C"/></linearGradient>
-          <linearGradient id="rb" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stop-color="#1B6FE0"/><stop offset="60%" stop-color="#2E9BF5"/><stop offset="100%" stop-color="#6FC4FF"/></linearGradient>
-        </defs>
+      <svg class="bidmark" data-h="30" viewBox="0 0 104 104" width="30" height="30" aria-label="BID Trust">
         <g><rect x="30" y="12" width="6" height="6" fill="#1560D8"/><rect x="21" y="19" width="7" height="7" fill="#2E9BF5"/><rect x="12" y="16" width="5" height="5" fill="#123A78"/><rect x="22" y="30" width="5" height="5" fill="#EDF3FA"/><rect x="13" y="27" width="6" height="6" fill="#1560D8"/><rect x="4" y="24" width="5" height="5" fill="#0E2E63"/><rect x="14" y="38" width="6" height="6" fill="#2E9BF5"/><rect x="6" y="35" width="4" height="4" fill="#123A78"/><rect x="19" y="47" width="4" height="4" fill="#1560D8"/><rect x="9" y="45" width="5" height="5" fill="#0E2E63"/></g>
         <path d="M28 24 L84 24 L84 58 C84 79 69 92 56 99 C43 92 28 79 28 58 Z" fill="url(#sv)"/>
         <path d="M33 29 L79 29 L79 58 C79 76 66 87 56 93 C46 87 33 76 33 58 Z" fill="url(#dp)"/>
@@ -307,7 +310,7 @@ body.shownotes .notes{display:block}
 <!-- ══════════════ 1 · TITLE ══════════════ -->
 <section class="slide active">
   <div class="body center" style="align-items:center;text-align:center">
-    <svg viewBox="0 0 104 104" width="76" height="76" style="margin:0 auto 22px">
+    <svg class="bidmark" data-h="76" viewBox="0 0 104 104" width="76" height="76" style="margin:0 auto 22px">
       <g><rect x="30" y="12" width="6" height="6" fill="#1560D8"/><rect x="21" y="19" width="7" height="7" fill="#2E9BF5"/><rect x="12" y="16" width="5" height="5" fill="#123A78"/><rect x="22" y="30" width="5" height="5" fill="#EDF3FA"/><rect x="13" y="27" width="6" height="6" fill="#1560D8"/><rect x="4" y="24" width="5" height="5" fill="#0E2E63"/><rect x="14" y="38" width="6" height="6" fill="#2E9BF5"/><rect x="6" y="35" width="4" height="4" fill="#123A78"/><rect x="19" y="47" width="4" height="4" fill="#1560D8"/><rect x="9" y="45" width="5" height="5" fill="#0E2E63"/></g>
       <path d="M28 24 L84 24 L84 58 C84 79 69 92 56 99 C43 92 28 79 28 58 Z" fill="url(#sv)"/>
       <path d="M33 29 L79 29 L79 58 C79 76 66 87 56 93 C46 87 33 76 33 58 Z" fill="url(#dp)"/>
@@ -799,7 +802,7 @@ body.shownotes .notes{display:block}
     <div class="cols c3" style="gap:16px;align-items:start">
       <div class="bidcard">
         <div style="display:flex;align-items:center;gap:7px">
-          <svg viewBox="0 0 104 104" width="18" height="18"><path d="M28 24 L84 24 L84 58 C84 79 69 92 56 99 C43 92 28 79 28 58 Z" fill="#DCE6F0"/><path d="M33 29 L79 29 L79 58 C79 76 66 87 56 93 C46 87 33 76 33 58 Z" fill="#0A2148"/><path d="M42 58 L53 70 L96 14" fill="none" stroke="#2E9BF5" stroke-width="12"/></svg>
+          <svg class="bidmark" data-h="18" viewBox="0 0 104 104" width="18" height="18"><path d="M28 24 L84 24 L84 58 C84 79 69 92 56 99 C43 92 28 79 28 58 Z" fill="#DCE6F0"/><path d="M33 29 L79 29 L79 58 C79 76 66 87 56 93 C46 87 33 76 33 58 Z" fill="#0A2148"/><path d="M42 58 L53 70 L96 14" fill="none" stroke="#2E9BF5" stroke-width="12"/></svg>
           <span style="font-size:9px;font-weight:800;letter-spacing:.2em">BID <span style="color:var(--ink-3)">TRUST</span></span>
         </div>
         <div class="nm">XYZ HR Consultants</div>
@@ -1392,7 +1395,7 @@ body.shownotes .notes{display:block}
     </div>
 
     <div class="center" style="border-top:1px solid var(--line);padding-top:24px">
-      <svg viewBox="0 0 104 104" width="46" height="46" style="margin-bottom:14px">
+      <svg class="bidmark" data-h="46" viewBox="0 0 104 104" width="46" height="46" style="margin-bottom:14px">
         <path d="M28 24 L84 24 L84 58 C84 79 69 92 56 99 C43 92 28 79 28 58 Z" fill="url(#sv)"/>
         <path d="M33 29 L79 29 L79 58 C79 76 66 87 56 93 C46 87 33 76 33 58 Z" fill="url(#dp)"/>
         <path d="M42 58 L53 70 L96 14" fill="none" stroke="url(#rb)" stroke-width="12" stroke-linejoin="miter"/>
