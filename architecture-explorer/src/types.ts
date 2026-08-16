@@ -18,7 +18,14 @@ export type Facet =
 /** Detail levels for the zoom control (§30). */
 export type ZoomLevel = 'executive' | 'system' | 'service' | 'data' | 'infrastructure'
 
-export type NodeTone = 'primary' | 'verify' | 'caution' | 'adverse' | 'neutral' | 'external'
+export type NodeTone =
+  | 'primary'
+  | 'brand'
+  | 'verify'
+  | 'caution'
+  | 'adverse'
+  | 'neutral'
+  | 'external'
 
 /**
  * The drawer payload (§6). Every clickable architecture component resolves to

@@ -3,7 +3,7 @@
 An interactive architecture map for **BID Trust** (Business Identity & Due Diligence) — a
 domain-agnostic trust, verification and due-diligence infrastructure platform.
 
-> **Trust, backed by verification.**
+> **Verify | Assess | Build Trust**
 
 This is **not** the BID Trust product. It is an explorer that lets founders, architects,
 developers, investors and business stakeholders visually understand how the whole ecosystem
@@ -11,25 +11,43 @@ fits together — business architecture and technical architecture in one place.
 
 ---
 
-## ⚠ Read first: the logo is a placeholder
+## Brand
 
-The brief referenced an attached BID Trust logo as the authoritative brand reference. **No image
-arrived with the prompt.** Rather than invent a mark and present it as yours, the app ships a
-clearly-labelled placeholder that follows the established brand direction only (navy ground,
-green verification check).
+The supplied BID Trust logo — the silver/blue shield with the ribbon checkmark, the pixel
+dissolve, the `BID` / `TRUST` lockup and the **Verify | Assess | Build Trust** tagline — is
+reproduced as vector in `src/brand/Logo.tsx`.
 
-**To drop in the real logo — one change, propagates everywhere:**
+**Why vector rather than the supplied raster:** the single-file/CSP build cannot fetch external
+images, and the mark has to stay crisp from a 16px favicon to a 34px hero. The SVG reproduces the
+supplied design; it is not a redesign. What it cannot reproduce exactly is the master artwork's
+photographic chrome bevel and gradient depth.
+
+**To use the master artwork instead — one flag, propagates everywhere:**
 
 ```
-Replace  public/logo.svg  with the official asset (keep the filename).
+1. Drop the supplied files into public/
+     public/logo-on-dark.png     ← the version artworked for dark grounds
+     public/logo-on-light.png    ← the version artworked for light grounds
+2. Set USE_MASTER_ASSETS = true in src/brand/Logo.tsx
 ```
 
-Every surface — top bar, sidebar, BID Card, public profile, story mode, hero, favicon — renders
-through `src/brand/Logo.tsx`, which is the single source of truth. Once swapped, set
-`LOGO_IS_PLACEHOLDER = false` in that file to remove the warning banner in the sidebar.
+Every surface — top bar, sidebar, hero, BID Card, public profile, story mode, favicon — renders
+through that one component, so nothing else needs editing. Use the masters for print and decks,
+where exact reproduction matters more than scalability.
 
-If the official mark is a raster or a more complex SVG, set `USE_INLINE_MARK = false` in
-`Logo.tsx` and it will render `public/logo.svg` as an `<img>` instead.
+### Colour system
+
+Two palettes that must not be conflated:
+
+| Token | Use |
+|---|---|
+| `brand-*` (blue, sampled from the logo) | Brand accents — active navigation, focus rings, primary actions, brand messaging |
+| `verify` (green) | **Verification state only** — verified checks, verify-tone nodes, assessment bands |
+| `caution` (amber) | Expiring, pending, under review |
+| `adverse` (red) | Exception, blocked, isolation boundary |
+
+Green is deliberately *not* a brand colour. Keeping it reserved for verification state is what
+lets it carry meaning rather than decoration — the same discipline the product itself depends on.
 
 ---
 
@@ -70,7 +88,7 @@ Requires Node 18+. Built and verified on Node 22.
 
 ```
 architecture-explorer/
-├── public/logo.svg              ← swap this for the real logo
+├── public/logo.svg              shield mark (favicon); see Brand above
 ├── src/
 │   ├── brand/Logo.tsx           single source of truth for the mark
 │   ├── types.ts                 shared domain types
@@ -173,7 +191,7 @@ Each is already shaped in the data layer, so wiring is substitution rather than 
 
 ## Assumptions
 
-1. **The logo is a placeholder.** No asset was supplied. See the warning at the top.
+1. **The logo is reproduced as vector** from the supplied artwork, so it scales and works under a strict CSP. Drop the raster masters into `public/` and flip one flag to use them verbatim — see Brand above.
 2. **All numbers are demo data**, labelled as such in the UI. Organizations and people are fictional (ABC Technologies, XYZ HR Consultants, LMN Components, OPQ Logistics, RST Security Services; Ravi Kumar, Anil Sharma, Priya Nair).
 3. **Providers are mock adapters** named Provider A/B/C or generic categories. No third-party verification API is integrated, and no claim is made that any specific provider is available. Access eligibility for several real-world channels is legally restricted.
 4. **Prices are illustrative starting prices**, labelled in the UI, not final market pricing.

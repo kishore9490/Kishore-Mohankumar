@@ -1,15 +1,52 @@
 <!--
-  PLACEHOLDER MARK — NOT THE AUTHORITATIVE BID TRUST LOGO.
+  BID Trust — shield mark (favicon / standalone).
 
-  The official logo was referenced as an attachment but did not arrive with the
-  brief, so this stands in. It follows the established brand direction only:
-  navy ground, green verification check.
-
-  TO SWAP IN THE REAL LOGO: replace this file's contents with the official SVG
-  (keep the filename). Nothing else needs to change — src/brand/Logo.tsx renders
-  this file everywhere the mark appears.
+  Vector reconstruction of the supplied logo, kept in sync with
+  src/brand/Logo.tsx (LogoMark). Reproduces the supplied design; it is not a
+  redesign. Replace with the master asset if an exact raster is required.
 -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="BID Trust">
-  <rect width="32" height="32" rx="8" fill="#1DB954"/>
-  <path d="M8.5 16.6 L13.6 21.5 L23.5 10.8" fill="none" stroke="#06220F" stroke-width="3.1" stroke-linecap="round" stroke-linejoin="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 104 104" width="104" height="104" role="img" aria-label="BID Trust">
+  <defs>
+    <linearGradient id="bidSilver" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="38%" stop-color="#DCE6F0"/>
+      <stop offset="62%" stop-color="#9DB0C4"/>
+      <stop offset="100%" stop-color="#E8EFF6"/>
+    </linearGradient>
+    <linearGradient id="bidBlue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2E9BF5"/>
+      <stop offset="55%" stop-color="#1560D8"/>
+      <stop offset="100%" stop-color="#0A2E6E"/>
+    </linearGradient>
+    <linearGradient id="bidDeep" x1="0" y1="0" x2="0.6" y2="1">
+      <stop offset="0%" stop-color="#12325F"/>
+      <stop offset="100%" stop-color="#061A3C"/>
+    </linearGradient>
+    <linearGradient id="bidRibbon" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1B6FE0"/>
+      <stop offset="60%" stop-color="#2E9BF5"/>
+      <stop offset="100%" stop-color="#6FC4FF"/>
+    </linearGradient>
+  </defs>
+
+  <g>
+    <rect x="30" y="12" width="6" height="6" fill="#1560D8"/>
+    <rect x="21" y="19" width="7" height="7" fill="#2E9BF5"/>
+    <rect x="12" y="16" width="5" height="5" fill="#123A78"/>
+    <rect x="22" y="30" width="5" height="5" fill="#EDF3FA"/>
+    <rect x="13" y="27" width="6" height="6" fill="#1560D8"/>
+    <rect x="4" y="24" width="5" height="5" fill="#0E2E63"/>
+    <rect x="14" y="38" width="6" height="6" fill="#2E9BF5"/>
+    <rect x="6" y="35" width="4" height="4" fill="#123A78"/>
+    <rect x="19" y="47" width="4" height="4" fill="#1560D8"/>
+    <rect x="9" y="45" width="5" height="5" fill="#0E2E63"/>
+  </g>
+
+  <path d="M28 24 L84 24 L84 58 C84 79 69 92 56 99 C43 92 28 79 28 58 Z" fill="url(#bidSilver)"/>
+  <path d="M33 29 L79 29 L79 58 C79 76 66 87 56 93 C46 87 33 76 33 58 Z" fill="url(#bidDeep)"/>
+  <path d="M33 29 L38 29 L38 58 C38 71 46 80 56 86 L56 93 C46 87 33 76 33 58 Z" fill="url(#bidBlue)" opacity="0.9"/>
+
+  <path d="M42 58 L53 70 L96 14" fill="none" stroke="url(#bidRibbon)" stroke-width="12" stroke-linejoin="miter" stroke-linecap="butt"/>
+  <path d="M53 70 L96 14" fill="none" stroke="#0A2E6E" stroke-width="2.6" stroke-linecap="butt" opacity="0.55" transform="translate(3.2,3.4)"/>
+  <path d="M55.5 66.5 L94 12.5" fill="none" stroke="#BFE2FF" stroke-width="1.6" stroke-linecap="butt" opacity="0.75"/>
 </svg>

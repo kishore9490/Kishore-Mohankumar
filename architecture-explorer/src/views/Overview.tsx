@@ -56,7 +56,7 @@ export default function Overview() {
       >
         <div
           className="absolute inset-0 opacity-[0.55]"
-          style={{ background: 'radial-gradient(900px 380px at 88% -10%, rgba(29,185,84,0.18), transparent 62%)' }}
+          style={{ background: 'radial-gradient(900px 380px at 88% -10%, rgba(46,155,245,0.20), transparent 62%)' }}
           aria-hidden
         />
         <div className="relative px-6 md:px-10 py-9 md:py-12">
@@ -70,8 +70,8 @@ export default function Overview() {
             businesses and people.
           </p>
           <div className="mt-6 flex flex-wrap items-center gap-2.5">
-            <span className="inline-flex items-center gap-2 rounded-full bg-verify/15 border border-verify/35 px-3.5 py-1.5 text-[12.5px] font-medium text-verify-bright">
-              <ShieldCheck size={13} /> Trust, backed by verification.
+            <span className="inline-flex items-center gap-2 rounded-full bg-brand-400/15 border border-brand-400/40 px-3.5 py-1.5 text-[12.5px] font-medium text-brand-300">
+              <ShieldCheck size={13} /> Verify · Assess · Build Trust
             </span>
             <button
               onClick={() => navigate('/network')}

@@ -4,6 +4,9 @@ import { Info } from 'lucide-react'
 
 export const TONE: Record<NodeTone, { chip: string; dot: string; border: string; text: string }> = {
   primary: { chip: 'bg-navy-850/[0.06] text-navy-700', dot: 'bg-navy-600', border: 'border-navy-600/30', text: 'text-navy-700' },
+  // Brand accent, sampled from the logo. Distinct from `verify`, which means
+  // verification state and nothing else.
+  brand: { chip: 'bg-brand-500/10 text-brand-700', dot: 'bg-brand-500', border: 'border-brand-500/35', text: 'text-brand-700' },
   verify: { chip: 'bg-verify/10 text-verify-deep', dot: 'bg-verify', border: 'border-verify/40', text: 'text-verify-deep' },
   caution: { chip: 'bg-caution/10 text-[#8A5A05]', dot: 'bg-caution', border: 'border-caution/45', text: 'text-[#8A5A05]' },
   adverse: { chip: 'bg-adverse/10 text-[#B32D33]', dot: 'bg-adverse', border: 'border-adverse/45', text: 'text-[#B32D33]' },
@@ -63,6 +66,7 @@ export function Note({ children, tone = 'neutral' }: { children: ReactNode; tone
     caution: 'bg-caution/[0.07] border-caution/35 text-[#7A4F05]',
     adverse: 'bg-adverse/[0.06] border-adverse/30 text-[#9E2429]',
     primary: 'bg-navy-850/[0.04] border-navy-500/25 text-navy-700',
+    brand: 'bg-brand-500/[0.06] border-brand-500/30 text-brand-700',
     external: 'bg-slate-50 border-slate-200 text-slate-600',
   }
   return (

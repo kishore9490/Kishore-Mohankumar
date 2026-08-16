@@ -12,6 +12,7 @@ import type { NodeTone } from '@/types'
 
 const NODE_STYLE: Record<NodeTone, string> = {
   primary: 'bg-white border-navy-500/35 text-navy-850 hover:border-navy-600',
+  brand: 'bg-brand-50 border-brand-500/40 text-brand-800 hover:border-brand-500',
   verify: 'bg-verify/[0.07] border-verify/45 text-verify-deep hover:border-verify',
   caution: 'bg-caution/[0.09] border-caution/50 text-[#7A4F05] hover:border-caution',
   adverse: 'bg-adverse/[0.07] border-adverse/50 text-[#9E2429] hover:border-adverse',

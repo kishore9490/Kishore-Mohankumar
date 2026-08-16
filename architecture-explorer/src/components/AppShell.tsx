@@ -6,7 +6,7 @@ import {
   Layers, Database, Lock, IndianRupee, Code2, Network, Sparkles, Compass,
   Search, Menu, X, Filter,
 } from 'lucide-react'
-import { Logo, LOGO_IS_PLACEHOLDER } from '@/brand/Logo'
+import { Logo, USING_VECTOR_RECONSTRUCTION } from '@/brand/Logo'
 import { useExplorer, ZOOM_ORDER } from '@/state/explorer'
 import type { Facet, ZoomLevel } from '@/types'
 import { Chip } from './ui'
@@ -70,7 +70,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         >
           {({ isActive }) => (
             <>
-              <span className={`h-4 w-[2px] rounded-full flex-none ${isActive ? 'bg-verify' : 'bg-transparent'}`} />
+              <span className={`h-4 w-[2px] rounded-full flex-none ${isActive ? 'bg-brand-400' : 'bg-transparent'}`} />
               <Icon size={15} className="flex-none" />
               <span className="truncate">{label}</span>
             </>
@@ -121,7 +121,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <button
             onClick={() => setShowFilters((v) => !v)}
             className={`flex-none flex items-center gap-1.5 rounded-md px-2 py-1 text-[11.5px] border transition-colors ${
-              facets.size ? 'bg-verify/15 border-verify/40 text-verify-bright' : 'bg-white/[0.06] border-white/10 text-ink-dim hover:text-white'
+              facets.size ? 'bg-brand-400/15 border-brand-400/45 text-brand-300' : 'bg-white/[0.06] border-white/10 text-ink-dim hover:text-white'
             }`}
           >
             <Filter size={12} />
@@ -164,7 +164,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                     key={f.id} onClick={() => toggleFacet(f.id)} aria-pressed={facets.has(f.id)}
                     className={`rounded-full px-3 py-1 text-[11.5px] border transition-colors ${
                       facets.has(f.id)
-                        ? 'bg-verify/20 border-verify/50 text-verify-bright font-medium'
+                        ? 'bg-brand-400/20 border-brand-400/50 text-brand-300 font-medium'
                         : 'bg-white/[0.05] border-white/10 text-ink-dim hover:text-white hover:border-white/25'
                     }`}
                   >
@@ -181,15 +181,17 @@ export function AppShell({ children }: { children: ReactNode }) {
         {/* ── Desktop sidebar ── */}
         <aside className="hidden lg:block w-[248px] flex-none bg-navy-900 overflow-y-auto border-r border-white/[0.06]">
           {sidebar}
-          {LOGO_IS_PLACEHOLDER && (
-            <div className="mx-3 mb-4 mt-2 rounded-lg border border-caution/30 bg-caution/[0.08] px-3 py-2.5">
-              <p className="text-[10.5px] leading-relaxed text-caution">
-                <strong className="font-semibold">Placeholder logo.</strong> The official mark did not
-                arrive with the brief. Replace <span className="mono">public/logo.svg</span> — it
-                propagates everywhere.
+          <div className="mx-3 mb-4 mt-3 px-3 py-3 rounded-lg border border-white/[0.07] bg-white/[0.03]">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-brand-300 mb-1.5">
+              Verify <span className="text-white/25">|</span> Assess <span className="text-white/25">|</span> Build Trust
+            </p>
+            {USING_VECTOR_RECONSTRUCTION && (
+              <p className="text-[10px] leading-relaxed text-ink-faint">
+                Mark rendered as vector, reproducing the supplied logo. For exact master artwork see{' '}
+                <span className="mono text-ink-dim">src/brand/Logo.tsx</span>.
               </p>
-            </div>
-          )}
+            )}
+          </div>
         </aside>
 
         {/* ── Mobile drawer nav ── */}
@@ -230,7 +232,7 @@ export function FilterHint() {
   return (
     <div className="mb-4 flex items-center gap-2 flex-wrap">
       <span className="text-[12px] text-slate-500">Filtered by</span>
-      {[...facets].map((f) => <Chip key={f} tone="verify">{f}</Chip>)}
+      {[...facets].map((f) => <Chip key={f} tone="brand">{f}</Chip>)}
       <button onClick={clearFacets} className="text-[12px] text-slate-500 underline underline-offset-2 hover:text-navy-850">
         clear
       </button>
