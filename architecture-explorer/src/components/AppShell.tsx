@@ -6,7 +6,7 @@ import {
   Layers, Database, Lock, IndianRupee, Code2, Network, Sparkles, Compass,
   Search, Menu, X, Filter,
 } from 'lucide-react'
-import { Logo, USING_VECTOR_RECONSTRUCTION } from '@/brand/Logo'
+import { LogoApp, USING_VECTOR_RECONSTRUCTION } from '@/brand/Logo'
 import { useExplorer, ZOOM_ORDER } from '@/state/explorer'
 import type { Facet, ZoomLevel } from '@/types'
 import { Chip } from './ui'
@@ -92,7 +92,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Menu size={20} />
           </button>
 
-          <Logo size={26} withWordmark tone="light" />
+          <LogoApp size={24} tone="light" />
 
           <span className="hidden sm:block h-5 w-px bg-white/15" />
           <span className="hidden sm:block text-[13px] text-ink-dim">Architecture Explorer</span>
@@ -207,7 +207,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 transition={{ type: 'spring', damping: 30, stiffness: 300 }}
               >
                 <div className="flex items-center justify-between px-4 h-14 border-b border-white/[0.08]">
-                  <Logo size={24} withWordmark tone="light" />
+                  <LogoApp size={22} tone="light" />
                   <button onClick={() => setMobileNav(false)} className="text-ink-dim p-1" aria-label="Close navigation">
                     <X size={18} />
                   </button>

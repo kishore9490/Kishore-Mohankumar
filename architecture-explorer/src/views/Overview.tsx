@@ -60,7 +60,7 @@ export default function Overview() {
           aria-hidden
         />
         <div className="relative px-6 md:px-10 py-9 md:py-12">
-          <Logo size={34} className="mb-5 inline-block" />
+          <Logo size={34} withWordmark withTagline tone="light" className="mb-6" />
           <h1 className="text-[32px] md:text-[42px] leading-[1.06] font-semibold tracking-[-0.025em] max-w-[18ch]">
             BID Trust
             <span className="block text-ink-dim font-normal">Architecture Explorer</span>
