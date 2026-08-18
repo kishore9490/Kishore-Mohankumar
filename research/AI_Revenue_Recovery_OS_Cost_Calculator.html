@@ -1,0 +1,1384 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Revenue Recovery OS — Investment & Cost Calculator</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#0b1220; --bg2:#0f1a2e; --panel:#12203a; --panel2:#16274a; --line:#223860;
+  --ink:#e8eefc; --ink2:#9fb3d6; --ink3:#6d82a8; --teal:#3ad1c8; --teal2:#1fa9a0;
+  --blue:#4f8cff; --amber:#ffbf47; --green:#3ad17a; --red:#ff6b6b; --violet:#a98bff;
+  --input:#0c1730; --shadow:0 8px 30px rgba(0,0,0,.35); --radius:12px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);font-size:14px}
+body{overflow:hidden}
+a{color:var(--teal)}
+.shell{display:grid;grid-template-columns:250px 1fr;grid-template-rows:100vh;height:100vh}
+/* Sidebar */
+.sidebar{background:linear-gradient(180deg,#0c1526,#0a1120);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.brand{padding:16px 16px 12px;border-bottom:1px solid var(--line)}
+.brand h1{font-size:14px;margin:0;letter-spacing:.3px;color:var(--ink)}
+.brand .sub{font-size:10px;color:var(--teal);letter-spacing:1.5px;text-transform:uppercase;margin-top:3px}
+.nav{flex:1;overflow-y:auto;min-height:0;padding:8px 8px 20px}
+.nav .grp{font-size:9px;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink3);padding:12px 10px 4px}
+.nav a{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:8px;color:var(--ink2);text-decoration:none;font-size:12.5px;cursor:pointer;user-select:none}
+.nav a .ic{width:16px;text-align:center;opacity:.85}
+.nav a:hover{background:var(--panel);color:var(--ink)}
+.nav a.active{background:linear-gradient(90deg,rgba(58,209,200,.16),rgba(58,209,200,.02));color:var(--teal);font-weight:600;box-shadow:inset 2px 0 0 var(--teal)}
+.nav a .badge{margin-left:auto;font-size:10px;color:var(--ink3)}
+/* Main */
+.main{display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.topbar{display:flex;align-items:center;gap:12px;padding:10px 20px;border-bottom:1px solid var(--line);background:var(--bg2);flex-wrap:wrap}
+.topbar .ttl{font-size:15px;font-weight:600}
+.topbar .spacer{flex:1}
+.topbar .kpi{display:flex;flex-direction:column;padding:2px 12px;border-left:1px solid var(--line)}
+.topbar .kpi .l{font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3)}
+.topbar .kpi .v{font-size:14px;font-weight:700;color:var(--teal)}
+.view{flex:1;overflow-y:auto;overflow-x:hidden;min-height:0;padding:22px 26px 80px}
+.btn{background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer}
+.btn:hover{background:#1c2f57;border-color:var(--teal2)}
+.btn.p{background:linear-gradient(90deg,var(--teal2),var(--teal));color:#062024;border:none;font-weight:700}
+.btn.p:hover{filter:brightness(1.08)}
+.btn.sm{padding:4px 9px;font-size:11px}
+.btn.dngr{border-color:#5a2330;color:var(--red)}
+.btn.dngr:hover{background:#2a1620}
+/* Cards */
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+.card h3{margin:0 0 10px;font-size:13px;letter-spacing:.3px}
+.card .hdr{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.card .hdr h3{margin:0;flex:1}
+.stat{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px}
+.stat .l{font-size:10px;text-transform:uppercase;letter-spacing:.9px;color:var(--ink3)}
+.stat .v{font-size:26px;font-weight:800;margin-top:4px;letter-spacing:-.5px}
+.stat .v.sm{font-size:19px}
+.stat .d{font-size:11px;color:var(--ink2);margin-top:3px}
+.stat.teal .v{color:var(--teal)} .stat.blue .v{color:var(--blue)} .stat.amber .v{color:var(--amber)}
+.stat.green .v{color:var(--green)} .stat.red .v{color:var(--red)} .stat.violet .v{color:var(--violet)}
+/* Tables */
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line)}
+th{font-size:10px;text-transform:uppercase;letter-spacing:.7px;color:var(--ink3);font-weight:600;position:sticky;top:0;background:var(--panel);z-index:1}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+tr:hover td{background:rgba(255,255,255,.02)}
+tfoot td{font-weight:700;border-top:2px solid var(--line);color:var(--teal)}
+.tbl-wrap{overflow-x:auto}
+/* Inputs */
+input,select{background:var(--input);border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:5px 7px;font-size:12px;font-family:inherit}
+input:focus,select:focus{outline:none;border-color:var(--teal)}
+input[type=number]{text-align:right;width:100%}
+input.mini{width:70px} input.mid{width:100px} input.wide{width:100%}
+input[type=range]{width:100%;accent-color:var(--teal)}
+input[type=checkbox]{accent-color:var(--teal);width:15px;height:15px}
+input[type=text].wide{width:100%}
+label.fld{display:flex;flex-direction:column;gap:4px;font-size:11px;color:var(--ink2)}
+label.fld .lab{display:flex;align-items:center;gap:5px}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.chip{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.5px}
+.chip.yes{background:rgba(58,209,122,.15);color:var(--green)}
+.chip.no{background:rgba(255,107,107,.15);color:var(--red)}
+.chip.partial{background:rgba(255,191,71,.15);color:var(--amber)}
+.chip.unknown{background:rgba(109,130,168,.18);color:var(--ink2)}
+.chip.quote{background:rgba(169,139,255,.16);color:var(--violet)}
+.chip.ref{background:rgba(79,140,255,.14);color:var(--blue);text-transform:uppercase}
+.tag{font-size:9px;letter-spacing:.6px;text-transform:uppercase;color:var(--blue);border:1px solid rgba(79,140,255,.35);border-radius:5px;padding:1px 6px;background:rgba(79,140,255,.07)}
+.muted{color:var(--ink3);font-size:11px}
+.note{font-size:11px;color:var(--ink2);background:rgba(79,140,255,.06);border:1px solid rgba(79,140,255,.2);border-left:3px solid var(--blue);border-radius:6px;padding:8px 11px;margin:10px 0}
+.warn{font-size:11px;color:var(--amber);background:rgba(255,191,71,.07);border:1px solid rgba(255,191,71,.28);border-left:3px solid var(--amber);border-radius:6px;padding:8px 11px;margin:8px 0}
+.crit{font-size:11px;color:var(--red);background:rgba(255,107,107,.07);border:1px solid rgba(255,107,107,.28);border-left:3px solid var(--red);border-radius:6px;padding:8px 11px;margin:8px 0}
+.sec-desc{color:var(--ink2);font-size:12.5px;margin:0 0 16px;max-width:900px;line-height:1.5}
+.tt{position:relative;cursor:help;border-bottom:1px dotted var(--ink3)}
+.tt .box{visibility:hidden;opacity:0;position:absolute;bottom:135%;left:0;width:250px;background:#0a1224;border:1px solid var(--teal2);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink);z-index:50;box-shadow:var(--shadow);transition:.15s;font-weight:400;letter-spacing:0;text-transform:none}
+.tt:hover .box{visibility:visible;opacity:1}
+.ico{font-size:10px;color:var(--ink3);border:1px solid var(--line);border-radius:50%;width:14px;height:14px;display:inline-flex;align-items:center;justify-content:center;cursor:help}
+.pill-row{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{background:var(--input);border:none;color:var(--ink2);padding:5px 11px;font-size:11px;cursor:pointer}
+.seg button.on{background:var(--teal2);color:#062024;font-weight:700}
+.bar{height:8px;border-radius:5px;background:var(--input);overflow:hidden;margin-top:4px}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--teal2),var(--teal))}
+.mono{font-variant-numeric:tabular-nums}
+.right{text-align:right}
+.flex{display:flex;align-items:center;gap:8px}
+.wrap{flex-wrap:wrap}
+canvas{max-width:100%}
+.del{color:var(--red);cursor:pointer;font-weight:700;border:none;background:none;font-size:14px}
+.add-row{color:var(--teal);cursor:pointer;font-size:12px;font-weight:600;background:none;border:1px dashed var(--teal2);border-radius:8px;padding:6px 12px;margin-top:8px}
+.hidden{display:none!important}
+.split{display:grid;grid-template-columns:1fr 380px;gap:16px}
+@media(max-width:1100px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:1fr}.split{grid-template-columns:1fr}}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--panel2);border:1px solid var(--teal2);color:var(--ink);padding:11px 16px;border-radius:10px;box-shadow:var(--shadow);font-size:13px;z-index:200;opacity:0;transform:translateY(10px);transition:.25s}
+.toast.show{opacity:1;transform:translateY(0)}
+.foot{margin-top:26px;padding-top:14px;border-top:1px solid var(--line);color:var(--ink3);font-size:10.5px;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <h1>AI Revenue Recovery OS</h1>
+      <div class="sub">Investment Calculator</div>
+    </div>
+    <nav class="nav" id="nav"></nav>
+  </aside>
+  <main class="main">
+    <header class="topbar">
+      <div class="ttl" id="viewTitle">Dashboard</div>
+      <div class="spacer"></div>
+      <div class="seg" title="Display currency">
+        <button id="curUSD" class="on" onclick="setCurrency('USD')">USD $</button>
+        <button id="curINR" onclick="setCurrency('INR')">INR ₹</button>
+      </div>
+      <div class="kpi"><span class="l">MVP</span><span class="v" id="kpiMvp">—</span></div>
+      <div class="kpi"><span class="l">12-Month</span><span class="v" id="kpi12">—</span></div>
+      <div class="kpi"><span class="l">Monthly Burn</span><span class="v" id="kpiBurn">—</span></div>
+      <button class="btn sm" onclick="saveState()">💾 Save</button>
+      <button class="btn sm" onclick="loadState()">📂 Load</button>
+      <button class="btn sm" onclick="exportJSON()">⬇ JSON</button>
+      <button class="btn sm" onclick="window.print()">🖨 PDF</button>
+      <button class="btn sm dngr" onclick="resetState()">↺ Reset</button>
+    </header>
+    <section class="view" id="view"></section>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =============================================================================
+   AI REVENUE RECOVERY OS — INTERACTIVE INVESTMENT & COST CALCULATOR
+   Self-contained. Every number below is a REFERENCE DEFAULT — EDITABLE seed
+   value drawn from the research cost model. NOTHING is hard-coded as an
+   authoritative total: all headline figures (MVP / 12-mo / 24-mo / per-claim)
+   are COMPUTED from the editable assumptions in real time.
+============================================================================= */
+
+const REF = 'REFERENCE DEFAULT — EDITABLE';
+const STORAGE_KEY = 'arr_os_cost_calculator_v1';
+
+/* ---------- DEFAULT STATE (seed = researched 2026 figures) ---------- */
+function defaults(){ return {
+  meta:{ fx:90, currency:'USD', contingencyPct:15, planningBand:'mid', buildMonths:8, prodMonths:11.5,
+         claimsPerMonth:50000, loadFactor:1.4 },
+  scope:[
+    {name:'Multi-tenant Core & Admin', on:true},
+    {name:'Eligibility & Benefits (270/271)', on:true},
+    {name:'Claim Status (276/277)', on:true},
+    {name:'Claims Submission (837)', on:true},
+    {name:'Remittance / Denials (835)', on:true},
+    {name:'Prior Authorization (278 / FHIR PAS)', on:true},
+    {name:'Denial Intelligence & Recovery', on:true},
+    {name:'Appeals Workflow', on:true},
+    {name:'Payer Intelligence (RAG)', on:true},
+    {name:'AI Voice Agent', on:true},
+    {name:'Document AI / Attachments', on:true},
+    {name:'AI Agent Workforce & Governance', on:true},
+    {name:'Patient Responsibility Estimation', on:false},
+    {name:'Payer-Side Decision Support (Model A)', on:false},
+    {name:'Analytics & Reporting', on:true},
+    {name:'Payer Portal / RPA Fallback', on:false},
+  ],
+  hr:[
+    {role:'CTO / Principal Architect', count:1, salaryUSD:86000, band:'mid'},
+    {role:'Senior Backend Engineer', count:1, salaryUSD:34000, band:'mid'},
+    {role:'Senior Frontend Engineer', count:1, salaryUSD:30000, band:'mid'},
+    {role:'AI / ML Engineer', count:1, salaryUSD:40000, band:'mid'},
+    {role:'DevOps / SRE Engineer', count:1, salaryUSD:32000, band:'mid'},
+    {role:'Integration Engineer (EDI/FHIR)', count:0, salaryUSD:25000, band:'mid'},
+    {role:'Security Engineer', count:0, salaryUSD:32000, band:'mid'},
+    {role:'QA Engineer', count:0, salaryUSD:17000, band:'mid'},
+    {role:'Product Manager', count:0, salaryUSD:40000, band:'mid'},
+    {role:'Healthcare / RCM Business Analyst', count:0, salaryUSD:14000, band:'mid'},
+    {role:'Data Engineer', count:0, salaryUSD:28000, band:'mid'},
+    {role:'Compliance Consultant (fractional)', count:0, salaryUSD:36000, band:'mid'},
+  ],
+  claude:{ users5x:0, users20x:5, price5x:100, price20x:200 },
+  chatgpt:{ bizUsers:5, bizPrice:20, entUsers:0, entPrice:null /* QUOTE REQUIRED */ },
+  prodAI:{
+    caching:true, cacheReadMult:0.10,
+    models:[
+      {name:'Claude Haiku 4.5', inP:1.00, outP:5.00, route:55},
+      {name:'Claude Sonnet 4.6', inP:3.00, outP:15.00, route:30},
+      {name:'Claude Opus 4.8', inP:5.00, outP:25.00, route:10},
+      {name:'Azure OpenAI GPT-4o (PHI/BAA path)', inP:2.50, outP:10.00, route:5},
+    ],
+    // per-claim token profile
+    tokensInPerClaim:14000, tokensOutPerClaim:3500, aiActionsPerClaim:6,
+    embedMonthly:60,
+  },
+  azure:{ scenario:'MVP', services:[
+    {svc:'Container Apps', tier:'Consumption (scaled)', mo:120, on:true},
+    {svc:'PostgreSQL Flexible Server', tier:'GP D4ds_v5 + HA', mo:500, on:true},
+    {svc:'Cache for Redis', tier:'Standard C1', mo:52, on:true},
+    {svc:'Blob Storage', tier:'Hot LRS', mo:40, on:true},
+    {svc:'Service Bus', tier:'Standard', mo:30, on:true},
+    {svc:'Key Vault', tier:'Standard', mo:15, on:true},
+    {svc:'Front Door + WAF', tier:'Standard', mo:35, on:true},
+    {svc:'API Management', tier:'Basic v2', mo:210, on:true},
+    {svc:'Defender for Cloud', tier:'Servers P2', mo:60, on:true},
+    {svc:'Sentinel + Log Analytics', tier:'~30 GB/mo', mo:150, on:true},
+    {svc:'Azure Monitor / App Insights', tier:'PAYG', mo:40, on:true},
+    {svc:'Container Registry', tier:'Standard', mo:20, on:true},
+    {svc:'Bandwidth / Egress', tier:'~300 GB', mo:30, on:true},
+    {svc:'Azure AI Search', tier:'Basic', mo:75, on:true},
+  ]},
+  // Azure stage presets (total monthly reference from research)
+  azurePresets:{ DEV:385, MVP:1377, PILOT:1377, MEDIUM:7176, LARGE:38694, ENTERPRISE:60000 },
+  connectivity:[
+    {ch:'EDI Clearinghouse (Stedi/Availity)', status:'YES', route:45, unit:0.12, note:'Free tier covers MVP; PAYG after'},
+    {ch:'Direct Payer API', status:'PARTIAL', route:10, unit:0.00, note:'Optum exception; most limited'},
+    {ch:'FHIR (Provider Access, 2027)', status:'PARTIAL', route:10, unit:0.00, note:'CMS-0057-F regulated payers by 2027'},
+    {ch:'Payer Portal / RPA', status:'PARTIAL', route:20, unit:0.05, note:'Fallback; brittle'},
+    {ch:'AI Voice Agent', status:'YES', route:10, unit:0.72, note:'~6 min @ $0.12/min'},
+    {ch:'Human Fallback', status:'YES', route:5, unit:3.50, note:'Manual work; most expensive'},
+  ],
+  clearinghouse:{ txnPerClaim:2.0, unitTxn:0.12, freeTierMVP:true },
+  voice:{ perMin:0.12, minutesPerClaim:6, escalationPct:8 },
+  doc:{ per1k:30, pagesPerClaim:3, ocrRatePct:15 },
+  security:[
+    {item:'HIPAA risk / gap assessment', oneTime:12000, annual:0, on:true},
+    {item:'HIPAA policies / SOPs + training', oneTime:8000, annual:0, on:true},
+    {item:'Compliance automation (Vanta/Drata)', oneTime:0, annual:15000, on:true},
+    {item:'Penetration test (web + API)', oneTime:16000, annual:0, on:true},
+    {item:'vCISO / fractional CISO', oneTime:0, annual:60000, on:true},
+    {item:'SIEM / managed SOC (MDR)', oneTime:0, annual:12000, on:false},
+    {item:'Security training (per employee/yr)', oneTime:0, annual:1200, on:true},
+  ],
+  compliance:[
+    {item:'SOC 2 Type I', oneTime:25000, annual:0, on:true, when:'M10–M11'},
+    {item:'SOC 2 Type II (first year)', oneTime:55000, annual:0, on:false, when:'M12 + 6mo'},
+    {item:'HITRUST i1', oneTime:130000, annual:0, on:false, when:'Year 2'},
+    {item:'HIPAA program (ongoing)', oneTime:0, annual:30000, on:true, when:'M10 →'},
+  ],
+  legal:[
+    {item:'Entity, contracts, BAAs, ToS/Privacy', oneTime:25000, annual:0, on:true},
+    {item:'Regulatory / healthcare counsel', oneTime:0, annual:18000, on:true},
+    {item:'IP / trademark', oneTime:6000, annual:0, on:false},
+  ],
+  development:{ aiProductivityPct:30, testingOneTime:15000, clearinghouseSetup:5000 },
+  milestones:[
+    {id:1, name:'M0 Discovery', dur:2, dep:'—', notes:'Scope, payer research, security reqs'},
+    {id:2, name:'M1 Architecture + Security', dur:3, dep:'M0', notes:'Azure foundation, CI/CD, tenant model'},
+    {id:3, name:'M2 Multi-tenant Core', dur:4, dep:'M1', notes:'Tenant mgmt, RBAC, audit'},
+    {id:4, name:'M3 Eligibility + Benefits', dur:4, dep:'M2', notes:'270/271, integration framework'},
+    {id:5, name:'M4 Claim Status', dur:3, dep:'M3', notes:'276/277, claim timeline'},
+    {id:6, name:'M5 Prior Authorization', dur:4, dep:'M3', notes:'278/FHIR PAS, PA workflow'},
+    {id:7, name:'M6 Denial Intelligence', dur:4, dep:'M4', notes:'835/CARC/RARC, recovery'},
+    {id:8, name:'M7 Appeals', dur:3, dep:'M6', notes:'AI draft + human approval'},
+    {id:9, name:'M8 Payer Intelligence', dur:4, dep:'M3-M7', notes:'RAG, recommendation engine'},
+    {id:10, name:'M9 AI Workforce', dur:3, dep:'M8', notes:'Agent orchestration + audit'},
+    {id:11, name:'M10 Security / HIPAA hardening', dur:4, dep:'M1-M9', notes:'Pen test, PHI controls'},
+    {id:12, name:'M11 Pilot', dur:4, dep:'M10', notes:'Design partner, KPIs'},
+    {id:13, name:'M12 Production readiness', dur:4, dep:'M11', notes:'HA, DR, runbooks, go-live'},
+  ],
+  scenarios:[
+    {name:'LEAN', teamCount:5, claims:30000, azureMo:1000, contingency:10, aiUsers:3, note:'Minimum viable spend'},
+    {name:'BASE', teamCount:5, claims:50000, azureMo:1377, contingency:15, aiUsers:5, note:'Planning baseline'},
+    {name:'AGGRESSIVE', teamCount:8, claims:120000, azureMo:3500, contingency:20, aiUsers:8, note:'Fast scale-up'},
+  ],
+  revenue:{ pricePerClaim:0.85, claimsMonth:50000, seatFee:0, seats:0, growthPctMo:8, grossMarginTarget:70 },
+  customItems:[
+    {name:'Design partner incentives', type:'ONE-TIME', amount:5000, qty:1, on:true, note:REF},
+  ],
+  sources:[
+    {item:'Claude Max plan', url:'https://support.claude.com/en/articles/11049741-what-is-the-max-plan', date:'2026-08', conf:'High'},
+    {item:'ChatGPT Business pricing', url:'https://openai.com/business/pricing/', date:'2026-08', conf:'High'},
+    {item:'ChatGPT Enterprise (quote-only)', url:'https://openai.com/chatgpt/enterprise/', date:'2026-08', conf:'High'},
+    {item:'Anthropic API pricing', url:'https://claude.com/pricing', date:'2026-08', conf:'Med'},
+    {item:'Azure OpenAI + HIPAA BAA', url:'https://learn.microsoft.com/en-us/azure/compliance/offerings/offering-hipaa-us', date:'2026-08', conf:'High'},
+    {item:'Azure Container Apps pricing', url:'https://azure.microsoft.com/en-us/pricing/details/container-apps/', date:'2026-08', conf:'High'},
+    {item:'Azure PostgreSQL Flexible Server', url:'https://azure.microsoft.com/en-us/pricing/details/postgresql/flexible-server/', date:'2026-08', conf:'Med'},
+    {item:'Stedi clearinghouse pricing', url:'https://www.stedi.com/pricing', date:'2026-08', conf:'High'},
+    {item:'SOC 2 cost benchmarks', url:'https://secureframe.com/hub/soc-2/audit-cost', date:'2026-08', conf:'Med-High'},
+    {item:'HITRUST cost benchmarks', url:'https://www.thoropass.com/blog/hitrust-audit-cost-a-guide', date:'2026-08', conf:'Med'},
+    {item:'Penetration test pricing', url:'https://www.brightdefense.com/resources/penetration-testing-pricing/', date:'2026-08', conf:'Med-High'},
+    {item:'India salary benchmarks', url:'https://6figr.com/', date:'2026-08', conf:'Med'},
+    {item:'Voice AI per-minute', url:'https://www.retellai.com/blog/ai-voice-agent-pricing-full-cost-breakdown-platform-comparison-roi-analysis', date:'2026-08', conf:'Est'},
+  ],
+  optimizations:[], // approved cost-reduction actions
+};}
+
+let S = defaults();
+let charts = {};
+
+/* ---------- NAV DEFINITION ---------- */
+const NAV = [
+  {grp:'Overview', items:[
+    ['dashboard','Dashboard','📊'],
+    ['assumptions','Global Assumptions','⚙️'],
+    ['scope','Product Scope','🧩'],
+  ]},
+  {grp:'Cost Inputs', items:[
+    ['hr','Human Resources','👥'],
+    ['aiworkforce','AI Workforce','🤖'],
+    ['aisubs','AI Subscriptions','🔑'],
+    ['prodai','Production AI','🧠'],
+    ['azure','Azure Infrastructure','☁️'],
+    ['connectivity','Healthcare Connectivity','🔌'],
+    ['voice','Voice & Document AI','🎙️'],
+    ['security','Security','🔒'],
+    ['compliance','HIPAA / Compliance','📋'],
+    ['legal','Legal','⚖️'],
+    ['development','Development','💻'],
+  ]},
+  {grp:'Planning', items:[
+    ['milestones','Milestones','📅'],
+    ['unit','Unit Economics','📐'],
+    ['revenue','Revenue Model','💵'],
+    ['scenarios','Scenarios','🎚️'],
+    ['model12','12-Month Model','📈'],
+    ['model24','24-Month Model','📉'],
+  ]},
+  {grp:'Output', items:[
+    ['investor','Investor View','🏦'],
+    ['sources','Sources','🔖'],
+    ['settings','Settings','🛠️'],
+  ]},
+];
+
+/* =============================================================================
+   CALCULATION ENGINE — all totals COMPUTED, never hard-coded
+============================================================================= */
+const fx = ()=> Math.max(1, +S.meta.fx||90);
+const mo2yr = 12;
+
+function calculateHR(){
+  const lf = +S.meta.loadFactor||1.4;
+  let annual=0, headcount=0; const rows=[];
+  S.hr.forEach(h=>{
+    const loaded = (+h.salaryUSD||0)*(+h.count||0)*lf;
+    annual += loaded; headcount += (+h.count||0);
+    rows.push({...h, loadedAnnual:loaded});
+  });
+  return {annualUSD:annual, monthlyUSD:annual/12, headcount, rows};
+}
+
+function calculateAISubs(){
+  const c = (+S.claude.users5x||0)*(+S.claude.price5x||0) + (+S.claude.users20x||0)*(+S.claude.price20x||0);
+  const g = (+S.chatgpt.bizUsers||0)*(+S.chatgpt.bizPrice||0);
+  const entQuote = (+S.chatgpt.entUsers||0)>0; // enterprise is QUOTE REQUIRED
+  return {claudeMo:c, chatgptMo:g, monthlyUSD:c+g, entQuote};
+}
+
+function calculateProdAIPerClaim(){
+  const m = S.prodAI;
+  const routeSum = m.models.reduce((a,x)=>a+(+x.route||0),0)||1;
+  const inTok=(+m.tokensInPerClaim||0)*(+m.aiActionsPerClaim||1);
+  const outTok=(+m.tokensOutPerClaim||0)*(+m.aiActionsPerClaim||1);
+  const cacheFac = m.caching ? (0.5*(+m.cacheReadMult||0.1)+0.5) : 1.0;
+  let cost=0; const breakdown=[];
+  m.models.forEach(x=>{
+    const w=(+x.route||0)/routeSum;
+    const ci = (inTok*w/1e6)*(+x.inP||0)*cacheFac;
+    const co = (outTok*w/1e6)*(+x.outP||0);
+    cost += ci+co; breakdown.push({name:x.name, route:x.route, cost:ci+co});
+  });
+  return {perClaim:cost, breakdown, routeSum};
+}
+
+function calculateVoicePerClaim(){
+  return (+S.voice.escalationPct||0)/100*(+S.voice.minutesPerClaim||0)*(+S.voice.perMin||0);
+}
+function calculateDocPerClaim(){
+  return (+S.doc.ocrRatePct||0)/100*(+S.doc.pagesPerClaim||0)*(+S.doc.per1k||0)/1000;
+}
+function calculateClearinghousePerClaim(){
+  return (+S.clearinghouse.txnPerClaim||0)*(+S.clearinghouse.unitTxn||0);
+}
+function calculateConnectivityPerClaim(){
+  const sum=S.connectivity.reduce((a,c)=>a+(+c.route||0),0)||1;
+  let cost=0;
+  S.connectivity.forEach(c=>{ cost += (+c.route||0)/sum*(+c.unit||0); });
+  return cost;
+}
+
+function calculateUnitEconomics(){
+  const ai=calculateProdAIPerClaim().perClaim;
+  const voice=calculateVoicePerClaim();
+  const doc=calculateDocPerClaim();
+  const ch=calculateClearinghousePerClaim();
+  const conn=calculateConnectivityPerClaim();
+  const allIn = ai+voice+doc+ch;
+  return {ai,voice,doc,ch,conn,allIn};
+}
+
+function calculateAzure(){
+  const on = S.azure.services.filter(s=>s.on);
+  const monthly = on.reduce((a,s)=>a+(+s.mo||0),0);
+  return {monthlyUSD:monthly, services:on};
+}
+
+function calculateProdAIMonthly(){
+  const per=calculateProdAIPerClaim().perClaim;
+  const claims=+S.meta.claimsPerMonth||0;
+  const voice=calculateVoicePerClaim()*claims;
+  const doc=calculateDocPerClaim()*claims;
+  const embed=+S.prodAI.embedMonthly||0;
+  return {ai:per*claims, voice, doc, embed, total:per*claims+voice+doc+embed};
+}
+function calculateClearinghouseMonthly(){
+  const claims=+S.meta.claimsPerMonth||0;
+  if(S.clearinghouse.freeTierMVP && claims<=50000) return 0;
+  return calculateClearinghousePerClaim()*claims;
+}
+
+function sumList(list){
+  let oneTime=0, annual=0;
+  list.forEach(x=>{ if(x.on===false) return; oneTime+=(+x.oneTime||0); annual+=(+x.annual||0); });
+  return {oneTime, annual};
+}
+function calculateSecurity(){ return sumList(S.security); }
+function calculateCompliance(){ return sumList(S.compliance); }
+function calculateLegal(){ return sumList(S.legal); }
+
+function calculateCustomItems(perMonthClaims){
+  const claims=perMonthClaims??(+S.meta.claimsPerMonth||0);
+  const users=calculateHR().headcount;
+  const tenants=10; // reference tenant count for per-tenant items
+  let oneTime=0, monthly=0, annual=0, quotes=[];
+  S.customItems.forEach(it=>{
+    if(it.on===false) return;
+    const amt=+it.amount||0, qty=+it.qty||1;
+    switch(it.type){
+      case 'ONE-TIME': oneTime+=amt*qty; break;
+      case 'MONTHLY': monthly+=amt*qty; break;
+      case 'ANNUAL': annual+=amt*qty; break;
+      case 'PER-USER': monthly+=amt*users; break;
+      case 'PER-TENANT': monthly+=amt*tenants; break;
+      case 'PER-CLAIM': monthly+=amt*claims; break;
+      case 'PER-TRANSACTION': monthly+=amt*claims*(+S.clearinghouse.txnPerClaim||1); break;
+      case 'PER-MINUTE': monthly+=amt*claims*(+S.voice.minutesPerClaim||0)*(+S.voice.escalationPct||0)/100; break;
+      case 'PER-GB': monthly+=amt*qty; break;
+      case 'PER-API-CALL': monthly+=amt*claims*(+S.prodAI.aiActionsPerClaim||1); break;
+      case 'PERCENTAGE': /* applied at end to subtotal */ break;
+      case 'QUOTE REQUIRED': quotes.push(it.name); break;
+    }
+  });
+  return {oneTime, monthly, annual, quotes};
+}
+
+/* ---------- HEADLINE INVESTMENT (fully computed) ---------- */
+function calculateInvestment(){
+  const cont=(+S.meta.contingencyPct||0)/100;
+  const buildMo=+S.meta.buildMonths||8;
+  const prodMo=+S.meta.prodMonths||11.5;
+
+  const hr=calculateHR();
+  const subs=calculateAISubs();
+  const azure=calculateAzure();
+  const prodAI=calculateProdAIMonthly();
+  const sec=calculateSecurity();
+  const comp=calculateCompliance();
+  const legal=calculateLegal();
+  const custom=calculateCustomItems();
+  const chMonthly=calculateClearinghouseMonthly();
+
+  // MVP (one-time build phase ~buildMonths)
+  const devCost = hr.monthlyUSD*buildMo;
+  const azureBuild = azure.monthlyUSD*buildMo*0.7; // ramp factor
+  const aiSubsBuild = subs.monthlyUSD*buildMo;
+  const aiApiPilot = prodAI.total*3; // ~3 pilot months
+  const chSetup = +S.development.clearinghouseSetup||0;
+  const testing = +S.development.testingOneTime||0;
+  const secOne = sec.oneTime + comp.oneTime + legal.oneTime;
+  const secAnnMvp = (sec.annual+comp.annual+legal.annual)*(buildMo/12);
+  const customBuild = custom.oneTime + custom.monthly*buildMo + custom.annual*(buildMo/12);
+  const mvpSub = devCost+azureBuild+aiSubsBuild+aiApiPilot+chSetup+testing+secOne+secAnnMvp+customBuild;
+  const mvp = mvpSub*(1+cont);
+  const mvpParts = {Development:devCost, Azure:azureBuild, 'AI Subscriptions':aiSubsBuild,
+    'Production AI':aiApiPilot, 'Security & Compliance':secOne+secAnnMvp, Legal:legal.oneTime,
+    'Clearinghouse & Testing':chSetup+testing, Custom:customBuild, Contingency:mvpSub*cont};
+
+  // 12-month (build + run)
+  const team12=hr.annualUSD;
+  const azure12=azure.monthlyUSD*12;
+  const ai12=prodAI.total*12;
+  const subs12=subs.monthlyUSD*12;
+  const ch12=chMonthly*12;
+  const sec12=sec.oneTime+comp.oneTime+legal.oneTime+(sec.annual+comp.annual+legal.annual);
+  const custom12=custom.oneTime+custom.monthly*12+custom.annual;
+  const other12=chSetup+testing;
+  const sub12=team12+azure12+ai12+subs12+ch12+sec12+custom12+other12;
+  const inv12=sub12*(1+cont);
+
+  // 24-month (scale)
+  const team24=hr.annualUSD*2*1.15; // team grows
+  const azure24=azure.monthlyUSD*24*1.6;
+  const ai24=prodAI.total*24*1.4;
+  const subs24=subs.monthlyUSD*24;
+  const ch24=chMonthly*24;
+  const sec24=sec12+comp.oneTime*0.5+(sec.annual+comp.annual+legal.annual);
+  const custom24=custom.oneTime+custom.monthly*24+custom.annual*2;
+  const sub24=team24+azure24+ai24+subs24+ch24+sec24+custom24+other12;
+  const inv24=sub24*(1+cont);
+
+  return {
+    mvp, mvpParts, inv12, inv24,
+    monthlyBurn12: inv12/12,
+    monthlyRun: hr.monthlyUSD+azure.monthlyUSD+prodAI.total+subs.monthlyUSD+chMonthly+
+                (sec.annual+comp.annual+legal.annual)/12+custom.monthly,
+    parts12:{Team:team12, Azure:azure12, 'Production AI':ai12, 'AI Subs':subs12,
+             Clearinghouse:ch12, 'Security/Legal':sec12, Custom:custom12, Other:other12,
+             Contingency:sub12*cont},
+    hr, subs, azure, prodAI, sec, comp, legal, custom, chMonthly
+  };
+}
+
+/* =============================================================================
+   FORMATTING
+============================================================================= */
+function money(usd, opts={}){
+  const v = S.meta.currency==='INR' ? usd*fx() : usd;
+  const sym = S.meta.currency==='INR' ? '₹' : '$';
+  const dp = opts.dp!==undefined?opts.dp:0;
+  if(opts.compact && Math.abs(v)>=1000){
+    if(Math.abs(v)>=1e7 && S.meta.currency==='INR') return sym+(v/1e7).toFixed(2)+' Cr';
+    if(Math.abs(v)>=1e5 && S.meta.currency==='INR') return sym+(v/1e5).toFixed(2)+' L';
+    if(Math.abs(v)>=1e6) return sym+(v/1e6).toFixed(2)+'M';
+    if(Math.abs(v)>=1e3) return sym+(v/1e3).toFixed(1)+'k';
+  }
+  return sym+v.toLocaleString('en-US',{minimumFractionDigits:dp,maximumFractionDigits:dp});
+}
+function money4(usd){
+  const v=S.meta.currency==='INR'?usd*fx():usd; const sym=S.meta.currency==='INR'?'₹':'$';
+  return sym+v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:4});
+}
+function pct(n){return (n||0).toFixed(1)+'%';}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+/* =============================================================================
+   STATE MUTATION HELPERS
+============================================================================= */
+function setPath(path, val){
+  const p=path.split('.'); let o=S;
+  for(let i=0;i<p.length-1;i++){ const k=p[i]; o = /^\d+$/.test(k)?o[+k]:o[k]; }
+  const last=p[p.length-1];
+  o[/^\d+$/.test(last)?+last:last] = val;
+  recalc();
+}
+function upd(el, path, num){
+  let v = el.type==='checkbox'?el.checked:el.value;
+  if(num) v = v===''?0:+v;
+  setPath(path, v);
+}
+
+/* =============================================================================
+   RENDER
+============================================================================= */
+let currentRoute='dashboard';
+function renderNav(){
+  const nav=document.getElementById('nav'); nav.innerHTML='';
+  NAV.forEach(g=>{
+    const gd=document.createElement('div'); gd.className='grp'; gd.textContent=g.grp; nav.appendChild(gd);
+    g.items.forEach(([id,label,ic])=>{
+      const a=document.createElement('a'); a.dataset.route=id;
+      a.innerHTML=`<span class="ic">${ic}</span><span>${label}</span>`;
+      a.onclick=()=>go(id);
+      if(id===currentRoute)a.classList.add('active');
+      nav.appendChild(a);
+    });
+  });
+}
+function go(route){
+  currentRoute=route;
+  document.querySelectorAll('.nav a').forEach(a=>a.classList.toggle('active',a.dataset.route===route));
+  const found=NAV.flatMap(g=>g.items).find(i=>i[0]===route);
+  document.getElementById('viewTitle').textContent=found?found[1]:route;
+  Object.values(charts).forEach(c=>{try{c.destroy()}catch(e){}}); charts={};
+  document.getElementById('view').scrollTop=0;
+  updateTopbar();
+  (VIEWS[route]||VIEWS.dashboard)();
+}
+function recalc(){ updateTopbar(); if(VIEWS[currentRoute])VIEWS[currentRoute](); }
+// Chart.js guard — the app is fully functional without charts (offline / CDN blocked)
+const chartOK=()=>typeof Chart!=='undefined';
+function mkChart(id,cfg){
+  const el=document.getElementById(id); if(!el)return;
+  if(!chartOK()){ const p=el.parentNode; const d=document.createElement('div'); d.className='muted';
+    d.style.cssText='padding:24px;text-align:center;border:1px dashed var(--line);border-radius:8px';
+    d.textContent='📊 Chart requires the Chart.js CDN (offline). All numbers above are computed and correct.';
+    p.replaceChild(d,el); return; }
+  try{ charts[id]=new Chart(el,cfg); }catch(e){}
+}
+function updateTopbar(){
+  const inv=calculateInvestment();
+  document.getElementById('kpiMvp').textContent=money(inv.mvp,{compact:true});
+  document.getElementById('kpi12').textContent=money(inv.inv12,{compact:true});
+  document.getElementById('kpiBurn').textContent=money(inv.monthlyBurn12,{compact:true});
+}
+const V=id=>document.getElementById('view');
+function set(html){document.getElementById('view').innerHTML=html;}
+function tip(t){return `<span class="tt"><span class="ico">i</span><span class="box">${esc(t)}</span></span>`;}
+
+const refBadge = `<span class="chip ref">${REF}</span>`;
+function foot(extra=''){
+  return `<div class="foot">${extra?extra+'<br>':''}All figures are <b>computed live</b> from your editable assumptions — no total is hard-coded.
+  Seed values are <b>${REF}</b>, drawn from researched 2026 pricing. Display FX: ₹${S.meta.fx}/USD (editable in Global Assumptions).
+  Not investment or legal advice · HIPAA-<i>aligned</i> architecture (not certified) · Development uses synthetic / de-identified data only.</div>`;
+}
+
+/* =============================================================================
+   VIEWS
+============================================================================= */
+const VIEWS={};
+
+/* ---------- DASHBOARD ---------- */
+VIEWS.dashboard=function(){
+  const inv=calculateInvestment(); const ue=calculateUnitEconomics();
+  const drivers=topDrivers(inv);
+  set(`
+  <p class="sec-desc">A live financial planning workspace for the AI Revenue Recovery OS build. Every assumption in the left-hand
+  sections feeds these totals instantly. ${refBadge} seed values come from the research cost model — change anything and the whole model recomputes.</p>
+  <div class="grid g4">
+    <div class="stat teal"><div class="l">MVP Investment</div><div class="v">${money(inv.mvp,{compact:true})}</div><div class="d">~${S.meta.buildMonths}-month build + 3-mo pilot, incl. ${S.meta.contingencyPct}% contingency</div></div>
+    <div class="stat blue"><div class="l">12-Month Investment</div><div class="v">${money(inv.inv12,{compact:true})}</div><div class="d">Build + run to steady state</div></div>
+    <div class="stat violet"><div class="l">24-Month Investment</div><div class="v">${money(inv.inv24,{compact:true})}</div><div class="d">Scale to production</div></div>
+    <div class="stat amber"><div class="l">Avg Monthly Burn (Yr 1)</div><div class="v">${money(inv.monthlyBurn12,{compact:true})}</div><div class="d">Steady-state run rate ${money(inv.monthlyRun,{compact:true})}/mo</div></div>
+  </div>
+  <div class="grid g4" style="margin-top:16px">
+    <div class="stat"><div class="l">All-in Cost / Claim</div><div class="v sm">${money4(ue.allIn)}</div><div class="d">AI+voice+doc+clearinghouse</div></div>
+    <div class="stat"><div class="l">Production AI / Claim</div><div class="v sm">${money4(ue.ai)}</div><div class="d">Blended model routing</div></div>
+    <div class="stat"><div class="l">Team Headcount</div><div class="v sm">${inv.hr.headcount}</div><div class="d">${money(inv.hr.annualUSD,{compact:true})}/yr loaded</div></div>
+    <div class="stat"><div class="l">Azure / Month</div><div class="v sm">${money(inv.azure.monthlyUSD,{compact:true})}</div><div class="d">${inv.azure.services.length} services on</div></div>
+  </div>
+  <div class="split" style="margin-top:16px">
+    <div class="card"><h3>MVP Cost Composition</h3><canvas id="cMvp" height="150"></canvas></div>
+    <div class="card"><h3>What Changes the Cost? — Top Drivers</h3>
+      <table><thead><tr><th>Driver</th><th class="num">Impact</th><th class="num">% of MVP</th></tr></thead><tbody>
+      ${drivers.map(d=>`<tr><td>${d.name}</td><td class="num">${money(d.value,{compact:true})}</td><td class="num">${pct(d.pct)}</td></tr>`).join('')}
+      </tbody></table>
+      <div class="note">Reduce the top driver and the MVP total moves the most. See <a onclick="go('investor')">Investor View</a> for the reduction engine.</div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px"><h3>12-Month Cost Categories</h3><canvas id="c12" height="90"></canvas></div>
+  ${foot()}`);
+  const cont='#e8eefc';
+  mkChart('cMvp',{type:'doughnut',
+    data:{labels:Object.keys(inv.mvpParts),datasets:[{data:Object.values(inv.mvpParts).map(v=>disp(v)),
+      backgroundColor:['#3ad1c8','#4f8cff','#a98bff','#ffbf47','#3ad17a','#ff6b6b','#1fa9a0','#6d82a8','#8899bb']}]},
+    options:{plugins:{legend:{position:'right',labels:{color:cont,font:{size:10}}}}}});
+  mkChart('c12',{type:'bar',
+    data:{labels:Object.keys(inv.parts12),datasets:[{label:'12-mo '+curSym(),data:Object.values(inv.parts12).map(v=>disp(v)),
+      backgroundColor:'#3ad1c8'}]},
+    options:{plugins:{legend:{display:false}},scales:{x:{ticks:{color:cont,font:{size:9}}},y:{ticks:{color:cont,callback:v=>curSym()+(v/1000).toFixed(0)+'k'}}}}});
+};
+function disp(usd){return S.meta.currency==='INR'?usd*fx():usd;}
+function curSym(){return S.meta.currency==='INR'?'₹':'$';}
+function topDrivers(inv){
+  const arr=Object.entries(inv.mvpParts).filter(([k])=>k!=='Contingency').map(([name,value])=>({name,value}));
+  const tot=inv.mvp||1;
+  return arr.sort((a,b)=>b.value-a.value).slice(0,5).map(d=>({...d,pct:d.value/tot*100}));
+}
+
+/* ---------- GLOBAL ASSUMPTIONS ---------- */
+VIEWS.assumptions=function(){
+  const m=S.meta;
+  set(`<p class="sec-desc">The central assumption engine. Every other section reads from these — there are no duplicated assumptions.
+  Change one value and the entire model recalculates. ${refBadge}</p>
+  <div class="grid g3">
+    <div class="card"><h3>Currency & Contingency</h3>
+      ${fld('USD → INR FX rate','number','meta.fx',m.fx,true,'Applies to every INR figure in the app. All INR = USD × FX (formula, never stored).')}
+      ${fld('Contingency %','number','meta.contingencyPct',m.contingencyPct,true,'Buffer added on top of every investment total (10 conservative / 15 base / 20 aggressive).')}
+      ${fld('Fully-loaded salary multiplier','number','meta.loadFactor',m.loadFactor,true,'Employer cost above base salary (benefits, taxes, equipment). 1.4 = +40%.')}
+    </div>
+    <div class="card"><h3>Volume & Build Duration</h3>
+      ${fld('Claims worked / month','number','meta.claimsPerMonth',m.claimsPerMonth,true,'Drives all per-claim runtime costs (AI, voice, doc, clearinghouse).')}
+      ${fld('MVP build months','number','meta.buildMonths',m.buildMonths,true,'Length of the one-time build phase feeding MVP investment.')}
+      ${fld('Production build months','number','meta.prodMonths',m.prodMonths,true,'Through M12 (production readiness).')}
+    </div>
+    <div class="card"><h3>Planning Band</h3>
+      <label class="fld"><span class="lab">Salary / cost band ${tip('Applies the low/mid/high band as your planning baseline.')}</span>
+      <div class="seg">
+        ${['low','mid','high'].map(b=>`<button class="${m.planningBand===b?'on':''}" onclick="setPath('meta.planningBand','${b}')">${b.toUpperCase()}</button>`).join('')}
+      </div></label>
+      <div class="note">The mid band is the planning baseline used in the research report. Low ≈ lean, High ≈ senior/US-adjacent.</div>
+    </div>
+  </div>
+  <div class="warn">Validation: FX must be &gt; 0, contingency 0–100%, claims ≥ 0. ${validateGlobal()}</div>
+  ${foot()}`);
+};
+function validateGlobal(){
+  const w=[];
+  if(fx()<=0)w.push('FX invalid'); if(S.meta.contingencyPct<0||S.meta.contingencyPct>100)w.push('Contingency out of range');
+  if(S.meta.claimsPerMonth<0)w.push('Negative claims'); return w.length?('⚠ '+w.join('; ')):'All global assumptions valid ✓';
+}
+function fld(label,type,path,val,num,tipText){
+  return `<label class="fld"><span class="lab">${esc(label)} ${tipText?tip(tipText):''}</span>
+  <input type="${type}" value="${esc(val)}" oninput="upd(this,'${path}',${!!num})"></label>`;
+}
+
+/* ---------- PRODUCT SCOPE ---------- */
+VIEWS.scope=function(){
+  set(`<p class="sec-desc">Toggle the functional modules in scope. Scope shapes which cost drivers matter (e.g. Voice, Document AI, Payer-side).
+  This is a planning checklist — it does not silently alter numbers; it documents what the investment funds. ${refBadge}</p>
+  <div class="card"><table><thead><tr><th>Module</th><th style="width:120px">In Scope</th></tr></thead><tbody>
+  ${S.scope.map((s,i)=>`<tr><td>${esc(s.name)}</td><td>
+    <label class="flex"><input type="checkbox" ${s.on?'checked':''} onchange="upd(this,'scope.${i}.on')"> ${s.on?'<span class="chip yes">YES</span>':'<span class="chip no">NO</span>'}</label>
+  </td></tr>`).join('')}
+  </tbody></table>
+  <div class="flex" style="margin-top:10px"><input id="newScope" class="wide" type="text" placeholder="Add a module to scope…" style="max-width:340px">
+  <button class="btn sm" onclick="addScope()">+ Add Module</button></div></div>
+  <div class="note">${S.scope.filter(s=>s.on).length} of ${S.scope.length} modules in scope.</div>
+  ${foot()}`);
+};
+function addScope(){const v=document.getElementById('newScope').value.trim(); if(!v)return; S.scope.push({name:v,on:true}); recalc();}
+
+/* ---------- HUMAN RESOURCES ---------- */
+VIEWS.hr=function(){
+  const hr=calculateHR(); const lf=+S.meta.loadFactor||1.4;
+  set(`<p class="sec-desc">Editable roles, salaries (base USD; INR shown at ₹${S.meta.fx}/USD) and headcount. Fully-loaded cost = base × count × ${lf} (load factor).
+  India-benchmarked salary defaults. ${refBadge}</p>
+  <div class="card"><div class="tbl-wrap"><table><thead><tr>
+    <th>Role</th><th class="num">Count</th><th class="num">Base Salary (USD/yr)</th><th class="num">Base (INR/yr)</th>
+    <th class="num">Loaded Annual</th><th></th></tr></thead><tbody>
+  ${S.hr.map((h,i)=>`<tr>
+    <td><input type="text" class="wide" value="${esc(h.role)}" oninput="upd(this,'hr.${i}.role')" style="min-width:220px"></td>
+    <td class="num"><input type="number" class="mini" value="${h.count}" oninput="upd(this,'hr.${i}.count',true)"></td>
+    <td class="num"><input type="number" class="mid" value="${h.salaryUSD}" oninput="upd(this,'hr.${i}.salaryUSD',true)"></td>
+    <td class="num mono">₹${(h.salaryUSD*fx()).toLocaleString('en-US')}</td>
+    <td class="num mono">${money(h.salaryUSD*h.count*lf)}</td>
+    <td><button class="del" onclick="delRow('hr',${i})">×</button></td></tr>`).join('')}
+  </tbody><tfoot><tr><td>Total — ${hr.headcount} FTE</td><td class="num">${hr.headcount}</td><td></td><td></td>
+    <td class="num">${money(hr.annualUSD)}</td><td></td></tr></tfoot></table></div>
+  <button class="add-row" onclick="S.hr.push({role:'New Role',count:1,salaryUSD:30000,band:'mid'});recalc()">+ ADD ROLE</button></div>
+  <div class="grid g3" style="margin-top:16px">
+    <div class="stat teal"><div class="l">Loaded Annual Payroll</div><div class="v sm">${money(hr.annualUSD,{compact:true})}</div></div>
+    <div class="stat"><div class="l">Monthly Payroll</div><div class="v sm">${money(hr.monthlyUSD,{compact:true})}</div></div>
+    <div class="stat"><div class="l">Build-Phase Payroll (${S.meta.buildMonths} mo)</div><div class="v sm">${money(hr.monthlyUSD*S.meta.buildMonths,{compact:true})}</div></div>
+  </div>
+  <div class="note">AI productivity (Development section) increases throughput but does <b>not</b> auto-reduce this headcount — team sizing stays a human decision.</div>
+  ${foot()}`);
+};
+function delRow(list,i){ S[list].splice(i,1); recalc(); }
+
+/* ---------- AI WORKFORCE ---------- */
+VIEWS.aiworkforce=function(){
+  set(`<p class="sec-desc">The AI agent workforce is <b>operated by</b> the human team through the coding/agent subscriptions — it is <b>not</b> a headcount and
+  <b>not</b> one paid subscription per agent. This page documents the agents; their tooling cost lives in <a onclick="go('aisubs')">AI Subscriptions</a>. ${refBadge}</p>
+  <div class="crit"><b>AI AGENTS ARE NOT EMPLOYEES.</b> Do not budget one subscription per agent. Cost = the human seats on Claude Max / ChatGPT that drive them (see AI Subscriptions).</div>
+  <div class="card"><h3>20-Agent Workforce (governed, least-privilege, human-approved high-risk actions)</h3>
+  <div class="pill-row">
+  ${['Product Manager','Project Manager','Business Analyst','Healthcare RCM','Payer Research','Architecture','Backend Dev','Frontend Dev','AI Engineer','EDI','FHIR','Integration','Database','QA','Security','DevOps','FinOps','Documentation','Compliance Research','Test Data'].map(a=>`<span class="tag" style="text-transform:none">${a}</span>`).join(' ')}
+  </div>
+  <div class="note">Each agent has a scoped identity, tool/data/tenant permissions and full audit. Development uses synthetic / de-identified data only.</div>
+  </div>
+  ${foot()}`);
+};
+
+/* ---------- AI SUBSCRIPTIONS ---------- */
+VIEWS.aisubs=function(){
+  const a=calculateAISubs(); const c=S.claude, g=S.chatgpt;
+  set(`<p class="sec-desc">Developer AI subscriptions (dev-tool seats). These are <b>not</b> production PHI infrastructure. Recommended baseline: 5 human users × Claude Max 20x. ${refBadge}</p>
+  <div class="grid g2">
+    <div class="card"><h3>Claude Max (Anthropic) ${tip('Max 5x and Max 20x are per-user/month plans. Recommended baseline = 5 users on Max 20x = $1,000/mo.')}</h3>
+      <div class="grid g2">
+        ${fld('Max 5x users','number','claude.users5x',c.users5x,true)}
+        ${fld('Max 5x $/user/mo','number','claude.price5x',c.price5x,true)}
+        ${fld('Max 20x users','number','claude.users20x',c.users20x,true)}
+        ${fld('Max 20x $/user/mo','number','claude.price20x',c.price20x,true)}
+      </div>
+      <div class="stat teal" style="margin-top:12px"><div class="l">Claude Monthly</div><div class="v sm">${money(a.claudeMo)}</div><div class="d">${c.users5x} × 5x + ${c.users20x} × 20x</div></div>
+    </div>
+    <div class="card"><h3>ChatGPT (OpenAI)</h3>
+      <div class="grid g2">
+        ${fld('Business users','number','chatgpt.bizUsers',g.bizUsers,true)}
+        ${fld('Business $/user/mo','number','chatgpt.bizPrice',g.bizPrice,true)}
+        ${fld('Enterprise users','number','chatgpt.entUsers',g.entUsers,true,'ChatGPT Enterprise pricing is QUOTE REQUIRED — not publicly disclosed. Users here flag a quote, they do not add a dollar amount.')}
+      </div>
+      ${g.entUsers>0?`<div class="warn"><span class="chip quote">QUOTE REQUIRED</span> ChatGPT Enterprise pricing is not publicly disclosed — obtain a quote. Not added to totals.</div>`:''}
+      <div class="stat blue" style="margin-top:12px"><div class="l">ChatGPT Monthly</div><div class="v sm">${money(a.chatgptMo)}</div><div class="d">Business seats only</div></div>
+    </div>
+  </div>
+  <div class="grid g3" style="margin-top:16px">
+    <div class="stat teal"><div class="l">Total Dev-Tool Subs / Month</div><div class="v sm">${money(a.monthlyUSD)}</div></div>
+    <div class="stat"><div class="l">Annual</div><div class="v sm">${money(a.monthlyUSD*12,{compact:true})}</div></div>
+    <div class="stat"><div class="l">Build Phase (${S.meta.buildMonths} mo)</div><div class="v sm">${money(a.monthlyUSD*S.meta.buildMonths,{compact:true})}</div></div>
+  </div>
+  <div class="note">Developer AI subscriptions are <b>not</b> production PHI infrastructure. Production model inference is calculated separately under <a onclick="go('prodai')">Production AI</a>.</div>
+  ${foot()}`);
+};
+
+/* ---------- PRODUCTION AI ---------- */
+VIEWS.prodai=function(){
+  const p=S.prodAI; const calc=calculateProdAIPerClaim(); const mo=calculateProdAIMonthly();
+  const routeOk=Math.abs(calc.routeSum-100)<0.01;
+  set(`<p class="sec-desc">Production model inference (PHI path, separate from dev-tool subscriptions). Route claims across models by % (must sum to 100). Cost is computed from tokens/claim × price × routing, with optional prompt caching. ${refBadge}</p>
+  <div class="card"><div class="tbl-wrap"><table><thead><tr>
+    <th>Model</th><th class="num">Input $/1M</th><th class="num">Output $/1M</th><th class="num">Routing %</th><th class="num">Cost/Claim</th><th></th></tr></thead><tbody>
+  ${p.models.map((m,i)=>`<tr>
+    <td><input type="text" class="wide" value="${esc(m.name)}" oninput="upd(this,'prodAI.models.${i}.name')" style="min-width:220px"></td>
+    <td class="num"><input type="number" class="mini" value="${m.inP}" oninput="upd(this,'prodAI.models.${i}.inP',true)"></td>
+    <td class="num"><input type="number" class="mini" value="${m.outP}" oninput="upd(this,'prodAI.models.${i}.outP',true)"></td>
+    <td class="num"><input type="number" class="mini" value="${m.route}" oninput="upd(this,'prodAI.models.${i}.route',true)"></td>
+    <td class="num mono">${money4(calc.breakdown[i].cost)}</td>
+    <td><button class="del" onclick="delRow2('prodAI','models',${i})">×</button></td></tr>`).join('')}
+  </tbody><tfoot><tr><td>Routing total</td><td></td><td></td><td class="num" style="color:${routeOk?'var(--green)':'var(--red)'}">${calc.routeSum.toFixed(1)}%</td>
+    <td class="num">${money4(calc.perClaim)}</td><td></td></tr></tfoot></table></div>
+  <button class="add-row" onclick="S.prodAI.models.push({name:'New Model',inP:1,outP:5,route:0});recalc()">+ ADD MODEL</button>
+  ${routeOk?'':'<div class="warn">⚠ Routing must sum to 100%. Currently '+calc.routeSum.toFixed(1)+'%.</div>'}
+  </div>
+  <div class="grid g3" style="margin-top:16px">
+    <div class="card"><h3>Per-Claim Token Profile</h3>
+      ${fld('AI actions / claim','number','prodAI.aiActionsPerClaim',p.aiActionsPerClaim,true,'How many model calls a claim triggers across its lifecycle.')}
+      ${fld('Input tokens / action','number','prodAI.tokensInPerClaim',p.tokensInPerClaim,true)}
+      ${fld('Output tokens / action','number','prodAI.tokensOutPerClaim',p.tokensOutPerClaim,true)}
+      <label class="flex" style="margin-top:8px"><input type="checkbox" ${p.caching?'checked':''} onchange="upd(this,'prodAI.caching')"> Prompt caching enabled ${tip('Cached input billed at cacheReadMult × normal. ~50% of input assumed cacheable.')}</label>
+      ${fld('Cache read multiplier','number','prodAI.cacheReadMult',p.cacheReadMult,true)}
+    </div>
+    <div class="stat teal"><div class="l">AI Cost / Claim</div><div class="v sm">${money4(calc.perClaim)}</div><div class="d">Blended over routing</div></div>
+    <div class="stat blue"><div class="l">Production AI / Month</div><div class="v sm">${money(mo.total,{compact:true})}</div><div class="d">${(+S.meta.claimsPerMonth).toLocaleString()} claims + embeddings</div></div>
+  </div>
+  <div class="note">Embeddings & retrieval: ${fldInline('prodAI.embedMonthly',p.embedMonthly)} /mo. This is production inference on the PHI path (Azure OpenAI BAA / approved models), separate from developer subscriptions.</div>
+  ${foot()}`);
+};
+function fldInline(path,val){return `<input type="number" class="mini" value="${val}" oninput="upd(this,'${path}',true)">`;}
+function delRow2(list,sub,i){S[list][sub].splice(i,1);recalc();}
+
+/* ---------- AZURE ---------- */
+VIEWS.azure=function(){
+  const az=calculateAzure(); const p=S.azurePresets;
+  set(`<p class="sec-desc">Per-service Azure infrastructure. Enable/disable each service, edit tier and monthly cost. Apply a stage preset to reset totals to a reference scale. ${refBadge}</p>
+  <div class="card"><div class="flex wrap" style="margin-bottom:10px"><span class="muted">Stage preset (reference monthly totals):</span>
+  ${Object.entries(p).map(([k,v])=>`<button class="btn sm" onclick="applyAzurePreset('${k}')">${k} · ${money(v,{compact:true})}</button>`).join('')}</div>
+  <div class="tbl-wrap"><table><thead><tr><th style="width:60px">On</th><th>Service</th><th>Tier / SKU</th><th class="num">Monthly (USD)</th><th class="num">Monthly (${curSym()})</th><th></th></tr></thead><tbody>
+  ${S.azure.services.map((s,i)=>`<tr>
+    <td><input type="checkbox" ${s.on?'checked':''} onchange="upd(this,'azure.services.${i}.on')"></td>
+    <td><input type="text" class="wide" value="${esc(s.svc)}" oninput="upd(this,'azure.services.${i}.svc')" style="min-width:200px"></td>
+    <td><input type="text" class="wide" value="${esc(s.tier)}" oninput="upd(this,'azure.services.${i}.tier')" style="min-width:170px"></td>
+    <td class="num"><input type="number" class="mid" value="${s.mo}" oninput="upd(this,'azure.services.${i}.mo',true)"></td>
+    <td class="num mono">${s.on?money(s.mo):'<span class="muted">off</span>'}</td>
+    <td><button class="del" onclick="delRow2('azure','services',${i})">×</button></td></tr>`).join('')}
+  </tbody><tfoot><tr><td></td><td>Total (${az.services.length} on)</td><td></td><td class="num">$${az.monthlyUSD.toLocaleString()}</td><td class="num">${money(az.monthlyUSD)}</td><td></td></tr></tfoot></table></div>
+  <button class="add-row" onclick="S.azure.services.push({svc:'New Service',tier:'',mo:0,on:true});recalc()">+ ADD SERVICE</button></div>
+  <div class="grid g3" style="margin-top:16px">
+    <div class="stat teal"><div class="l">Azure / Month</div><div class="v sm">${money(az.monthlyUSD,{compact:true})}</div></div>
+    <div class="stat"><div class="l">Azure / Year</div><div class="v sm">${money(az.monthlyUSD*12,{compact:true})}</div></div>
+    <div class="stat"><div class="l">Build-Phase (ramped)</div><div class="v sm">${money(az.monthlyUSD*S.meta.buildMonths*0.7,{compact:true})}</div></div>
+  </div>
+  <div class="note">All Azure PHI services must sit under a signed Microsoft HIPAA BAA. Quote-only dedicated capacity (e.g. reserved AI capacity) is recorded "Not publicly disclosed" — obtain a quote.</div>
+  ${foot()}`);
+};
+function applyAzurePreset(stage){
+  const target=S.azurePresets[stage]; const cur=calculateAzure().monthlyUSD||1;
+  const factor=target/cur;
+  S.azure.services.forEach(s=>{ if(s.on) s.mo=Math.round(s.mo*factor); });
+  S.azure.scenario=stage; toast('Azure scaled to '+stage+' reference ('+money(target,{compact:true})+'/mo)'); recalc();
+}
+
+/* ---------- CONNECTIVITY ---------- */
+VIEWS.connectivity=function(){
+  const sum=S.connectivity.reduce((a,c)=>a+(+c.route||0),0);
+  const perClaim=calculateConnectivityPerClaim(); const ok=Math.abs(sum-100)<0.01;
+  const chipFor=s=>({YES:'yes',NO:'no',PARTIAL:'partial',UNKNOWN:'unknown','QUOTE REQUIRED':'quote'}[s]||'unknown');
+  set(`<p class="sec-desc">Right-channel routing: EDI → API → FHIR → Portal → Voice → Human. Set the share of claims routed to each channel (must sum to 100%) and its per-claim unit cost. Capability status uses YES / NO / PARTIAL / UNKNOWN / QUOTE REQUIRED. ${refBadge}</p>
+  <div class="card"><div class="tbl-wrap"><table><thead><tr><th>Channel</th><th>Status</th><th class="num">Route %</th><th class="num">Unit $/claim</th><th>Note</th><th></th></tr></thead><tbody>
+  ${S.connectivity.map((c,i)=>`<tr>
+    <td><input type="text" class="wide" value="${esc(c.ch)}" oninput="upd(this,'connectivity.${i}.ch')" style="min-width:190px"></td>
+    <td><select onchange="upd(this,'connectivity.${i}.status')">${['YES','PARTIAL','NO','UNKNOWN','QUOTE REQUIRED'].map(o=>`<option ${c.status===o?'selected':''}>${o}</option>`).join('')}</select> <span class="chip ${chipFor(c.status)}">${c.status}</span></td>
+    <td class="num"><input type="number" class="mini" value="${c.route}" oninput="upd(this,'connectivity.${i}.route',true)"></td>
+    <td class="num"><input type="number" class="mini" value="${c.unit}" step="0.01" oninput="upd(this,'connectivity.${i}.unit',true)"></td>
+    <td><input type="text" class="wide" value="${esc(c.note)}" oninput="upd(this,'connectivity.${i}.note')" style="min-width:170px"></td>
+    <td><button class="del" onclick="delRow('connectivity',${i})">×</button></td></tr>`).join('')}
+  </tbody><tfoot><tr><td>Weighted per-claim</td><td></td><td class="num" style="color:${ok?'var(--green)':'var(--red)'}">${sum.toFixed(0)}%</td><td class="num">${money4(perClaim)}</td><td></td><td></td></tr></tfoot></table></div>
+  <button class="add-row" onclick="S.connectivity.push({ch:'New Channel',status:'UNKNOWN',route:0,unit:0,note:''});recalc()">+ ADD CHANNEL</button>
+  ${ok?'':'<div class="warn">⚠ Routing must sum to 100%. Currently '+sum.toFixed(0)+'%.</div>'}</div>
+  <div class="card" style="margin-top:16px"><h3>Clearinghouse Transaction Cost</h3>
+    <div class="grid g3">
+      ${fld('Transactions / claim','number','clearinghouse.txnPerClaim',S.clearinghouse.txnPerClaim,true,'Eligibility + status + submission etc. per claim.')}
+      ${fld('Unit $/transaction','number','clearinghouse.unitTxn',S.clearinghouse.unitTxn,true,'Stedi PAYG per-transaction estimate; free tier covers MVP.')}
+      <label class="flex" style="margin-top:20px"><input type="checkbox" ${S.clearinghouse.freeTierMVP?'checked':''} onchange="upd(this,'clearinghouse.freeTierMVP')"> Free tier covers MVP (≤50k claims → $0)</label>
+    </div>
+    <div class="stat teal" style="margin-top:12px"><div class="l">Clearinghouse / Month</div><div class="v sm">${money(calculateClearinghouseMonthly(),{compact:true})}</div><div class="d">${money4(calculateClearinghousePerClaim())}/claim</div></div>
+  </div>
+  <div class="note">Direct payer API ≠ clearinghouse connectivity; free sandbox ≠ free production. Prior-auth moves to FHIR PAS for CMS-regulated payers by Jan 1, 2027 (CMS-0057-F).</div>
+  ${foot()}`);
+};
+
+/* ---------- VOICE & DOC ---------- */
+VIEWS.voice=function(){
+  const v=S.voice, d=S.doc; const claims=+S.meta.claimsPerMonth||0;
+  const vpc=calculateVoicePerClaim(), dpc=calculateDocPerClaim();
+  set(`<p class="sec-desc">Voice AI (payer calls) and Document AI (attachment OCR) runtime calculators. Costs apply only to the % of claims that escalate. ${refBadge}</p>
+  <div class="grid g2">
+    <div class="card"><h3>🎙️ Voice AI</h3>
+      ${fld('$/minute (blended)','number','voice.perMin',v.perMin,true,'Blended voice stack estimate: $0.05–0.15 typical; premium to $0.40.')}
+      ${fld('Minutes / escalated call','number','voice.minutesPerClaim',v.minutesPerClaim,true)}
+      ${fld('% claims escalating to voice','number','voice.escalationPct',v.escalationPct,true)}
+      <div class="stat teal" style="margin-top:10px"><div class="l">Voice / Claim (blended)</div><div class="v sm">${money4(vpc)}</div><div class="d">${money(vpc*claims,{compact:true})}/mo</div></div>
+    </div>
+    <div class="card"><h3>📄 Document AI</h3>
+      ${fld('$/1k pages (custom OCR)','number','doc.per1k',d.per1k,true,'Azure AI Document Intelligence custom model tier.')}
+      ${fld('Pages / claim needing OCR','number','doc.pagesPerClaim',d.pagesPerClaim,true)}
+      ${fld('% claims needing OCR','number','doc.ocrRatePct',d.ocrRatePct,true)}
+      <div class="stat blue" style="margin-top:10px"><div class="l">Doc / Claim (blended)</div><div class="v sm">${money4(dpc)}</div><div class="d">${money(dpc*claims,{compact:true})}/mo</div></div>
+    </div>
+  </div>
+  ${foot()}`);
+};
+
+/* ---------- SECURITY / COMPLIANCE / LEGAL (shared renderer) ---------- */
+function costListView(title,desc,list,path,extraCols){
+  const sum=sumList(list);
+  return `<p class="sec-desc">${desc} ${refBadge}</p>
+  <div class="card"><div class="tbl-wrap"><table><thead><tr><th style="width:50px">On</th><th>Item</th>${extraCols?'<th>When</th>':''}<th class="num">One-Time (USD)</th><th class="num">Annual (USD)</th><th></th></tr></thead><tbody>
+  ${list.map((x,i)=>`<tr>
+    <td><input type="checkbox" ${x.on!==false?'checked':''} onchange="upd(this,'${path}.${i}.on')"></td>
+    <td><input type="text" class="wide" value="${esc(x.item)}" oninput="upd(this,'${path}.${i}.item')" style="min-width:230px"></td>
+    ${extraCols?`<td><input type="text" value="${esc(x.when||'')}" oninput="upd(this,'${path}.${i}.when')" style="width:90px"></td>`:''}
+    <td class="num"><input type="number" class="mid" value="${x.oneTime||0}" oninput="upd(this,'${path}.${i}.oneTime',true)"></td>
+    <td class="num"><input type="number" class="mid" value="${x.annual||0}" oninput="upd(this,'${path}.${i}.annual',true)"></td>
+    <td><button class="del" onclick="delRow('${path}',${i})">×</button></td></tr>`).join('')}
+  </tbody><tfoot><tr><td></td><td>Total (enabled)</td>${extraCols?'<td></td>':''}<td class="num">${money(sum.oneTime)}</td><td class="num">${money(sum.annual)}/yr</td><td></td></tr></tfoot></table></div>
+  <button class="add-row" onclick="S['${path}'].push({item:'New Item',oneTime:0,annual:0,on:true${extraCols?",when:''":''}});recalc()">+ ADD ITEM</button></div>`;
+}
+VIEWS.security=function(){
+  set(costListView('Security','Security tooling and services. HIPAA-aligned architecture — not "HIPAA certified". SOC 2 / HITRUST live under Compliance.',
+    S.security,'security',false)+
+    `<div class="note">SOC 2 Type II, HITRUST default to OFF here (they live in Compliance). Security training is per-employee/year — scale it with headcount.</div>${foot()}`);
+};
+VIEWS.compliance=function(){
+  set(costListView('HIPAA / Compliance','Attestations and programs. <b>SOC 2 Type II and HITRUST default OFF</b> — enable when a payer/enterprise customer requires them. HIPAA is a program (aligned, not certified).',
+    S.compliance,'compliance',true)+
+    `<div class="warn">HIPAA-<b>aligned</b> architecture and a HIPAA <b>compliance program</b> — never "HIPAA certified". Payer-side AI is decision-support with human governance; it does not make final coverage/medical-necessity/payment decisions (CMS-4201-F; CA SB 1120).</div>${foot()}`);
+};
+VIEWS.legal=function(){
+  set(costListView('Legal','Entity formation, contracts, BAAs, healthcare/regulatory counsel, IP.',
+    S.legal,'legal',false)+foot());
+};
+
+/* ---------- DEVELOPMENT ---------- */
+VIEWS.development=function(){
+  const dv=S.development; const hr=calculateHR();
+  const uplift={10:'Conservative',20:'Realistic-low',30:'Planning baseline',40:'Optimistic'};
+  set(`<p class="sec-desc">Development levers. AI productivity uplift models throughput gains — it <b>does not</b> auto-reduce headcount (team sizing stays a human decision on the HR page). ${refBadge}</p>
+  <div class="grid g2">
+    <div class="card"><h3>AI Productivity Uplift</h3>
+      <div class="seg" style="margin-bottom:10px">
+      ${[10,20,30,40].map(p=>`<button class="${dv.aiProductivityPct===p?'on':''}" onclick="setPath('development.aiProductivityPct',${p})">+${p}%</button>`).join('')}
+      </div>
+      <div class="stat teal"><div class="l">Effective capacity of a ${hr.headcount}-FTE team</div>
+        <div class="v sm">${(hr.headcount*(1+dv.aiProductivityPct/100)).toFixed(1)} FTE-equiv</div>
+        <div class="d">${uplift[dv.aiProductivityPct]||''} · headcount unchanged</div></div>
+      <div class="warn">AI augments the team; it does not replace developers. Cost is unchanged — throughput/timeline improve.</div>
+    </div>
+    <div class="card"><h3>One-Time Development Costs</h3>
+      ${fld('Testing / QA tooling (one-time)','number','development.testingOneTime',dv.testingOneTime,true)}
+      ${fld('Clearinghouse setup / onboarding','number','development.clearinghouseSetup',dv.clearinghouseSetup,true)}
+      <div class="note">These flow into the MVP investment as one-time line items.</div>
+    </div>
+  </div>
+  ${foot()}`);
+};
+
+/* ---------- MILESTONES ---------- */
+VIEWS.milestones=function(){
+  const total=S.milestones.reduce((a,m)=>a+(+m.dur||0),0);
+  set(`<p class="sec-desc">Editable milestone planner (add / edit / delete / reorder). Durations in weeks (realistic case). MVP-capable ≈ M8–M9; pilot ≈ M11. ${refBadge}</p>
+  <div class="card"><div class="tbl-wrap"><table><thead><tr><th style="width:40px">#</th><th>Milestone</th><th class="num">Weeks</th><th>Depends</th><th>Notes</th><th style="width:90px">Move</th><th></th></tr></thead><tbody>
+  ${S.milestones.map((m,i)=>`<tr>
+    <td class="muted">${i+1}</td>
+    <td><input type="text" class="wide" value="${esc(m.name)}" oninput="upd(this,'milestones.${i}.name')" style="min-width:200px"></td>
+    <td class="num"><input type="number" class="mini" value="${m.dur}" oninput="upd(this,'milestones.${i}.dur',true)"></td>
+    <td><input type="text" value="${esc(m.dep)}" oninput="upd(this,'milestones.${i}.dep')" style="width:70px"></td>
+    <td><input type="text" class="wide" value="${esc(m.notes)}" oninput="upd(this,'milestones.${i}.notes')" style="min-width:200px"></td>
+    <td><button class="btn sm" onclick="moveM(${i},-1)">↑</button><button class="btn sm" onclick="moveM(${i},1)">↓</button></td>
+    <td><button class="del" onclick="delRow('milestones',${i})">×</button></td></tr>`).join('')}
+  </tbody><tfoot><tr><td></td><td>Total duration</td><td class="num">${total} wk</td><td colspan="4">≈ ${(total/4.33).toFixed(1)} months (realistic)</td></tr></tfoot></table></div>
+  <button class="add-row" onclick="S.milestones.push({id:Date.now(),name:'New Milestone',dur:2,dep:'',notes:''});recalc()">+ ADD MILESTONE</button></div>
+  <div class="grid g3" style="margin-top:16px">
+    <div class="stat"><div class="l">Aggressive (0.8×)</div><div class="v sm">${(total*0.8/4.33).toFixed(1)} mo</div></div>
+    <div class="stat teal"><div class="l">Realistic (1.0×)</div><div class="v sm">${(total/4.33).toFixed(1)} mo</div></div>
+    <div class="stat"><div class="l">Conservative (1.3×)</div><div class="v sm">${(total*1.3/4.33).toFixed(1)} mo</div></div>
+  </div>
+  ${foot()}`);
+};
+function moveM(i,dir){const j=i+dir; if(j<0||j>=S.milestones.length)return; const a=S.milestones; [a[i],a[j]]=[a[j],a[i]]; recalc();}
+
+/* ---------- UNIT ECONOMICS ---------- */
+VIEWS.unit=function(){
+  const ue=calculateUnitEconomics(); const rev=S.revenue;
+  const price=+rev.pricePerClaim||0; const gm=price>0?(price-ue.allIn)/price*100:0;
+  set(`<p class="sec-desc">Cost-to-serve per worked claim vs. price per claim. Gross margin and contribution computed live. ${refBadge}</p>
+  <div class="grid g4">
+    <div class="stat teal"><div class="l">All-in Cost / Claim</div><div class="v sm">${money4(ue.allIn)}</div></div>
+    <div class="stat blue"><div class="l">Price / Claim</div><div class="v sm">${money4(price)}</div></div>
+    <div class="stat ${gm>=50?'green':'amber'}"><div class="l">Gross Margin</div><div class="v sm">${pct(gm)}</div></div>
+    <div class="stat"><div class="l">Contribution / Claim</div><div class="v sm">${money4(price-ue.allIn)}</div></div>
+  </div>
+  <div class="split" style="margin-top:16px">
+    <div class="card"><h3>Cost / Claim Breakdown</h3><table><tbody>
+      <tr><td>Production AI</td><td class="num">${money4(ue.ai)}</td></tr>
+      <tr><td>Voice AI</td><td class="num">${money4(ue.voice)}</td></tr>
+      <tr><td>Document AI</td><td class="num">${money4(ue.doc)}</td></tr>
+      <tr><td>Clearinghouse</td><td class="num">${money4(ue.ch)}</td></tr>
+    </tbody><tfoot><tr><td>All-in / claim</td><td class="num">${money4(ue.allIn)}</td></tr></tfoot></table>
+      <div class="muted" style="margin-top:8px">Connectivity-weighted channel cost: ${money4(ue.conn)}/claim (informational; overlaps clearinghouse/voice).</div>
+    </div>
+    <div class="card"><h3>Cost/Claim Composition</h3><canvas id="cUnit" height="180"></canvas></div>
+  </div>
+  <div class="card" style="margin-top:16px"><h3>Margin at Volume</h3><canvas id="cVol" height="90"></canvas></div>
+  ${foot()}`);
+  mkChart('cUnit',{type:'doughnut',
+    data:{labels:['AI','Voice','Doc','Clearinghouse'],datasets:[{data:[ue.ai,ue.voice,ue.doc,ue.ch].map(v=>disp(v)),
+      backgroundColor:['#3ad1c8','#a98bff','#ffbf47','#4f8cff']}]},
+    options:{plugins:{legend:{position:'right',labels:{color:'#e8eefc',font:{size:11}}}}}});
+  const vols=[10000,50000,100000,250000,500000];
+  mkChart('cVol',{type:'bar',
+    data:{labels:vols.map(v=>(v/1000)+'k'),datasets:[
+      {label:'Revenue',data:vols.map(v=>disp(v*price)),backgroundColor:'#3ad17a'},
+      {label:'Cost',data:vols.map(v=>disp(v*ue.allIn)),backgroundColor:'#ff6b6b'}]},
+    options:{plugins:{legend:{labels:{color:'#e8eefc'}}},scales:{x:{ticks:{color:'#e8eefc'}},y:{ticks:{color:'#e8eefc',callback:v=>curSym()+(v/1000).toFixed(0)+'k'}}}}});
+};
+
+/* ---------- REVENUE ---------- */
+VIEWS.revenue=function(){
+  const r=S.revenue; const ue=calculateUnitEconomics(); const inv=calculateInvestment();
+  const claims=+r.claimsMonth||0;
+  const mrr=claims*(+r.pricePerClaim||0)+(+r.seatFee||0)*(+r.seats||0);
+  const arr=mrr*12; const cogs=claims*ue.allIn+inv.monthlyRun*0.4;
+  const gm=mrr>0?(mrr-claims*ue.allIn)/mrr*100:0;
+  const burn=inv.monthlyRun; const netMo=mrr-burn;
+  let beMonth='—'; if(netMo>0){beMonth='profitable at current volume';}
+  else { // months to break-even if revenue grows at growthPctMo
+    let m=mrr, b=burn, i=0; const g=(+r.growthPctMo||0)/100;
+    while(m<b && i<120){ m*=(1+g); i++; } beMonth=i>=120?'>120 mo':i+' mo';
+  }
+  set(`<p class="sec-desc">Revenue model: per-claim pricing (+ optional per-seat). MRR/ARR, gross margin and break-even computed against your live cost base. ${refBadge}</p>
+  <div class="grid g2">
+    <div class="card"><h3>Pricing Inputs</h3><div class="grid g2">
+      ${fld('Price / claim','number','revenue.pricePerClaim',r.pricePerClaim,true)}
+      ${fld('Billable claims / month','number','revenue.claimsMonth',r.claimsMonth,true)}
+      ${fld('Per-seat fee / mo','number','revenue.seatFee',r.seatFee,true)}
+      ${fld('Seats','number','revenue.seats',r.seats,true)}
+      ${fld('MoM growth %','number','revenue.growthPctMo',r.growthPctMo,true)}
+      ${fld('Gross-margin target %','number','revenue.grossMarginTarget',r.grossMarginTarget,true)}
+    </div></div>
+    <div class="card"><h3>Outputs</h3>
+      <div class="grid g2">
+        <div class="stat teal"><div class="l">MRR</div><div class="v sm">${money(mrr,{compact:true})}</div></div>
+        <div class="stat blue"><div class="l">ARR</div><div class="v sm">${money(arr,{compact:true})}</div></div>
+        <div class="stat ${gm>=r.grossMarginTarget?'green':'amber'}"><div class="l">Gross Margin</div><div class="v sm">${pct(gm)}</div></div>
+        <div class="stat ${netMo>=0?'green':'red'}"><div class="l">Net / Month</div><div class="v sm">${money(netMo,{compact:true})}</div></div>
+      </div>
+      <div class="stat ${netMo>=0?'green':'amber'}" style="margin-top:12px"><div class="l">Break-even</div><div class="v sm">${beMonth}</div><div class="d">vs monthly burn ${money(burn,{compact:true})} at ${r.growthPctMo}% MoM growth</div></div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px"><h3>Revenue vs Burn (24 mo @ ${r.growthPctMo}% growth)</h3><canvas id="cRev" height="90"></canvas></div>
+  ${foot()}`);
+  const g=(+r.growthPctMo||0)/100; const labels=[],revA=[],burnA=[]; let m=mrr;
+  for(let i=1;i<=24;i++){ labels.push('M'+i); revA.push(disp(m)); burnA.push(disp(burn)); m*=(1+g);}
+  mkChart('cRev',{type:'line',
+    data:{labels,datasets:[{label:'MRR',data:revA,borderColor:'#3ad17a',tension:.3},{label:'Burn',data:burnA,borderColor:'#ff6b6b',borderDash:[5,4],tension:0}]},
+    options:{plugins:{legend:{labels:{color:'#e8eefc'}}},scales:{x:{ticks:{color:'#e8eefc',font:{size:9}}},y:{ticks:{color:'#e8eefc',callback:v=>curSym()+(v/1000).toFixed(0)+'k'}}}}});
+};
+
+/* ---------- SCENARIOS ---------- */
+VIEWS.scenarios=function(){
+  set(`<p class="sec-desc">Unlimited named scenarios (LEAN / BASE / AGGRESSIVE / add your own). Each overrides key drivers; the table compares computed investment across all of them side by side. ${refBadge}</p>
+  <div class="card"><div class="tbl-wrap"><table><thead><tr><th>Scenario</th><th class="num">Team</th><th class="num">Claims/mo</th><th class="num">Azure/mo</th><th class="num">AI users</th><th class="num">Contingency %</th><th>Note</th><th></th></tr></thead><tbody>
+  ${S.scenarios.map((sc,i)=>`<tr>
+    <td><input type="text" value="${esc(sc.name)}" oninput="upd(this,'scenarios.${i}.name')" style="width:110px"></td>
+    <td class="num"><input type="number" class="mini" value="${sc.teamCount}" oninput="upd(this,'scenarios.${i}.teamCount',true)"></td>
+    <td class="num"><input type="number" class="mid" value="${sc.claims}" oninput="upd(this,'scenarios.${i}.claims',true)"></td>
+    <td class="num"><input type="number" class="mid" value="${sc.azureMo}" oninput="upd(this,'scenarios.${i}.azureMo',true)"></td>
+    <td class="num"><input type="number" class="mini" value="${sc.aiUsers}" oninput="upd(this,'scenarios.${i}.aiUsers',true)"></td>
+    <td class="num"><input type="number" class="mini" value="${sc.contingency}" oninput="upd(this,'scenarios.${i}.contingency',true)"></td>
+    <td><input type="text" class="wide" value="${esc(sc.note)}" oninput="upd(this,'scenarios.${i}.note')" style="min-width:150px"></td>
+    <td><button class="btn sm" onclick="applyScenario(${i})">Apply</button> <button class="del" onclick="delRow('scenarios',${i})">×</button></td></tr>`).join('')}
+  </tbody></table></div>
+  <button class="add-row" onclick="S.scenarios.push({name:'NEW',teamCount:5,claims:50000,azureMo:1377,contingency:15,aiUsers:5,note:''});recalc()">+ ADD SCENARIO</button></div>
+  <div class="card" style="margin-top:16px"><h3>Computed Investment Comparison</h3><div class="tbl-wrap"><table><thead><tr><th>Scenario</th><th class="num">MVP</th><th class="num">12-Month</th><th class="num">24-Month</th><th class="num">Monthly Burn</th></tr></thead><tbody>
+  ${S.scenarios.map(sc=>{const c=scenarioCompute(sc);return `<tr><td><b>${esc(sc.name)}</b></td><td class="num">${money(c.mvp,{compact:true})}</td><td class="num">${money(c.inv12,{compact:true})}</td><td class="num">${money(c.inv24,{compact:true})}</td><td class="num">${money(c.monthlyBurn12,{compact:true})}</td></tr>`;}).join('')}
+  </tbody></table></div></div>
+  <div class="card" style="margin-top:16px"><h3>Scenario Investment (MVP / 12-mo / 24-mo)</h3><canvas id="cScn" height="90"></canvas></div>
+  <div class="note">"Apply" copies a scenario's drivers into the live model (team size scales HR counts proportionally, claims/Azure/AI users/contingency set directly). Everything recomputes.</div>
+  ${foot()}`);
+  const names=S.scenarios.map(s=>s.name); const comp=S.scenarios.map(scenarioCompute);
+  mkChart('cScn',{type:'bar',
+    data:{labels:names,datasets:[
+      {label:'MVP',data:comp.map(c=>disp(c.mvp)),backgroundColor:'#3ad1c8'},
+      {label:'12-mo',data:comp.map(c=>disp(c.inv12)),backgroundColor:'#4f8cff'},
+      {label:'24-mo',data:comp.map(c=>disp(c.inv24)),backgroundColor:'#a98bff'}]},
+    options:{plugins:{legend:{labels:{color:'#e8eefc'}}},scales:{x:{ticks:{color:'#e8eefc'}},y:{ticks:{color:'#e8eefc',callback:v=>curSym()+(v/1000).toFixed(0)+'k'}}}}});
+};
+function scenarioCompute(sc){
+  const saved=JSON.stringify(S); const s2=JSON.parse(saved);
+  const curTeam=s2.hr.reduce((a,h)=>a+(+h.count||0),0)||1; const factor=(+sc.teamCount||curTeam)/curTeam;
+  s2.hr.forEach(h=>h.count=Math.round(h.count*factor));
+  s2.meta.claimsPerMonth=+sc.claims||s2.meta.claimsPerMonth;
+  s2.meta.contingencyPct=+sc.contingency||s2.meta.contingencyPct;
+  // scale azure to target
+  const curAz=s2.azure.services.filter(x=>x.on).reduce((a,x)=>a+x.mo,0)||1; const af=(+sc.azureMo||curAz)/curAz;
+  s2.azure.services.forEach(x=>{if(x.on)x.mo=Math.round(x.mo*af);});
+  s2.claude.users20x=+sc.aiUsers||s2.claude.users20x; s2.chatgpt.bizUsers=+sc.aiUsers||s2.chatgpt.bizUsers;
+  const old=S; S=s2; const r=calculateInvestment(); S=old; return r;
+}
+function applyScenario(i){
+  const sc=S.scenarios[i];
+  const curTeam=S.hr.reduce((a,h)=>a+(+h.count||0),0)||1; const factor=(+sc.teamCount||curTeam)/curTeam;
+  S.hr.forEach(h=>h.count=Math.max(0,Math.round(h.count*factor)));
+  S.meta.claimsPerMonth=+sc.claims||S.meta.claimsPerMonth;
+  S.meta.contingencyPct=+sc.contingency||S.meta.contingencyPct;
+  const curAz=calculateAzure().monthlyUSD||1; const af=(+sc.azureMo||curAz)/curAz;
+  S.azure.services.forEach(x=>{if(x.on)x.mo=Math.round(x.mo*af);});
+  S.claude.users20x=+sc.aiUsers||S.claude.users20x; S.chatgpt.bizUsers=+sc.aiUsers||S.chatgpt.bizUsers;
+  toast('Applied scenario '+sc.name); recalc();
+}
+
+/* ---------- 12 / 24 MONTH MODELS ---------- */
+function monthlyModel(months){
+  const inv=calculateInvestment(); const hr=inv.hr, az=inv.azure, subs=inv.subs, prodAI=inv.prodAI;
+  const secAnn=(inv.sec.annual+inv.comp.annual+inv.legal.annual)/12;
+  const cont=(+S.meta.contingencyPct||0)/100;
+  const rows=[]; let cum=0;
+  const oneTimeMonth1=inv.sec.oneTime+inv.comp.oneTime+inv.legal.oneTime+inv.custom.oneTime+
+    (+S.development.testingOneTime||0)+(+S.development.clearinghouseSetup||0);
+  for(let m=1;m<=months;m++){
+    const scale=1+ (m/months)*0.6; // gentle ramp of runtime as volume grows
+    const team=hr.monthlyUSD;
+    const azure=az.monthlyUSD*(m<=S.meta.buildMonths?0.7:1)*(m>12?1.3:1);
+    const ai=prodAI.total*(m>12?1.3:1);
+    const sub=subs.monthlyUSD;
+    const ch=inv.chMonthly*(m>12?1.3:1);
+    const oneTime=m===1?oneTimeMonth1:0;
+    const base=team+azure+ai+sub+ch+secAnn+inv.custom.monthly+oneTime;
+    const withCont=base*(1+cont);
+    cum+=withCont;
+    rows.push({m,team,azure,ai,sub,ch,secAnn,oneTime,total:withCont,cum});
+  }
+  return rows;
+}
+function modelView(months,title){
+  const rows=monthlyModel(months); const total=rows[rows.length-1].cum;
+  set(`<p class="sec-desc">${title} — month-by-month spend, fully computed from your assumptions with a gentle runtime ramp. One-time build costs land in month 1. ${refBadge}</p>
+  <div class="grid g3">
+    <div class="stat teal"><div class="l">${months}-Month Total</div><div class="v sm">${money(total,{compact:true})}</div></div>
+    <div class="stat"><div class="l">Avg Monthly</div><div class="v sm">${money(total/months,{compact:true})}</div></div>
+    <div class="stat"><div class="l">Peak Month</div><div class="v sm">${money(Math.max(...rows.map(r=>r.total)),{compact:true})}</div></div>
+  </div>
+  <div class="card" style="margin-top:16px"><h3>Cumulative Spend</h3><canvas id="cCum" height="80"></canvas></div>
+  <div class="card" style="margin-top:16px"><div class="tbl-wrap"><table><thead><tr><th>Mo</th><th class="num">Team</th><th class="num">Azure</th><th class="num">Prod AI</th><th class="num">Subs</th><th class="num">Clearing</th><th class="num">Sec/Legal</th><th class="num">One-Time</th><th class="num">Total</th><th class="num">Cumulative</th></tr></thead><tbody>
+  ${rows.map(r=>`<tr><td>M${r.m}</td><td class="num">${money(r.team,{compact:true})}</td><td class="num">${money(r.azure,{compact:true})}</td><td class="num">${money(r.ai,{compact:true})}</td><td class="num">${money(r.sub,{compact:true})}</td><td class="num">${money(r.ch,{compact:true})}</td><td class="num">${money(r.secAnn,{compact:true})}</td><td class="num">${r.oneTime?money(r.oneTime,{compact:true}):'—'}</td><td class="num"><b>${money(r.total,{compact:true})}</b></td><td class="num">${money(r.cum,{compact:true})}</td></tr>`).join('')}
+  </tbody></table></div></div>
+  ${foot()}`);
+  mkChart('cCum',{type:'line',
+    data:{labels:rows.map(r=>'M'+r.m),datasets:[{label:'Cumulative',data:rows.map(r=>disp(r.cum)),borderColor:'#3ad1c8',backgroundColor:'rgba(58,209,200,.12)',fill:true,tension:.25}]},
+    options:{plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#e8eefc',font:{size:9}}},y:{ticks:{color:'#e8eefc',callback:v=>curSym()+(v/1000).toFixed(0)+'k'}}}}});
+}
+VIEWS.model12=()=>modelView(12,'12-Month Model');
+VIEWS.model24=()=>modelView(24,'24-Month Model');
+
+/* ---------- INVESTOR VIEW ---------- */
+VIEWS.investor=function(){
+  const inv=calculateInvestment(); const ue=calculateUnitEconomics(); const drivers=topDrivers(inv);
+  const opts=optimizationSuggestions(inv);
+  set(`<p class="sec-desc">Board-ready summary with the dynamic cost-driver analysis and a cost-optimization engine. Optimizations require your approval before they change the model. ${refBadge}</p>
+  <div class="grid g4">
+    <div class="stat teal"><div class="l">MVP Ask</div><div class="v">${money(inv.mvp,{compact:true})}</div></div>
+    <div class="stat blue"><div class="l">12-Month</div><div class="v">${money(inv.inv12,{compact:true})}</div></div>
+    <div class="stat violet"><div class="l">24-Month</div><div class="v">${money(inv.inv24,{compact:true})}</div></div>
+    <div class="stat amber"><div class="l">All-in / Claim</div><div class="v">${money4(ue.allIn)}</div></div>
+  </div>
+  <div class="split" style="margin-top:16px">
+    <div class="card"><h3>What Changes the Cost? (Top 5 Drivers)</h3>
+      <table><thead><tr><th>Driver</th><th class="num">Impact</th><th class="num">% of MVP</th><th></th></tr></thead><tbody>
+      ${drivers.map(d=>`<tr><td>${d.name}</td><td class="num">${money(d.value,{compact:true})}</td><td class="num">${pct(d.pct)}</td><td style="width:120px"><div class="bar"><i style="width:${Math.min(100,d.pct*2)}%"></i></div></td></tr>`).join('')}
+      </tbody></table>
+    </div>
+    <div class="card"><h3>Cost Composition</h3><canvas id="cInv" height="200"></canvas></div>
+  </div>
+  <div class="card" style="margin-top:16px"><div class="hdr"><h3>How Can We Reduce Cost? — Optimization Engine</h3></div>
+    <p class="muted">Each suggestion estimates savings but does <b>nothing</b> until you approve it. Approving applies the change to your live model.</p>
+    <table><thead><tr><th>Suggestion</th><th class="num">Est. Monthly Saving</th><th style="width:130px">Action</th></tr></thead><tbody>
+    ${opts.map((o,i)=>`<tr><td>${o.label}<div class="muted">${o.detail}</div></td><td class="num" style="color:var(--green)">${money(o.saveMo,{compact:true})}</td>
+      <td><button class="btn sm p" onclick="approveOpt(${i})">Approve</button></td></tr>`).join('')||'<tr><td colspan="3" class="muted">No further automatic reductions detected at current settings.</td></tr>'}
+    </tbody></table>
+  </div>
+  <div class="card" style="margin-top:16px"><h3>What-If Sliders</h3>
+    <div class="grid g2">
+      ${slider('Claims / month','meta.claimsPerMonth',S.meta.claimsPerMonth,0,500000,5000)}
+      ${slider('Team headcount factor (%)','__teamFactor',100,20,300,10)}
+      ${slider('Azure spend (%)','__azureFactor',100,20,300,10)}
+      ${slider('Contingency %','meta.contingencyPct',S.meta.contingencyPct,0,40,1)}
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px"><h3>MVP Cost Waterfall</h3><canvas id="cWf" height="90"></canvas></div>
+  ${foot('Investor-facing: figures are model outputs, not a commitment. Verify live pricing before board approval; quote-only items are recorded "Not publicly disclosed".')}`);
+  mkChart('cInv',{type:'doughnut',
+    data:{labels:Object.keys(inv.mvpParts),datasets:[{data:Object.values(inv.mvpParts).map(disp),
+      backgroundColor:['#3ad1c8','#4f8cff','#a98bff','#ffbf47','#3ad17a','#ff6b6b','#1fa9a0','#6d82a8','#8899bb']}]},
+    options:{plugins:{legend:{position:'right',labels:{color:'#e8eefc',font:{size:10}}}}}});
+  // waterfall (stacked bar emulation)
+  const parts=Object.entries(inv.mvpParts); let running=0; const base=[],inc=[];
+  parts.forEach(([k,v])=>{base.push(running);inc.push(disp(v));running+=disp(v);});
+  mkChart('cWf',{type:'bar',
+    data:{labels:parts.map(p=>p[0]),datasets:[
+      {label:'base',data:base,backgroundColor:'rgba(0,0,0,0)',stack:'w'},
+      {label:'cost',data:inc,backgroundColor:'#3ad1c8',stack:'w'}]},
+    options:{plugins:{legend:{display:false}},scales:{x:{stacked:true,ticks:{color:'#e8eefc',font:{size:9}}},y:{stacked:true,ticks:{color:'#e8eefc',callback:v=>curSym()+(v/1000).toFixed(0)+'k'}}}}});
+};
+function slider(label,path,val,min,max,step){
+  return `<label class="fld"><span class="lab">${label}: <b id="sl_${path}">${val}</b></span>
+  <input type="range" min="${min}" max="${max}" step="${step}" value="${val}" oninput="sliderChange('${path}',this.value)"></label>`;
+}
+function sliderChange(path,v){
+  document.getElementById('sl_'+path).textContent=v;
+  if(path==='__teamFactor'){ applyFactorTeam(+v/100); }
+  else if(path==='__azureFactor'){ applyFactorAzure(+v/100); }
+  else setPath(path,+v);
+}
+let _teamBase=null,_azureBase=null;
+function applyFactorTeam(f){ if(!_teamBase)_teamBase=S.hr.map(h=>h.count); S.hr.forEach((h,i)=>h.count=Math.max(0,Math.round(_teamBase[i]*f))); recalc(); }
+function applyFactorAzure(f){ if(!_azureBase)_azureBase=S.azure.services.map(s=>s.mo); S.azure.services.forEach((s,i)=>s.mo=Math.round(_azureBase[i]*f)); recalc(); }
+
+function optimizationSuggestions(inv){
+  const out=[];
+  // 1. Downgrade Claude Max 20x->5x
+  if(S.claude.users20x>0){ const save=S.claude.users20x*(S.claude.price20x-S.claude.price5x);
+    out.push({label:'Move Claude Max 20x seats → 5x',detail:'Lower-tier dev seats where 20x headroom is unused.',saveMo:save,
+      apply:()=>{S.claude.users5x+=S.claude.users20x;S.claude.users20x=0;}});}
+  // 2. Enable clearinghouse free tier
+  if(!S.clearinghouse.freeTierMVP && S.meta.claimsPerMonth<=50000){ const save=calculateClearinghouseMonthly();
+    out.push({label:'Use clearinghouse free tier for MVP volume',detail:'≤50k claims/mo qualifies for Stedi free tier.',saveMo:save,
+      apply:()=>{S.clearinghouse.freeTierMVP=true;}});}
+  // 3. Route more claims to cheapest model
+  const calc=calculateProdAIPerClaim();
+  const cheapest=[...S.prodAI.models].sort((a,b)=>(a.inP+a.outP)-(b.inP+b.outP))[0];
+  if(cheapest && cheapest.route<70){ const claims=+S.meta.claimsPerMonth||0;
+    const before=calc.perClaim*claims;
+    out.push({label:`Shift +15% routing to ${cheapest.name}`,detail:'Cheapest model absorbs more light/mid actions.',saveMo:before*0.12,
+      apply:()=>{ const idx=S.prodAI.models.indexOf(cheapest); let moved=15;
+        S.prodAI.models.forEach((m,i)=>{ if(i!==idx && m.route>0){const take=Math.min(m.route,moved/(S.prodAI.models.length-1)); m.route-=take;} });
+        S.prodAI.models[idx].route+=15;}});}
+  // 4. Turn off premium Azure if MVP
+  const pricey=S.azure.services.filter(s=>s.on&&s.mo>=200).sort((a,b)=>b.mo-a.mo)[0];
+  if(pricey && S.meta.claimsPerMonth<=50000){
+    out.push({label:`Defer "${pricey.svc}" (${pricey.tier}) to production`,detail:'High-cost service not required at MVP scale.',saveMo:pricey.mo,
+      apply:()=>{ const i=S.azure.services.indexOf(pricey); S.azure.services[i].on=false; }});}
+  // 5. Enable prompt caching
+  if(!S.prodAI.caching){ const claims=+S.meta.claimsPerMonth||0;
+    out.push({label:'Enable prompt caching',detail:'Cache repeated system/context tokens.',saveMo:calc.perClaim*claims*0.3,
+      apply:()=>{S.prodAI.caching=true;}});}
+  return out;
+}
+function approveOpt(i){
+  const inv=calculateInvestment(); const opts=optimizationSuggestions(inv);
+  if(opts[i]){ opts[i].apply(); toast('Applied: '+opts[i].label); recalc(); }
+}
+
+/* ---------- SOURCES ---------- */
+VIEWS.sources=function(){
+  set(`<p class="sec-desc">Pricing provenance for the ${REF} seed values. Confidence: High (primary/official), Med (secondary-corroborated), Est (modeled estimate). Verify live pricing before board commitment. ${refBadge}</p>
+  <div class="card"><div class="tbl-wrap"><table><thead><tr><th>Item</th><th>Source</th><th>Date</th><th>Confidence</th><th></th></tr></thead><tbody>
+  ${S.sources.map((s,i)=>`<tr>
+    <td><input type="text" class="wide" value="${esc(s.item)}" oninput="upd(this,'sources.${i}.item')" style="min-width:180px"></td>
+    <td><input type="text" class="wide" value="${esc(s.url)}" oninput="upd(this,'sources.${i}.url')" style="min-width:260px"> <a href="${esc(s.url)}" target="_blank" rel="noopener">↗</a></td>
+    <td><input type="text" value="${esc(s.date)}" oninput="upd(this,'sources.${i}.date')" style="width:80px"></td>
+    <td><input type="text" value="${esc(s.conf)}" oninput="upd(this,'sources.${i}.conf')" style="width:90px"></td>
+    <td><button class="del" onclick="delRow('sources',${i})">×</button></td></tr>`).join('')}
+  </tbody></table></div>
+  <button class="add-row" onclick="S.sources.push({item:'New source',url:'',date:'',conf:'Med'});recalc()">+ ADD SOURCE</button></div>
+  <div class="warn">Quote-only items (ChatGPT Enterprise, some Azure dedicated capacity) are "Not publicly disclosed" — obtain a written quote before relying on them.</div>
+  ${foot()}`);
+};
+
+/* ---------- SETTINGS (custom cost items + persistence + export) ---------- */
+VIEWS.settings=function(){
+  const custom=calculateCustomItems(); const types=['ONE-TIME','MONTHLY','ANNUAL','PER-USER','PER-TENANT','PER-CLAIM','PER-TRANSACTION','PER-MINUTE','PER-GB','PER-API-CALL','PERCENTAGE','QUOTE REQUIRED'];
+  set(`<p class="sec-desc">Custom cost-item engine, persistence and exports. Add any cost with the right cost type — the engine converts it into the model automatically. ${refBadge}</p>
+  <div class="card"><div class="hdr"><h3>Custom Cost Items</h3></div>
+  <div class="tbl-wrap"><table><thead><tr><th style="width:50px">On</th><th>Name</th><th>Cost Type</th><th class="num">Amount (USD)</th><th class="num">Qty</th><th>Note</th><th></th></tr></thead><tbody>
+  ${S.customItems.map((it,i)=>`<tr>
+    <td><input type="checkbox" ${it.on!==false?'checked':''} onchange="upd(this,'customItems.${i}.on')"></td>
+    <td><input type="text" class="wide" value="${esc(it.name)}" oninput="upd(this,'customItems.${i}.name')" style="min-width:170px"></td>
+    <td><select onchange="upd(this,'customItems.${i}.type')">${types.map(t=>`<option ${it.type===t?'selected':''}>${t}</option>`).join('')}</select></td>
+    <td class="num"><input type="number" class="mid" value="${it.amount}" oninput="upd(this,'customItems.${i}.amount',true)" ${it.type==='QUOTE REQUIRED'?'disabled':''}></td>
+    <td class="num"><input type="number" class="mini" value="${it.qty||1}" oninput="upd(this,'customItems.${i}.qty',true)"></td>
+    <td><input type="text" value="${esc(it.note||'')}" oninput="upd(this,'customItems.${i}.note')" style="min-width:120px"></td>
+    <td><button class="del" onclick="delRow('customItems',${i})">×</button></td></tr>`).join('')}
+  </tbody></table></div>
+  <button class="add-row" onclick="S.customItems.push({name:'New cost item',type:'MONTHLY',amount:0,qty:1,on:true,note:'${REF}'});recalc()">+ ADD COST ITEM</button>
+  <div class="grid g3" style="margin-top:14px">
+    <div class="stat"><div class="l">Custom One-Time</div><div class="v sm">${money(custom.oneTime,{compact:true})}</div></div>
+    <div class="stat"><div class="l">Custom Monthly</div><div class="v sm">${money(custom.monthly,{compact:true})}</div></div>
+    <div class="stat"><div class="l">Custom Annual</div><div class="v sm">${money(custom.annual,{compact:true})}</div></div>
+  </div>
+  ${custom.quotes.length?`<div class="warn"><span class="chip quote">QUOTE REQUIRED</span> ${custom.quotes.map(esc).join(', ')} — not added to totals.</div>`:''}
+  </div>
+  <div class="grid g2" style="margin-top:16px">
+    <div class="card"><h3>Persistence</h3>
+      <div class="pill-row">
+        <button class="btn p" onclick="saveState()">💾 Save to Browser</button>
+        <button class="btn" onclick="loadState()">📂 Load</button>
+        <button class="btn dngr" onclick="resetState()">↺ Reset to Defaults</button>
+      </div>
+      <div class="muted">Saved in this browser via localStorage (key: <code>${STORAGE_KEY}</code>). No data leaves your machine.</div>
+    </div>
+    <div class="card"><h3>Export / Import</h3>
+      <div class="pill-row">
+        <button class="btn" onclick="exportJSON()">⬇ Export JSON</button>
+        <button class="btn" onclick="exportCSV()">⬇ Export CSV</button>
+        <button class="btn" onclick="document.getElementById('importFile').click()">⬆ Import JSON</button>
+        <button class="btn" onclick="window.print()">🖨 Print / PDF</button>
+      </div>
+      <input type="file" id="importFile" class="hidden" accept="application/json" onchange="importJSON(event)">
+      <div class="muted">JSON round-trips the full model; CSV exports the computed line items.</div>
+    </div>
+  </div>
+  ${foot()}`);
+};
+
+/* =============================================================================
+   PERSISTENCE & EXPORT
+============================================================================= */
+function saveState(){ try{localStorage.setItem(STORAGE_KEY,JSON.stringify(S));toast('Saved to browser ✓');}catch(e){toast('Save failed: '+e.message);} }
+function loadState(){ try{const d=localStorage.getItem(STORAGE_KEY); if(!d){toast('No saved state found');return;} S=Object.assign(defaults(),JSON.parse(d)); toast('Loaded ✓'); go(currentRoute);}catch(e){toast('Load failed');} }
+function resetState(){ if(confirm('Reset all assumptions to REFERENCE DEFAULTS? This clears your edits.')){ S=defaults(); _teamBase=_azureBase=null; toast('Reset to defaults'); go('dashboard'); } }
+function autosave(){ try{localStorage.setItem(STORAGE_KEY,JSON.stringify(S));}catch(e){} }
+function setCurrency(c){ S.meta.currency=c; document.getElementById('curUSD').classList.toggle('on',c==='USD'); document.getElementById('curINR').classList.toggle('on',c==='INR'); go(currentRoute); }
+
+function download(name,content,type){ const b=new Blob([content],{type}); const u=URL.createObjectURL(b); const a=document.createElement('a'); a.href=u; a.download=name; a.click(); URL.revokeObjectURL(u); }
+function exportJSON(){ download('ARR_OS_cost_model.json',JSON.stringify({state:S,computed:calculateInvestment(),unit:calculateUnitEconomics()},null,2),'application/json'); toast('Exported JSON'); }
+function importJSON(ev){ const f=ev.target.files[0]; if(!f)return; const r=new FileReader(); r.onload=e=>{try{const j=JSON.parse(e.target.result); S=Object.assign(defaults(),j.state||j); toast('Imported ✓'); go('dashboard');}catch(err){toast('Invalid JSON');}}; r.readAsText(f); }
+function exportCSV(){
+  const inv=calculateInvestment(); const ue=calculateUnitEconomics();
+  const L=[['Category','Line Item','USD','INR ('+S.meta.fx+'/USD)']];
+  const push=(c,i,v)=>L.push([c,i,Math.round(v),Math.round(v*fx())]);
+  inv.hr.rows.forEach(h=>push('Human Resources',h.role+' ×'+h.count,h.loadedAnnual));
+  push('AI Subscriptions','Claude Max (annual)',inv.subs.claudeMo*12);
+  push('AI Subscriptions','ChatGPT (annual)',inv.subs.chatgptMo*12);
+  push('Azure','Infrastructure (annual)',inv.azure.monthlyUSD*12);
+  push('Production AI','Runtime (annual)',inv.prodAI.total*12);
+  push('Security','One-time + annual',inv.sec.oneTime+inv.sec.annual);
+  push('Compliance','One-time + annual',inv.comp.oneTime+inv.comp.annual);
+  push('Legal','One-time + annual',inv.legal.oneTime+inv.legal.annual);
+  L.push([]); push('HEADLINE','MVP Investment',inv.mvp); push('HEADLINE','12-Month',inv.inv12);
+  push('HEADLINE','24-Month',inv.inv24); push('HEADLINE','Monthly Burn (Yr1)',inv.monthlyBurn12);
+  L.push(['UNIT','All-in cost/claim',ue.allIn.toFixed(4),(ue.allIn*fx()).toFixed(4)]);
+  const csv=L.map(r=>r.map(c=>`"${String(c==null?'':c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  download('ARR_OS_cost_model.csv',csv,'text/csv'); toast('Exported CSV');
+}
+
+/* =============================================================================
+   TOAST + BOOT
+============================================================================= */
+let toastT;
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2200); }
+
+// autosave on any recalc
+const _recalc=recalc;
+recalc=function(){ _recalc(); autosave(); };
+
+// boot
+(function(){
+  try{ const d=localStorage.getItem(STORAGE_KEY); if(d) S=Object.assign(defaults(),JSON.parse(d)); }catch(e){}
+  renderNav(); go('dashboard');
+})();
+</script>
+</body>
+</html>
