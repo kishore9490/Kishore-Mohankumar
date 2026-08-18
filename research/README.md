@@ -27,6 +27,19 @@ where portal / voice / human fallback is still necessary.
 
 The full 113-field per-payer capability detail lives in `payer_records.py` and the study-2 workbook's per-workflow sheets.
 
+**Study 3 — Product build, technology, security & investment cost model**
+
+| File | What it is |
+|---|---|
+| `AI_Revenue_Recovery_OS_Product_Build_and_Investment_Report.pdf` | 29-page report — product vision & three models, functional scope, tech stack & architecture, multi-tenant, AI architecture & 20-agent workforce, security/HIPAA/compliance, Azure cost, AI runtime & dev-tool cost (Claude Max/ChatGPT), HR & development cost, milestones & plan, 12/24-month budgets, unit economics, connectivity strategy, security controls & PHI data flow, DR/BCP & governance, risks, final recommendation. Charts, TOC, page numbers. |
+| `AI_Revenue_Recovery_OS_Product_Cost_Model.xlsx` | **39-sheet** workbook with **~250 assumption-driven formula cells** — edit the ASSUMPTIONS sheet (USD/INR rate, claims/month, team & tool users, per-claim AI cost, contingency) and dependent sheets recalculate. Azure cost by scale/environment, Claude Max/ChatGPT/production-AI cost, human resources, dev/security/HIPAA/compliance cost, milestones, unit economics, MVP/pilot/production & 12/24-month budgets, commercial models, risks, security controls, PHI flow, DR/BCP, AI governance, sources. |
+| `AI_Revenue_Recovery_OS_Technology_Architecture.md` | Full technology architecture (design). |
+| `AI_Revenue_Recovery_OS_Project_Plan.md` | Build plan, milestones, AI-augmented org. |
+
+Generators: `costmodel.py` (sourced 2026 pricing + scenarios + compute), `build_costmodel.py` (charts, 39-sheet Excel, PDF).
+
+**Cost model headlines (MODEL ASSUMPTIONS, FX Rs 90/USD):** MVP investment ≈ **$383k**; 12-month ≈ **$1.49M**; 24-month ≈ **$4.45M**; Azure **$1.4k/mo (MVP) → $38.7k/mo (large)**; Claude Max baseline **$1,000/mo** (5 × Max 20x); all-in cost per worked claim ≈ **$0.43** (clearinghouse transaction the largest lever; Stedi free tier covers the MVP). Verify live pricing before board commitment; quote-only items (ChatGPT Enterprise, some Azure dedicated capacity) are recorded "Not publicly disclosed". HIPAA-*aligned* (not certified); payer-side is AI decision-support with human governance; no PHI.
+
 **Final answer (study 2): YES, WITH CONDITIONS.** Start provider-side now on existing clearinghouse APIs (near-$0 MVP via Stedi's free tier); grow into payer-side as **Model A** decision-support and **Model B** administrative services; **Model C** (delegated claims/UM/payment decisions) is long-term and heavily regulated. Final medical-necessity/coverage decisions cannot be made by AI alone (CMS-4201-F; CA SB 1120) — a qualified clinician must own any adverse determination.
 
 ## Regenerate
