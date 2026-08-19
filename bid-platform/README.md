@@ -14,12 +14,33 @@ evidence-backed record.
 
 ## Run it
 
-Requires **Node 18+**. No database server, no Docker — SQLite lives in a file.
+Requires **Node 18+** and a **Postgres** connection string. You do not need to install
+Postgres — a free hosted database takes about two minutes and works for both local
+development and production, which keeps dev and prod on the same engine.
+
+### 1. Get a database
+
+Create a free project at **[neon.tech](https://neon.tech)** (or Supabase, Railway, or any
+Postgres) and copy the **pooled** connection string.
+
+### 2. Configure
 
 ```bash
 cd bid-platform
+cp .env.example .env
+```
+
+Open `.env` and paste your connection string into `DATABASE_URL`. Generate a session secret:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+### 3. Install and run
+
+```bash
 npm install
-npm run setup      # creates the database and seeds demo data
+npm run setup      # creates the tables and seeds demo data
 npm run dev
 ```
 
@@ -33,6 +54,33 @@ priya@abc.example   /   demo1234
 
 **Windows:** if PowerShell blocks npm, use `npm.cmd` instead of `npm`, or run
 `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned` once.
+
+---
+
+## Deploy it
+
+The app is a standard Next.js project and deploys to Vercel without changes.
+
+1. Push this repository to GitHub (already done if you are reading this there).
+2. At **[vercel.com/new](https://vercel.com/new)**, import the repository and set the
+   **Root Directory** to `bid-platform`.
+3. Add two environment variables:
+
+   | Name | Value |
+   |---|---|
+   | `DATABASE_URL` | your **pooled** Postgres connection string |
+   | `SESSION_SECRET` | the random value you generated above |
+
+4. Deploy. Then create the tables and demo data against the production database:
+
+   ```bash
+   npm run setup      # with the production DATABASE_URL in your local .env
+   ```
+
+**Use the pooled connection string in production.** Serverless functions open many short
+connections, and a direct endpoint will hit its connection limit. `src/db/index.ts` already
+caps the pool at one connection and disables prepared statements when running on Vercel,
+because pooled endpoints do not support them.
 
 ---
 
@@ -122,20 +170,21 @@ bid-platform/
 
 ## Stack
 
-Next.js 16 (App Router) · TypeScript · Tailwind · Drizzle ORM · SQLite via libSQL · Lucide.
+Next.js 16 (App Router) · TypeScript · Tailwind · Drizzle ORM · PostgreSQL via postgres.js · Lucide.
 
-libSQL ships prebuilt per-platform binaries, so there is no native compilation step on
-Windows, macOS or Linux.
+No native compilation step, so `npm install` behaves the same on Windows, macOS and Linux.
+The database driver is provider-neutral — Neon, Supabase, Railway, RDS or a local server all
+work from the same connection string.
 
 ## Moving to production
 
-1. **Swap SQLite for Postgres.** Change the Drizzle dialect and `DATABASE_URL`; the schema
-   is portable.
-2. **Set `SESSION_SECRET`** to a real random value — see `.env.example`.
-3. **Replace the mock providers** with real adapters behind the same interface, and
+1. **Set `SESSION_SECRET`** to a real random value — see `.env.example`.
+2. **Replace the mock providers** with real adapters behind the same interface, and
    negotiate caching/reuse rights in every provider contract.
-4. **Add email delivery** for invitations.
-5. **Add rate limiting and bot protection** on `/p/[bidId]` — a scraped verified-business
+3. **Add email delivery** for invitations.
+4. **Add rate limiting and bot protection** on `/p/[bidId]` — a scraped verified-business
    directory has real commercial value.
-6. **Move evidence to write-once object storage** with independent keys, separate from the
+5. **Move evidence to write-once object storage** with independent keys, separate from the
    application database.
+6. **Add row-level security** in Postgres as a second line of defence behind the
+   application-level workspace scoping.

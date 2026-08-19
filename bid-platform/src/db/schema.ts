@@ -1,7 +1,7 @@
-import { sqliteTable, text, integer, index } from 'drizzle-orm/sqlite-core'
+import { pgTable, text, integer, boolean, timestamp, index } from 'drizzle-orm/pg-core'
 
 /**
- * BID Trust data model.
+ * BID Trust data model (PostgreSQL).
  *
  * Two rules govern this schema and are worth stating up front:
  *
@@ -16,11 +16,11 @@ import { sqliteTable, text, integer, index } from 'drizzle-orm/sqlite-core'
  */
 
 const id = () => text('id').primaryKey()
-const ts = (n: string) => integer(n, { mode: 'timestamp_ms' })
+const ts = (n: string) => timestamp(n, { withTimezone: true, mode: 'date' })
 
 /* ── Identity ─────────────────────────────────────────────────────────── */
 
-export const organizations = sqliteTable(
+export const organizations = pgTable(
   'organizations',
   {
     id: id(),
@@ -40,15 +40,15 @@ export const organizations = sqliteTable(
     incorporatedOn: text('incorporated_on'),
     employeeBand: text('employee_band'),
     logoText: text('logo_text'),
-    // Lifecycle: UNKNOWN → INVITED → REGISTERED → MEMBER → VERIFIED_MEMBER → …
+    // UNKNOWN → INVITED → REGISTERED → MEMBER → VERIFIED_MEMBER → …
     lifecycleStage: text('lifecycle_stage').notNull().default('REGISTERED'),
-    profilePublic: integer('profile_public', { mode: 'boolean' }).notNull().default(true),
+    profilePublic: boolean('profile_public').notNull().default(true),
     createdAt: ts('created_at').notNull(),
   },
-  (t) => ({ gstinIdx: index('org_gstin_idx').on(t.gstin) }),
+  (t) => [index('org_gstin_idx').on(t.gstin)],
 )
 
-export const workspaces = sqliteTable('workspaces', {
+export const workspaces = pgTable('workspaces', {
   id: id(),
   organizationId: text('organization_id').notNull().references(() => organizations.id),
   name: text('name').notNull(),
@@ -56,7 +56,7 @@ export const workspaces = sqliteTable('workspaces', {
   createdAt: ts('created_at').notNull(),
 })
 
-export const users = sqliteTable('users', {
+export const users = pgTable('users', {
   id: id(),
   email: text('email').notNull().unique(),
   name: text('name').notNull(),
@@ -66,7 +66,7 @@ export const users = sqliteTable('users', {
   createdAt: ts('created_at').notNull(),
 })
 
-export const sessions = sqliteTable('sessions', {
+export const sessions = pgTable('sessions', {
   id: id(),
   userId: text('user_id').notNull().references(() => users.id),
   expiresAt: ts('expires_at').notNull(),
@@ -75,12 +75,12 @@ export const sessions = sqliteTable('sessions', {
 
 /* ── Relationships — tenant-private ───────────────────────────────────── */
 
-export const relationships = sqliteTable(
+export const relationships = pgTable(
   'relationships',
   {
     id: id(),
     workspaceId: text('workspace_id').notNull().references(() => workspaces.id),
-    fromOrgId: text('from_org_id').notNull().references(() => organizations.id),
+    fromOrgId: text('from_org_id').notNull(),
     toOrgId: text('to_org_id').notNull().references(() => organizations.id),
     type: text('type').notNull(),
     // Purpose is what makes collection lawful and proportionate. Required.
@@ -90,12 +90,12 @@ export const relationships = sqliteTable(
     criticality: text('criticality').notNull().default('STANDARD'),
     createdAt: ts('created_at').notNull(),
   },
-  (t) => ({ wsIdx: index('rel_ws_idx').on(t.workspaceId) }),
+  (t) => [index('rel_ws_idx').on(t.workspaceId)],
 )
 
 /* ── Policy — versions are immutable once active ──────────────────────── */
 
-export const policies = sqliteTable('policies', {
+export const policies = pgTable('policies', {
   id: id(),
   workspaceId: text('workspace_id').notNull().references(() => workspaces.id),
   name: text('name').notNull(),
@@ -103,7 +103,7 @@ export const policies = sqliteTable('policies', {
   createdAt: ts('created_at').notNull(),
 })
 
-export const policyVersions = sqliteTable('policy_versions', {
+export const policyVersions = pgTable('policy_versions', {
   id: id(),
   policyId: text('policy_id').notNull().references(() => policies.id),
   version: text('version').notNull(),
@@ -115,7 +115,7 @@ export const policyVersions = sqliteTable('policy_versions', {
 
 /* ── Campaigns and invitations ────────────────────────────────────────── */
 
-export const campaigns = sqliteTable('campaigns', {
+export const campaigns = pgTable('campaigns', {
   id: id(),
   workspaceId: text('workspace_id').notNull().references(() => workspaces.id),
   name: text('name').notNull(),
@@ -124,7 +124,7 @@ export const campaigns = sqliteTable('campaigns', {
   createdAt: ts('created_at').notNull(),
 })
 
-export const campaignMembers = sqliteTable(
+export const campaignMembers = pgTable(
   'campaign_members',
   {
     id: id(),
@@ -139,12 +139,12 @@ export const campaignMembers = sqliteTable(
     status: text('status').notNull().default('INVITED'),
     createdAt: ts('created_at').notNull(),
   },
-  (t) => ({ campIdx: index('cm_campaign_idx').on(t.campaignId) }),
+  (t) => [index('cm_campaign_idx').on(t.campaignId)],
 )
 
 /* ── Verification ─────────────────────────────────────────────────────── */
 
-export const verificationRequests = sqliteTable('verification_requests', {
+export const verificationRequests = pgTable('verification_requests', {
   id: id(),
   bidRef: text('bid_ref').notNull().unique(),
   workspaceId: text('workspace_id').notNull().references(() => workspaces.id),
@@ -161,7 +161,7 @@ export const verificationRequests = sqliteTable('verification_requests', {
   createdAt: ts('created_at').notNull(),
 })
 
-export const verificationChecks = sqliteTable(
+export const verificationChecks = pgTable(
   'verification_checks',
   {
     id: id(),
@@ -176,15 +176,15 @@ export const verificationChecks = sqliteTable(
     confidence: text('confidence'),
     sourceClass: text('source_class'),
     detail: text('detail'),
-    reused: integer('reused', { mode: 'boolean' }).notNull().default(false),
+    reused: boolean('reused').notNull().default(false),
     costPaise: integer('cost_paise').notNull().default(0),
     executedAt: ts('executed_at'),
   },
-  (t) => ({ reqIdx: index('vc_req_idx').on(t.requestId) }),
+  (t) => [index('vc_req_idx').on(t.requestId)],
 )
 
 /** Immutable, content-addressed. Never edited — only appended. */
-export const evidence = sqliteTable('evidence', {
+export const evidence = pgTable('evidence', {
   id: id(),
   checkId: text('check_id').notNull().references(() => verificationChecks.id),
   contentHash: text('content_hash').notNull(),
@@ -194,7 +194,7 @@ export const evidence = sqliteTable('evidence', {
   retentionUntil: ts('retention_until').notNull(),
 })
 
-export const assessments = sqliteTable('assessments', {
+export const assessments = pgTable('assessments', {
   id: id(),
   requestId: text('request_id').notNull().references(() => verificationRequests.id),
   /** LOW | MEDIUM | HIGH | INSUFFICIENT_EVIDENCE | BLOCKED — never a bare score. */
@@ -206,7 +206,7 @@ export const assessments = sqliteTable('assessments', {
   createdAt: ts('created_at').notNull(),
 })
 
-export const credentials = sqliteTable('credentials', {
+export const credentials = pgTable('credentials', {
   id: id(),
   bidRef: text('bid_ref').notNull().unique(),
   holderOrgId: text('holder_org_id').notNull().references(() => organizations.id),
@@ -219,7 +219,7 @@ export const credentials = sqliteTable('credentials', {
 
 /* ── Governance ───────────────────────────────────────────────────────── */
 
-export const consents = sqliteTable('consents', {
+export const consents = pgTable('consents', {
   id: id(),
   bidRef: text('bid_ref').notNull().unique(),
   grantorOrgId: text('grantor_org_id').notNull().references(() => organizations.id),
@@ -234,7 +234,7 @@ export const consents = sqliteTable('consents', {
 })
 
 /** Append-only. No service has an update or delete path to this table. */
-export const auditLog = sqliteTable(
+export const auditLog = pgTable(
   'audit_log',
   {
     id: id(),
@@ -246,17 +246,16 @@ export const auditLog = sqliteTable(
     detail: text('detail'),
     at: ts('at').notNull(),
   },
-  (t) => ({ wsIdx: index('audit_ws_idx').on(t.workspaceId) }),
+  (t) => [index('audit_ws_idx').on(t.workspaceId)],
 )
 
-export const providerCalls = sqliteTable('provider_calls', {
+export const providerCalls = pgTable('provider_calls', {
   id: id(),
   checkId: text('check_id').notNull(),
   providerId: text('provider_id').notNull(),
   outcome: text('outcome').notNull(),
   latencyMs: integer('latency_ms').notNull(),
   costPaise: integer('cost_paise').notNull(),
-  failedOver: integer('failed_over', { mode: 'boolean' }).notNull().default(false),
+  failedOver: boolean('failed_over').notNull().default(false),
   at: ts('at').notNull(),
 })
-

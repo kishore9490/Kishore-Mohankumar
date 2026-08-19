@@ -27,6 +27,10 @@ const POLICY = {
 }
 
 async function main() {
+  if (!process.env.DATABASE_URL) {
+    console.error('\n  DATABASE_URL is not set. Copy .env.example to .env and add your Postgres connection string.\n')
+    process.exit(1)
+  }
   const now = new Date()
   const orgId = randomUUID(), wsId = randomUUID(), policyId = randomUUID(), pvId = randomUUID()
 
