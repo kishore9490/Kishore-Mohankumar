@@ -9,6 +9,67 @@ An industry-agnostic enterprise trust, verification and due-diligence infrastruc
 
 ---
 
+## Run it on your machine
+
+Everything below runs locally. Requires **Node 18+** (built and verified on Node 22)
+and **Python 3.8+** for the model and PDF export.
+
+```bash
+git clone https://github.com/kishore9490/Kishore-Mohankumar.git
+cd Kishore-Mohankumar
+git checkout claude/bid-trust-strategy-ah940a
+```
+
+### 1. The Architecture Explorer (interactive app)
+
+```bash
+cd architecture-explorer
+npm install
+npm run dev
+```
+
+Open **http://localhost:5173** — 15 screens, 69 clickable components, the
+animated network scenario, the editable policy builder, the BID Digital Card
+and the public profile.
+
+```bash
+npm run build            # typecheck + production build → dist/
+npm run preview          # serve the production build
+npm run build:singlefile # one self-contained HTML file, no external requests
+```
+
+### 2. The investor deck
+
+Open `deck/bid-trust-investor-deck.html` in any browser — no build step.
+Arrow keys navigate, **N** toggles speaker notes, **A** shows all slides.
+
+Ready-made PDFs are in `deck/pdf/`. To regenerate them:
+
+```bash
+pip install playwright && playwright install chromium
+python3 deck/build-pdf.py
+```
+
+### 3. The financial model
+
+```bash
+python3 models/unit_economics.py     # regenerates models/OUTPUT.md
+```
+
+No dependencies. Edit the assumption CSVs in `models/` and re-run — every
+downstream number moves with them.
+
+### 4. The strategy dossier (single page)
+
+Open `design/strategy-dossier.html` directly, or rebuild it from the markdown:
+
+```bash
+pip install markdown
+python3 design/build-dossier.py
+```
+
+---
+
 ## What this repository contains
 
 The complete strategy, product architecture, business model and go-to-market plan for BID Trust.
@@ -34,6 +95,18 @@ The complete strategy, product architecture, business model and go-to-market pla
 | 16 | [Competitive Landscape](docs/16-competitive-landscape.md) | Who else is in this market and where BID sits |
 | 17 | [Roadmap & Build Sequence](docs/17-roadmap.md) | 0–24 months |
 | 18 | [Risk Register & Open Questions](docs/18-risks-and-open-questions.md) | What can kill this, what needs answering |
+
+## What else is in here
+
+| Path | What it is |
+|---|---|
+| `docs/` | The 19 strategy documents indexed above |
+| `architecture-explorer/` | React + TypeScript interactive architecture map (15 screens) |
+| `deck/` | Investor deck (HTML + PDFs + PDF build script) |
+| `models/` | Runnable unit-economics model driven by editable assumption CSVs |
+| `design/` | Strategy dossier page, BID Card visual direction, build script |
+
+---
 
 **Design mockups:** [`design/bid-card.html`](design/bid-card.html) — open in a browser for the BID Card and public profile visual direction.
 
