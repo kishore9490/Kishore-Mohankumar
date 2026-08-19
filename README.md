@@ -14,10 +14,47 @@ An industry-agnostic enterprise trust, verification and due-diligence infrastruc
 Everything below runs locally. Requires **Node 18+** (built and verified on Node 22)
 and **Python 3.8+** for the model and PDF export.
 
+### Get the code
+
+**With git (macOS / Linux / Windows with Git installed):**
+
 ```bash
 git clone https://github.com/kishore9490/Kishore-Mohankumar.git
 cd Kishore-Mohankumar
 git checkout claude/bid-trust-strategy-ah940a
+```
+
+**Windows without git — PowerShell, no install required:**
+
+```powershell
+cd $HOME
+New-Item -ItemType Directory -Force -Path Projects | Out-Null
+cd Projects
+
+$url = "https://github.com/kishore9490/Kishore-Mohankumar/archive/refs/heads/claude/bid-trust-strategy-ah940a.zip"
+Invoke-WebRequest -Uri $url -OutFile bidtrust.zip -UseBasicParsing
+Expand-Archive -Path bidtrust.zip -DestinationPath . -Force
+
+cd Kishore-Mohankumar-claude-bid-trust-strategy-ah940a
+```
+
+> Do not run any of this from `C:\Windows\system32`. It is a protected system
+> folder and the commands will fail or need admin rights.
+
+#### If PowerShell blocks npm
+
+`npm : File C:\Program Files\nodejs\npm.ps1 cannot be loaded because running
+scripts is disabled on this system` means Node is installed fine and PowerShell
+is refusing to run npm's script wrapper. Either:
+
+```powershell
+npm.cmd install        # use npm.cmd — changes nothing on your system
+```
+
+or allow local scripts once, which needs no admin rights:
+
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
 ```
 
 ### 1. The Architecture Explorer (interactive app)
