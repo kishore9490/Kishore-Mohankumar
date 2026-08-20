@@ -13,8 +13,9 @@ paid or external AI API.
 | | |
 |---|---|
 | **12 keynote scenes** | Purpose-built animated visuals (never PDF pages) covering the problem, the transaction layer, the capability matrix, positioning, architecture, payer intelligence, denial intelligence, prior auth & appeals, the roadmap and the conclusion. |
-| **AI presenter** | A male or female executive presenter built from a data spec — tailored suit or blazer, age-appropriate features, visemes, blinking, gaze, gestures, breathing and speaking/listening/thinking states. |
-| **AI audience** | 3 / 5 / 7 executives drawn to the character reference — CFO (blonde, glasses), CTO (dark hair, glasses), RCM Director (hair tied back), Healthcare/Payer Expert (grey-haired, 40s–60s), Investor, plus a Provider COO and Compliance Counsel for a seven-seat room. Distinct wardrobes, seating depth and sparse, human-paced idle behaviour. |
+| **AI presenter** | The male or female executive presenter from the character reference, cut out and lit onto the stage, cross-fading between three keynote poses as they gesture, present and point. |
+| **AI audience** | The five executives from the reference — CFO, CTO, RCM Director, Healthcare/Payer Expert, Investor — lit out of a dark room, with gaze, lean, nod, note-taking and thinking states. A seven-seat room adds an illustrated Provider COO and Compliance Counsel. |
+| **Two character sets** | *Photographic* uses the supplied reference. *Illustrated* falls back to the built-in parametric vector cast. The presentation engine is identical either way; switch in Settings. |
 | **Behavioural profiles** | Each executive declares a `behavior` block: the scene topics that pull their attention, their signature movement, and what they push back on. Scenes declare topics; the audience engine matches the two, so the CFO reaches for her notes on an economics beat while the CTO leans in on an architecture one. No role is special-cased in code. |
 | **Auto & manual advance** | Automatic runs the deck end to end. Manual delivers a scene, then holds — the stage shows a **Next scene** prompt and the transport relabels — so you can present live or take questions between scenes. Switchable mid-session. |
 | **Interruptions** | Executives raise a hand, ask a question in character, and the presenter answers — with camera cuts to the questioner and a two-shot. Frequency follows the Low / Medium / High interaction setting. |
@@ -29,6 +30,14 @@ paid or external AI API.
 ## Keyboard
 
 `Space` play/pause · `←` `→` scene · `F` fullscreen · `M` mute · `C` captions · `A` ask · `R` record · `Esc` close
+
+## Recording
+
+Recording needs its own browser tab — browsers do not grant screen capture to a page
+embedded inside another page, so the Record button explains that and offers to reopen the
+presentation full-page. The capture request falls back through progressively simpler
+constraint sets, because browsers disagree about which `getDisplayMedia` options they accept,
+and any failure is reported by name rather than swallowed.
 
 ## Recording audio
 
