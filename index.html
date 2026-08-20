@@ -712,10 +712,16 @@ h1,h2,h3,h4,p{margin:0}
 .c-arm.l{transform-origin:60% 5%}
 .c-arm.r{transform-origin:40% 5%}
 .c-pupil{transform-box:fill-box;transition:transform .42s var(--ease)}
-.c-lid{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(.04);transition:transform .085s ease-out}
+.c-lid{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(.32);transition:transform .085s ease-out}
 .blink .c-lid{transform:scaleY(1)}
 .c-brow{transform-box:fill-box;transform-origin:50% 100%;transition:transform .4s var(--ease)}
 .c-mouth{transition:d .075s linear}
+.c-lips{transform-box:fill-box;transform-origin:50% 40%;transition:transform .1s var(--ease-soft)}
+[data-viseme="OPEN"]  .c-lips{transform:scale(1.05,1.14)}
+[data-viseme="WIDE"]  .c-lips{transform:scale(1.14,1.2)}
+[data-viseme="ROUND"] .c-lips{transform:scale(.9,1.12)}
+[data-viseme="SMILE"] .c-lips{transform:scale(1.08,1)}
+.c-eye{transform-box:fill-box}
 .c-teeth{opacity:0;transition:opacity .12s}
 [data-viseme="OPEN"] .c-teeth,[data-viseme="WIDE"] .c-teeth{opacity:.85}
 .char[data-emotion="happy"] .c-brow{transform:translateY(-1px)}
@@ -864,6 +870,22 @@ h1,h2,h3,h4,p{margin:0}
 body[data-rec="recording"] .rec-hud,body[data-rec="paused"] .rec-hud{display:flex}
 .rec-hud .rdot{width:9px;height:9px;border-radius:50%;background:#ff4d67;box-shadow:0 0 12px #ff4d67;animation:pulseDot 1.4s infinite}
 body[data-rec="paused"] .rec-hud .rdot{animation:none;opacity:.5}
+.advance-hint{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:8px 14px;border-radius:11px;
+  background:rgba(91,140,255,.18);border:1px solid rgba(91,140,255,.5);
+  backdrop-filter:blur(14px);color:#dbe6ff;
+  font-size:12px;font-weight:560;letter-spacing:-.01em;
+  box-shadow:0 10px 30px -14px rgba(91,140,255,.9);
+  animation:awaitPulse 2.6s ease-in-out infinite;
+}
+.advance-hint:hover{background:rgba(91,140,255,.3)}
+.advance-hint svg{width:15px;height:15px}
+@keyframes awaitPulse{0%,100%{opacity:.85}50%{opacity:1;transform:translateX(2px)}}
+.cbtn.play.await{animation:awaitGlow 2.2s ease-in-out infinite}
+@keyframes awaitGlow{0%,100%{box-shadow:0 12px 26px -14px rgba(70,120,255,.95)}50%{box-shadow:0 12px 34px -10px rgba(120,160,255,1)}}
+body[data-motion="reduced"] .advance-hint,body[data-motion="reduced"] .cbtn.play.await{animation:none}
+
 .countdown{
   position:absolute;inset:0;z-index:60;display:none;place-items:center;
   background:radial-gradient(60% 60% at 50% 50%,rgba(4,7,13,.86),rgba(4,7,13,.97));
@@ -1396,6 +1418,10 @@ body[data-env="investor"] .env::before{background:
     </div>
     <div class="hud-tr">
       <div class="rec-hud" id="recHud" role="status"><span class="rdot"></span><span id="recTime">00:00</span></div>
+      <button class="advance-hint" id="advanceHint" hidden>
+        Next scene
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h13M12 6l6 6-6 6"/></svg>
+      </button>
     </div>
   </main>
 
@@ -1429,6 +1455,10 @@ body[data-env="investor"] .env::before{background:
       <button class="cbtn" id="btnAsk" title="Ask the meeting">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 3a4 4 0 0 1 4 4v4a4 4 0 0 1-8 0V7a4 4 0 0 1 4-4z"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
         <span class="lbl">Ask the Meeting</span>
+      </button>
+      <button class="cbtn" id="btnAdvance" title="Switch between automatic and manual slide advance">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M3 12a9 9 0 0 1 9-9 9 9 0 0 1 9 9"/><path d="M21 12a9 9 0 0 1-9 9 9 9 0 0 1-9-9"/><path d="M18 3v4h-4M6 21v-4h4"/></svg>
+        <span class="lbl" id="advanceLabel">Auto</span>
       </button>
       <button class="cbtn" id="btnAudience" data-panel="audience" title="Audience">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 6.5a3 3 0 0 1 0 5.9M17 20a6 6 0 0 0-2-4.5"/></svg>
@@ -1656,6 +1686,17 @@ body[data-env="investor"] .env::before{background:
       </div>
     </div>
     <div class="fgroup">
+      <div class="lg">Playback</div>
+      <div class="field">
+        <label for="setAdvance">Slide advance</label>
+        <div class="seg" id="setAdvance" role="group" aria-label="Slide advance">
+          <button data-val="auto" aria-pressed="true">Automatic</button>
+          <button data-val="manual" aria-pressed="false">Manual</button>
+        </div>
+        <div class="hint"><b>Automatic</b> runs the deck end to end. <b>Manual</b> delivers a scene, then waits for you to advance — useful when presenting live or taking questions.</div>
+      </div>
+    </div>
+    <div class="fgroup">
       <div class="lg">Camera</div>
       <div class="field">
         <div class="seg" id="setCamera" role="group" aria-label="Camera mode">
@@ -1869,6 +1910,7 @@ const Store = {
     mode: 'executive',
     interaction: 'medium',
     camera: 'auto',
+    advance: 'auto',        // auto | manual slide advance
     captions: true,
     muted: false,
     ambience: true,
@@ -1908,74 +1950,94 @@ const PRESENTERS = {
     id: 'presenter', name: 'Dr. Anika Rao', role: 'Chief Product Officer',
     kind: 'presenter', voiceHint: ['female','samantha','zira','karen','google uk english female','victoria'],
     pitch: 1.06, rate: 1.0,
-    look: { skin:'#d9a888', hair:'#2c1d22', hairStyle:'bob', suit:'#33436b', suit2:'#44578a',
-            shirt:'#eef2fb', accent:'#5b8cff', lips:'#b4666c', build:'slim', glasses:false }
+    look: { skin:'#d9a67f', iris:'#3a2418', hair:'#2a1a16', hairStyle:'wave',
+            suit:'#d6c9b2', suit2:'#e7ddca', trousers:'#2b2f3c', shirt:'#23252d', accent:'#b9a88c',
+            lips:'#a55f63', build:'slim', glasses:false, attire:'blazer-open' }
   },
   male: {
     id: 'presenter', name: 'Marcus Vale', role: 'Chief Product Officer',
     kind: 'presenter', voiceHint: ['male','daniel','david','alex','google uk english male','fred'],
     pitch: .92, rate: 1.0,
-    look: { skin:'#c8926c', hair:'#241d18', hairStyle:'short', suit:'#2f3d60', suit2:'#3f5180',
-            shirt:'#eef2fb', accent:'#31d8c0', lips:'#8d5a52', build:'broad', glasses:false }
+    look: { skin:'#c68b62', iris:'#3b2a1c', hair:'#241a14', hairStyle:'short', stubble:true,
+            suit:'#1e2a48', suit2:'#31456f', shirt:'#f2f5fb', accent:'#4d7ad6',
+            lips:'#8d5a52', build:'broad', glasses:false, attire:'suit-tie' }
   }
 };
 
-/* 7 defined executives; the room uses the first N (3 / 5 / 7) */
+/* Seven defined executives; a room uses the first N (3 / 5 / 7).
+   `behavior` drives how each one reacts: `focus` lists the scene topics that
+   pull their attention, `tell` is their signature movement, and `challenge`
+   names what they push back on. The audience engine reads these — no role is
+   special-cased anywhere in the code. */
 const AUDIENCE = [
   {
-    id:'cfo', name:'Sarah Lindqvist', role:'Chief Financial Officer', short:'CFO',
-    personality:'financially skeptical', questionStyle:'economics', theme:'#f2cc5c',
-    voiceHint:['female','samantha','zira','karen'], pitch:1.12, rate:.99,
-    look:{ skin:'#f0cdb0', hair:'#a8763f', hairStyle:'bob', suit:'#4b3d62', suit2:'#5c4b78',
-           shirt:'#f6f1e8', accent:'#f2cc5c', lips:'#c06a72', glasses:false, build:'slim' },
-    reactions:['Runs the numbers','Notes the unit cost','Marks the pricing risk']
+    id:'cfo', name:'Sarah Lindqvist', role:'CFO — Financial Strategist', short:'CFO',
+    personality:'financially analytical and sceptical', questionStyle:'economics, ROI and unit cost',
+    theme:'#f2cc5c', voiceHint:['female','samantha','zira','karen'], pitch:1.12, rate:.99,
+    look:{ skin:'#eec9ab', iris:'#5b7a92', hair:'#c9a76a', hairStyle:'neat',
+           suit:'#3d4358', suit2:'#4e566f', shirt:'#f3f0ea', accent:'#8a93ad',
+           lips:'#b9707a', glasses:true, glassFrame:'rgba(238,244,255,.8)', build:'slim', attire:'blazer-blouse' },
+    behavior:{ focus:['economics','risk'], tell:'note', challenge:'cost, ROI and financial exposure' },
+    reactions:['Runs the numbers','Notes the unit cost','Marks the pricing risk','Checks the payback']
   },
   {
-    id:'cto', name:'Dev Nair', role:'Chief Technology Officer', short:'CTO',
-    personality:'architecturally rigorous', questionStyle:'architecture',
+    id:'cto', name:'Dev Nair', role:'CTO — Technical Lead', short:'CTO',
+    personality:'logical and architecture-focused', questionStyle:'architecture, APIs and scalability',
     theme:'#5b8cff', voiceHint:['male','daniel','david','alex'], pitch:.9, rate:1.03,
-    look:{ skin:'#a9764f', hair:'#141014', hairStyle:'short', suit:'#2c4560', suit2:'#375a7c',
-           shirt:'#dbe7f5', accent:'#5b8cff', lips:'#7c4f45', glasses:true, build:'slim' },
-    reactions:['Sketches the flow','Checks the contract','Traces the failure path']
+    look:{ skin:'#a9744c', iris:'#2f2018', hair:'#17120f', hairStyle:'short', stubble:true,
+           suit:'#2b3a52', suit2:'#3a4d6c', shirt:'#dfe7f2', accent:'#5b8cff',
+           lips:'#7c4f45', glasses:true, build:'slim', attire:'suit-tie' },
+    behavior:{ focus:['architecture','standards','data'], tell:'lean', challenge:'integration and failure paths' },
+    reactions:['Sketches the flow','Checks the contract','Traces the failure path','Maps the integration']
   },
   {
-    id:'rcm', name:'Teresa Alvarez', role:'RCM Director', short:'RCM',
-    personality:'operationally practical', questionStyle:'workflow',
+    id:'rcm', name:'Teresa Alvarez', role:'RCM Director — Operations Lead', short:'RCM',
+    personality:'practical and process-oriented', questionStyle:'workflow and operational reality',
     theme:'#31d8c0', voiceHint:['female','victoria','karen','google us english'], pitch:1.03, rate:.97,
-    look:{ skin:'#c98f68', hair:'#2b1a12', hairStyle:'bun', suit:'#31534f', suit2:'#3e6a65',
-           shirt:'#eaf5f2', accent:'#31d8c0', lips:'#b2606a', glasses:false, build:'mid' },
-    reactions:['Thinks about the queue','Weighs the staffing impact','Pictures the worklist']
+    look:{ skin:'#c98f68', iris:'#3a2418', hair:'#241511', hairStyle:'tied',
+           suit:'#35494f', suit2:'#456068', shirt:'#eef5f4', accent:'#31d8c0',
+           lips:'#b2606a', glasses:false, build:'mid', attire:'blazer-blouse' },
+    behavior:{ focus:['workflow','operations','delivery'], tell:'nod', challenge:'what the team actually does on Monday' },
+    reactions:['Thinks about the queue','Weighs the staffing impact','Pictures the worklist','Counts the touches']
   },
   {
-    id:'payer', name:'Dr. Grace Okoro', role:'Payer & Regulatory Expert', short:'Payer',
-    personality:'regulatorily precise', questionStyle:'payer-connectivity',
-    theme:'#a98bff', voiceHint:['female','moira','tessa','google uk english female'], pitch:1.0, rate:.95,
-    look:{ skin:'#7a5236', hair:'#171014', hairStyle:'curls', suit:'#453a67', suit2:'#544878',
-           shirt:'#f2eefc', accent:'#a98bff', lips:'#a8535f', glasses:true, build:'mid' },
-    reactions:['Checks the rule text','Notes the payer scope','Flags the enforcement date']
+    id:'payer', name:'Dr. Martin Hale', role:'Healthcare / Payer Expert', short:'Payer',
+    personality:'domain-deep and regulatorily precise', questionStyle:'payer connectivity and regulation',
+    theme:'#a98bff', voiceHint:['male','daniel','fred','google uk english male'], pitch:.88, rate:.94,
+    look:{ skin:'#dbb492', iris:'#4a5f72', hair:'#8d8b88', hairStyle:'receding',
+           suit:'#333a48', suit2:'#434c5e', shirt:'#eef1f7', accent:'#a98bff',
+           lips:'#a2685e', glasses:false, build:'mid', attire:'suit-tie' },
+    behavior:{ focus:['regulatory','standards','risk'], tell:'note', challenge:'payer scope and what the rule actually says' },
+    reactions:['Checks the rule text','Notes the payer scope','Flags the enforcement date','Recalls the IG']
   },
   {
-    id:'investor', name:'Jonathan Reeve', role:'Managing Partner, Investor', short:'Investor',
-    personality:'moat-focused', questionStyle:'moat',
+    id:'investor', name:'Jonathan Reeve', role:'Investor — Strategic Partner', short:'Investor',
+    personality:'strategic and growth-focused', questionStyle:'moat, scalability and differentiation',
     theme:'#e8b767', voiceHint:['male','alex','david','google uk english male'], pitch:.86, rate:.96,
-    look:{ skin:'#e8c3a3', hair:'#6d6a67', hairStyle:'short', suit:'#343a46', suit2:'#434a59',
-           shirt:'#ffffff', accent:'#e8b767', lips:'#9c6560', glasses:false, build:'broad' },
-    reactions:['Weighs defensibility','Considers the comparable','Tests the thesis']
+    look:{ skin:'#e0b795', iris:'#3f5468', hair:'#221a15', hairStyle:'short',
+           suit:'#2a2f3c', suit2:'#39414f', shirt:'#ffffff', accent:'#e8b767',
+           lips:'#9c6560', glasses:false, build:'broad', attire:'suit-tie' },
+    behavior:{ focus:['moat','strategy','economics'], tell:'lean', challenge:'defensibility and who else can build this' },
+    reactions:['Weighs defensibility','Considers the comparable','Tests the thesis','Sizes the market']
   },
   {
     id:'coo', name:'Priya Raman', role:'Provider COO', short:'COO',
-    personality:'delivery-minded', questionStyle:'workflow',
+    personality:'delivery-minded', questionStyle:'rollout and change management',
     theme:'#7fd4a8', voiceHint:['female','samantha','karen'], pitch:1.08, rate:.98,
-    look:{ skin:'#d8a37b', hair:'#241713', hairStyle:'long', suit:'#3a4562', suit2:'#48557a',
-           shirt:'#f4f7fd', accent:'#7fd4a8', lips:'#b56670', glasses:false, build:'slim' },
+    look:{ skin:'#d8a37b', iris:'#33221a', hair:'#241713', hairStyle:'wave',
+           suit:'#37455e', suit2:'#465877', shirt:'#f4f7fd', accent:'#7fd4a8',
+           lips:'#b56670', glasses:false, build:'slim', attire:'blazer-blouse' },
+    behavior:{ focus:['operations','delivery','workflow'], tell:'nod', challenge:'rollout sequencing' },
     reactions:['Maps it to operations','Considers change management']
   },
   {
     id:'compliance', name:'Alan Whitfield', role:'Compliance Counsel', short:'Legal',
-    personality:'risk-aware', questionStyle:'payer-connectivity',
+    personality:'risk-aware', questionStyle:'data boundaries and auditability',
     theme:'#94a7c9', voiceHint:['male','daniel','fred','david'], pitch:.94, rate:.93,
-    look:{ skin:'#edd0b8', hair:'#3d3a37', hairStyle:'short', suit:'#3a414f', suit2:'#485062',
-           shirt:'#eef1f7', accent:'#94a7c9', lips:'#9d6a63', glasses:true, build:'mid' },
+    look:{ skin:'#e6cbb3', iris:'#4c5a68', hair:'#5c5852', hairStyle:'short',
+           suit:'#2f3542', suit2:'#3d4453', shirt:'#eef1f7', accent:'#94a7c9',
+           lips:'#9d6a63', glasses:true, build:'mid', attire:'suit-tie' },
+    behavior:{ focus:['regulatory','risk','data'], tell:'note', challenge:'the audit trail and the data boundary' },
     reactions:['Notes the audit trail','Checks the data boundary']
   }
 ];
@@ -1986,7 +2048,8 @@ const Cast = {
   build() {
     this.presenter = PRESENTERS[Store.settings.presenter] || PRESENTERS.female;
     const n = clamp(parseInt(Store.settings.seats, 10) || 5, 3, 7);
-    // 3-person room keeps CFO / CTO / RCM; 5 adds payer + investor; 7 adds COO + legal
+    // a 3-person room keeps CFO / CTO / RCM; 5 adds the payer expert and the
+    // investor; 7 adds the provider COO and compliance counsel
     this.room = AUDIENCE.slice(0, n).map((p, i) => Object.assign({}, p, { seat: i, kind: 'audience' }));
     return this;
   },
@@ -1995,7 +2058,12 @@ const Cast = {
     if (id === 'user') return { id:'user', name:'You', role:'Guest', kind:'user', theme:'#cfe0ff' };
     return this.room.find(p => p.id === id) || AUDIENCE.find(p => p.id === id) || this.presenter;
   },
-  inRoom(id) { return !!this.room.find(p => p.id === id); }
+  inRoom(id) { return !!this.room.find(p => p.id === id); },
+  /** everyone in the room whose behavioural focus matches a scene's topics */
+  interestedIn(topics) {
+    if (!topics || !topics.length) return [];
+    return this.room.filter(p => p.behavior && p.behavior.focus.some(f => topics.indexOf(f) >= 0));
+  }
 };
 
 /* --------------------------------------------------------------------------
@@ -2009,6 +2077,7 @@ const SCENES = [
   id: 1, key:'opening', title:'AI Revenue Recovery OS',
   kicker:'Executive Briefing · August 2026',
   agenda:'Opening — the question we were asked',
+  topics:['strategy'],
   visual:'opening', camera:'wide',
   lines:[
     { t:"Good morning, and thank you for the time. Over the next few minutes I'll take you through the findings of our U.S. Payer API and Revenue Cycle Management feasibility study.", cam:'presenter', gesture:'open', gaze:'camera', step:0 },
@@ -2022,6 +2091,7 @@ const SCENES = [
   id: 2, key:'problem', title:'U.S. Healthcare RCM Is Digitized — But Not Unified',
   kicker:'The problem',
   agenda:'The problem — a digitized, fragmented ecosystem',
+  topics:['workflow','operations'],
   visual:'fragmentation', camera:'screen',
   lines:[
     { t:"Here is the shape of the problem. Revenue cycle work is already digital — it is simply not unified.", cam:'screen', gaze:'screen', gesture:'present', step:1 },
@@ -2042,6 +2112,7 @@ const SCENES = [
   id: 3, key:'discovery', title:'The Connectivity Problem Is Not the Real Moat',
   kicker:'Key discovery',
   agenda:'Key discovery — connectivity already exists',
+  topics:['architecture','strategy','standards'],
   visual:'adoption', camera:'screen',
   lines:[
     { t:"This is the finding that should reshape the product strategy. The connectivity problem is, to a large extent, already solved.", cam:'presenter', gaze:'camera', gesture:'emphasis', step:0 },
@@ -2064,6 +2135,7 @@ const SCENES = [
   id: 4, key:'transactions', title:'The Healthcare Transaction Layer',
   kicker:'Standards',
   agenda:'Transaction layer — the mandated X12 standards',
+  topics:['standards','architecture'],
   visual:'transactions', camera:'screen',
   lines:[
     { t:"Let me put the standards themselves on the screen, because they are the foundation everything else rests on.", cam:'screen', gaze:'screen', gesture:'present', step:0 },
@@ -2085,6 +2157,7 @@ const SCENES = [
   id: 5, key:'matrix', title:'What Can We Automate Today?',
   kicker:'Capability assessment',
   agenda:'Capability matrix — green, yellow, orange, red',
+  topics:['workflow','economics','risk'],
   visual:'matrix', camera:'screen',
   lines:[
     { t:"So — what can we realistically build today? The report grades every workflow, and I want to be precise about the boundaries.", cam:'presenter', gaze:'audience', gesture:'present', step:0 },
@@ -2107,6 +2180,7 @@ const SCENES = [
   id: 6, key:'versus', title:"Why a Clearinghouse Alone Isn't Enough",
   kicker:'Positioning',
   agenda:'Positioning — connectivity versus intelligence',
+  topics:['moat','strategy'],
   visual:'versus', camera:'screen',
   lines:[
     { t:"This is the slide I would ask you to remember.", cam:'presenter', gaze:'camera', gesture:'emphasis', step:0 },
@@ -2128,6 +2202,7 @@ const SCENES = [
   id: 7, key:'architecture', title:'Recommended Production Architecture',
   kicker:'Product architecture',
   agenda:'Architecture — orchestration over existing rails',
+  topics:['architecture','operations'],
   visual:'architecture', camera:'screen',
   lines:[
     { t:"Here is how that is assembled in production. The platform is an orchestration layer above existing connectivity — not a replacement for it.", cam:'screen', gaze:'screen', gesture:'present', step:1 },
@@ -2149,6 +2224,7 @@ const SCENES = [
   id: 8, key:'intelligence', title:'The Payer Intelligence Layer',
   kicker:'Proprietary layer',
   agenda:'Payer intelligence — the proprietary layer',
+  topics:['moat','data','risk'],
   visual:'graph', camera:'screen',
   lines:[
     { t:"Let me open up the payer intelligence layer, because this is the proprietary part of the system.", cam:'screen', gaze:'screen', gesture:'present', step:1 },
@@ -2169,6 +2245,7 @@ const SCENES = [
   id: 9, key:'denials', title:'AI Denial Intelligence',
   kicker:'Recovery engine',
   agenda:'Denial intelligence — 835 to next best action',
+  topics:['economics','workflow'],
   visual:'denial', camera:'screen',
   lines:[
     { t:"Denials are where this becomes tangible, because denials are fully electronic.", cam:'presenter', gaze:'audience', gesture:'present', step:0 },
@@ -2191,6 +2268,7 @@ const SCENES = [
   id: 10, key:'pa', title:'Prior Authorization & Appeals — The Honest Picture',
   kicker:'The hard frontier',
   agenda:'Prior auth & appeals — where automation stops',
+  topics:['regulatory','risk','standards'],
   visual:'pa', camera:'screen',
   lines:[
     { t:"I want to be very careful on this slide, because it is where most vendor decks overstate what is possible.", cam:'presenter', gaze:'audience', gesture:'present', step:0, emo:'concerned' },
@@ -2214,6 +2292,7 @@ const SCENES = [
   id: 11, key:'roadmap', title:'Phased Roadmap',
   kicker:'Execution plan',
   agenda:'Roadmap — MVP, V1, production',
+  topics:['economics','delivery','strategy'],
   visual:'roadmap', camera:'screen',
   lines:[
     { t:"That leads to a phased recommendation, and the phasing is deliberately conservative.", cam:'presenter', gaze:'audience', gesture:'present', step:0 },
@@ -2236,6 +2315,7 @@ const SCENES = [
   id: 12, key:'closing', title:'The Bottom Line',
   kicker:'Conclusion',
   agenda:'Conclusion — build the intelligence layer',
+  topics:['moat','strategy'],
   visual:'closing', camera:'closing',
   lines:[
     { t:"Let me close where the report closes.", cam:'presenter', gaze:'camera', gesture:'present', step:0 },
@@ -2251,80 +2331,43 @@ const SCENES = [
 
 /* --------------------------------------------------------------------------
    4. CHARACTER ENGINE
-   Parametric SVG humans: head, hair, brows, eyes, lids, pupils, nose, mouth
-   (5 visemes), body, arms, hands, clothing. Every part is addressable so a
-   GLB / VRM / three.js character can be dropped in behind the same API:
-      CharacterEngine.create(spec) -> { el, setViseme, setGaze, blink, ... }
+   Every character is an independent component created from a pure data spec.
+   Rendering goes through a renderer registry, so the vector renderer below can
+   be replaced by canvas, three.js, a VRM/GLB avatar or generated portrait
+   assets without the presentation engine knowing:
+
+       CharacterEngine.registerRenderer('vrm', { build, wire });
+       CharacterEngine.setRenderer('vrm');
+
+   A renderer supplies `build(spec)` (markup for the mount) and optionally
+   `wire(root, spec)` returning the control surface. Anything it does not
+   supply falls back to the shared DOM controller, so a renderer that keeps the
+   same part class names (.c-head, .c-mouth, .c-pupil, .c-lid, .c-brow, .c-arm)
+   needs no wiring code at all.
+
+   Control surface (identical for every renderer):
+       { id, spec, el, setViseme, setEmotion, setGesture, setGaze,
+         blinkOnce, startBlinking, destroy }
    -------------------------------------------------------------------------- */
+
+/* Mouth apertures. Sized for a real mouth rather than a cartoon one; the lips
+   scale slightly with the aperture (see .c-lips in the stylesheet). */
 const VISEMES = {
-  REST:  'M-11,0 Q0,3.4 11,0 Q0,1.6 -11,0 Z',
-  SMILE: 'M-12,-1.2 Q0,7.6 12,-1.2 Q0,3 -12,-1.2 Z',
-  OPEN:  'M-9.5,-2 Q0,-5.4 9.5,-2 Q10.5,6.2 0,9 Q-10.5,6.2 -9.5,-2 Z',
-  WIDE:  'M-13,-2.4 Q0,-6.4 13,-2.4 Q13,7.4 0,10.4 Q-13,7.4 -13,-2.4 Z',
-  ROUND: 'M-5.6,-3 Q0,-7 5.6,-3 Q8.6,3 0,8.6 Q-8.6,3 -5.6,-3 Z'
+  REST:  'M-9,0.2 Q0,1.9 9,0.2 Q0,0.9 -9,0.2 Z',
+  SMILE: 'M-9.8,-0.6 Q0,4.4 9.8,-0.6 Q0,1.7 -9.8,-0.6 Z',
+  OPEN:  'M-7.4,-0.5 Q0,-2.7 7.4,-0.5 Q8,4.7 0,6.5 Q-8,4.7 -7.4,-0.5 Z',
+  WIDE:  'M-10,-0.9 Q0,-3.5 10,-0.9 Q10,5.5 0,7.7 Q-10,5.5 -10,-0.9 Z',
+  ROUND: 'M-4.4,-1.5 Q0,-4.1 4.4,-1.5 Q6.4,2.5 0,6.1 Q-6.4,2.5 -4.4,-1.5 Z'
 };
 
 const CharacterEngine = (function () {
   let uid = 0;
+  const renderers = new Map();
+  let activeRenderer = 'vector';
 
-  /* --- hair variants (drawn in head-local coordinates) --- */
-  function hair(style, color, dark) {
-    const back = {
-      bob:   `<path d="M-29,16 Q-31,-32 0,-32 Q31,-32 29,16 L24,18 Q25,-12 0,-14 Q-25,-12 -24,18 Z" fill="${dark}"/>`,
-      long:  `<path d="M-29,30 Q-32,-34 0,-34 Q32,-34 29,30 L22,30 Q25,-12 0,-14 Q-25,-12 -22,30 Z" fill="${dark}"/>`,
-      bun:   `<circle cx="0" cy="-33" r="11" fill="${dark}"/>`,
-      curls: `<g fill="${dark}"><circle cx="-22" cy="-14" r="12"/><circle cx="0" cy="-26" r="13"/><circle cx="22" cy="-14" r="12"/><circle cx="-25" cy="2" r="9"/><circle cx="25" cy="2" r="9"/></g>`,
-      short: ''
-    }[style] || '';
-    const front = {
-      bob:   `<path d="M-27,-8 Q-25,-30 0,-31 Q25,-30 27,-8 Q16,-21 -2,-19 Q-16,-17 -27,-8 Z" fill="${color}"/>`,
-      long:  `<path d="M-27,-6 Q-26,-31 0,-32 Q26,-31 27,-6 Q18,-23 0,-21 Q-14,-19 -27,-6 Z" fill="${color}"/>`,
-      bun:   `<path d="M-26,-9 Q-24,-30 0,-31 Q24,-30 26,-9 Q14,-22 0,-21 Q-13,-20 -26,-9 Z" fill="${color}"/>`,
-      curls: `<path d="M-26,-8 Q-24,-30 0,-31 Q24,-30 26,-8 Q13,-24 0,-23 Q-13,-22 -26,-8 Z" fill="${color}"/>`,
-      short: `<path d="M-25,-8 Q-24,-30 0,-30 Q24,-30 25,-8 Q22,-20 8,-21 Q-6,-22 -16,-16 Q-22,-13 -25,-8 Z" fill="${color}"/>`
-    }[style] || '';
-    return { back, front };
-  }
-
-  /* --- head assembly, head-local coordinates centred on (0,0) --- */
-  function head(look, id) {
-    const h = hair(look.hairStyle, look.hair, shade(look.hair, -18));
-    const eye = (x) => `
-      <g class="c-eyegroup">
-        <ellipse cx="${x}" cy="-2.5" rx="6.4" ry="4.4" fill="#fdfbf8"/>
-        <circle class="c-pupil" cx="${x}" cy="-2.2" r="3.1" fill="#241c22"/>
-        <circle cx="${x + 1.1}" cy="-3.6" r="1" fill="#fff" opacity=".85"/>
-        <rect class="c-lid" x="${x - 7}" y="-7.4" width="14" height="10" rx="4" fill="${look.skin}"/>
-      </g>`;
-    const glasses = look.glasses ? `
-      <g fill="none" stroke="rgba(226,236,255,.62)" stroke-width="1.5">
-        <rect x="-19" y="-8.4" width="16" height="12" rx="5"/>
-        <rect x="3" y="-8.4" width="16" height="12" rx="5"/>
-        <path d="M-3,-2.6 h6"/><path d="M-19,-4 h-5"/><path d="M19,-4 h5"/>
-      </g>` : '';
-    return `
-      ${h.back}
-      <ellipse cx="0" cy="34" rx="9" ry="11" fill="${shade(look.skin, -12)}"/>
-      <ellipse cx="-25" cy="2" rx="4.4" ry="6" fill="${shade(look.skin, -8)}"/>
-      <ellipse cx="25" cy="2" rx="4.4" ry="6" fill="${shade(look.skin, -8)}"/>
-      <ellipse cx="0" cy="0" rx="25.5" ry="30" fill="url(#face${id})"/>
-      <path class="c-brow l" d="M-18,-12.6 Q-11,-16.4 -4,-12.8" stroke="${shade(look.hair, 8)}" stroke-width="2.4" stroke-linecap="round" fill="none"/>
-      <path class="c-brow r" d="M4,-12.8 Q11,-16.4 18,-12.6" stroke="${shade(look.hair, 8)}" stroke-width="2.4" stroke-linecap="round" fill="none"/>
-      ${eye(-10.5)}${eye(10.5)}
-      <path d="M0,-1 q-2.6,7.4 .4,9.2 q2,1.2 3.4,-.6" stroke="${shade(look.skin, -22)}" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-      ${glasses}
-      <g transform="translate(0,15.5)">
-        <path class="c-mouth" d="${VISEMES.REST}" fill="${look.lips || '#9c5a5c'}"/>
-        <path class="c-teeth" d="M-7.6,-1.2 h15.2 v3.4 h-15.2 Z" fill="#fff8f4" opacity="0"/>
-      </g>
-      <ellipse cx="-15" cy="8" rx="5" ry="3" fill="${look.lips || '#c07070'}" opacity=".16"/>
-      <ellipse cx="15" cy="8" rx="5" ry="3" fill="${look.lips || '#c07070'}" opacity=".16"/>
-      ${h.front}`;
-  }
-
-  /* darken / lighten a hex colour */
+  /* ---- colour helpers ---- */
   function shade(hex, amt) {
-    const c = hex.replace('#', '');
+    const c = String(hex).replace('#', '');
     const n = parseInt(c.length === 3 ? c.split('').map(x => x + x).join('') : c, 16);
     const r = clamp(((n >> 16) & 255) + amt, 0, 255),
           g = clamp(((n >> 8) & 255) + amt, 0, 255),
@@ -2332,118 +2375,289 @@ const CharacterEngine = (function () {
     return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
   }
 
-  function defs(look, id) {
+  /* =========================================================================
+     VECTOR RENDERER — head-local coordinates are centred on (0,0):
+     crown -31, chin +30, half-width 23.5, eyes at y -4, mouth at y +16.
+     ========================================================================= */
+
+  /* ---- hair, one entry per silhouette in the character reference ---- */
+  function hair(L, id) {
+    const c = L.hair, d = shade(c, -20), hi = shade(c, 26);
+    const styles = {
+      /* cropped executive cut with a side part */
+      short: {
+        back: `<path d="M-22.6,-2 C-24.4,-19 -14,-30.5 0,-30.5 C14,-30.5 24.4,-19 22.6,-2
+                 L20.4,-1 C20.8,-16 12.4,-23.5 0,-23.5 C-12.4,-23.5 -20.8,-16 -20.4,-1 Z" fill="${d}"/>`,
+        front: `<path d="M-22.8,-7.5 C-23.4,-23 -12.6,-31 0,-31 C13.2,-31 23.4,-23.4 22.6,-6.8
+                  C21,-15.4 15.6,-20.4 6.2,-21.4 C-3.6,-22.4 -13.4,-18.6 -18.4,-11.6
+                  C-19.8,-9.6 -21.4,-8.2 -22.8,-7.5 Z" fill="${c}"/>
+                <path d="M-13.6,-24.4 C-6.4,-27.4 5.6,-27 12.4,-22.6 C6,-24.6 -5.6,-25 -13.6,-24.4 Z" fill="${hi}" opacity=".5"/>`
+      },
+      /* mature cut, higher temples */
+      receding: {
+        back: `<path d="M-22.4,-1 C-24,-17 -14,-29 0,-29 C14,-29 24,-17 22.4,-1
+                 L20.2,0 C20.6,-15 12.2,-22 0,-22 C-12.2,-22 -20.6,-15 -20.2,0 Z" fill="${d}"/>`,
+        front: `<path d="M-22.6,-5.5 C-22.8,-18.6 -14.6,-27.4 -2,-28.2 C10,-29 21.4,-21.8 22.4,-5.2
+                  C20.4,-14.2 14.6,-18.6 4.6,-18.4 C-2.6,-18.2 -8.4,-20.4 -14.4,-16.4
+                  C-18.6,-13.6 -21.2,-9.4 -22.6,-5.5 Z" fill="${c}"/>`
+      },
+      /* long, softly waved — female presenter */
+      wave: {
+        back: `<path d="M-26.5,46 C-33,16 -29,-17 -14.5,-26.5 C-6.5,-31.5 8,-31.5 16.5,-25.5
+                 C30,-16.5 32,16 26.5,46 C24,30 23,8 20.5,-4 C14,3 -14,3 -20.5,-4
+                 C-23,8 -24,30 -26.5,46 Z" fill="${d}"/>
+               <path d="M-24,34 C-27,12 -25,-8 -20,-14 C-22,0 -22.5,16 -21.4,32 Z" fill="${hi}" opacity=".26"/>`,
+        front: `<path d="M-23,-5 C-23.6,-23 -12.6,-31 0.6,-31 C13.6,-31 23.4,-22.6 23,-5
+                  C21,-16.6 13.4,-22 2.6,-21.4 C-8.6,-20.8 -17.6,-15 -21.4,-5 Z" fill="${c}"/>
+                <path d="M-21.6,-8 C-16,-18.6 -5,-23.4 6.6,-22 C-3.4,-21 -13.4,-16.4 -19.4,-7 Z" fill="${hi}" opacity=".45"/>`
+      },
+      /* neat shoulder-length with an inward curl — CFO */
+      neat: {
+        back: `<path d="M-25,34 C-29.5,10 -26.5,-18 -13.5,-26 C-6,-30.5 7,-30.5 14.5,-25.5
+                 C28,-17 29.5,10 25,34 C22.5,25 21.8,6 20,-3 C13.5,3 -13.5,3 -20,-3
+                 C-21.8,6 -22.5,25 -25,34 Z" fill="${d}"/>
+               <path d="M-25,34 C-22.5,38.5 -18,40 -13.5,37.5 C-18,35.5 -22,34.5 -25,34 Z" fill="${d}"/>
+               <path d="M25,34 C22.5,38.5 18,40 13.5,37.5 C18,35.5 22,34.5 25,34 Z" fill="${d}"/>`,
+        front: `<path d="M-22.6,-6 C-23.4,-23 -12.4,-30.6 0,-30.6 C12.8,-30.6 23.4,-23 22.6,-6
+                  C20.6,-16.6 13,-21.6 2,-21.2 C-9.4,-20.8 -18,-15.4 -21.4,-6 Z" fill="${c}"/>
+                <path d="M-19,-14.6 C-12,-21.4 0,-24 9.4,-21.6 C0.6,-21.4 -10.6,-19.4 -19,-14.6 Z" fill="${hi}" opacity=".55"/>`
+      },
+      /* pulled back into a low knot — RCM director */
+      tied: {
+        back: `<path d="M-21.6,0 C-23.6,-18 -13.6,-29.4 0,-29.4 C13.6,-29.4 23.6,-18 21.6,0
+                 L19.4,1 C19.8,-15 12,-22.4 0,-22.4 C-12,-22.4 -19.8,-15 -19.4,1 Z" fill="${d}"/>
+               <ellipse cx="0" cy="8" rx="10.5" ry="9" fill="${d}"/>
+               <ellipse cx="0" cy="7" rx="7.5" ry="6" fill="${c}" opacity=".55"/>`,
+        front: `<path d="M-22.2,-6.4 C-23,-23 -12.2,-30.8 0,-30.8 C12.6,-30.8 23,-23 22.2,-6.4
+                  C21.4,-14.6 14,-21.6 0,-21.6 C-14,-21.6 -21.4,-14.6 -22.2,-6.4 Z" fill="${c}"/>
+                <path d="M-20.6,-9 C-15,-18.6 -6,-22.4 0,-22.4 C-7,-20 -15.4,-15.6 -20.6,-9 Z" fill="${hi}" opacity=".4"/>`
+      }
+    };
+    return styles[L.hairStyle] || styles.short;
+  }
+
+  /* ---- one eye, drawn at cx (never mirrored, so gaze stays coherent) ---- */
+  function eye(cx, L, id, i) {
+    const lash = shade(L.hair, -8);
+    return `
+      <g class="c-eye">
+        <path d="M${cx - 6.2},-3.8 C${cx - 4.8},-6.7 ${cx - 2},-7.7 ${cx + 0.3},-7.6
+                 C${cx + 3.1},-7.5 ${cx + 5.1},-6.1 ${cx + 6.2},-3.8
+                 C${cx + 4.8},-1.5 ${cx + 2.6},-0.6 ${cx + 0.2},-0.7
+                 C${cx - 2.6},-0.8 ${cx - 4.8},-1.7 ${cx - 6.2},-3.8 Z" fill="#f6f2ed"/>
+        <g clip-path="url(#eye${id}_${i})">
+          <g class="c-pupil">
+            <circle cx="${cx + 0.2}" cy="-4.2" r="2.95" fill="${L.iris || '#4a352a'}"/>
+            <circle cx="${cx + 0.2}" cy="-4.2" r="2.95" fill="none" stroke="rgba(0,0,0,.45)" stroke-width="0.6"/>
+            <circle cx="${cx + 0.2}" cy="-4.2" r="1.2" fill="#130e11"/>
+            <circle cx="${cx + 1.1}" cy="-5.3" r="0.8" fill="#fff" opacity=".9"/>
+          </g>
+        </g>
+        <rect class="c-lid" x="${cx - 6.6}" y="-8.2" width="13.2" height="8.6" fill="${L.skin}"/>
+        <path d="M${cx - 6.4},-4 C${cx - 4.9},-7.1 ${cx - 2},-8.1 ${cx + 0.3},-8
+                 C${cx + 3.3},-7.9 ${cx + 5.3},-6.4 ${cx + 6.5},-4"
+              fill="none" stroke="${lash}" stroke-width="1.35" stroke-linecap="round"/>
+        <path d="M${cx - 5.4},-8.9 C${cx - 3},-10.8 ${cx + 2.6},-11 ${cx + 5.6},-8.6"
+              fill="none" stroke="rgba(0,0,0,.13)" stroke-width="0.9"/>
+        <path d="M${cx - 5.4},-2.6 C${cx - 3.3},-0.8 ${cx + 2.6},-0.5 ${cx + 5.7},-2.8"
+              fill="none" stroke="rgba(0,0,0,.13)" stroke-width="0.8"/>
+      </g>`;
+  }
+
+  /* ---- head ---- */
+  function head(L, id) {
+    const h = hair(L, id);
+    const brow = s => `M${3.2 * s},-13.2 C${6.6 * s},-16 ${11.8 * s},-16.2 ${15.4 * s},-13.8
+                       C${11.8 * s},-14.7 ${6.8 * s},-14.4 ${3.6 * s},-12.1 Z`;
+    const glasses = L.glasses ? `
+      <g class="c-glasses" fill="rgba(180,205,240,.07)" stroke="${L.glassFrame || 'rgba(226,236,255,.68)'}" stroke-width="1.35">
+        <rect x="-17.4" y="-10" width="14.6" height="11.4" rx="3.2"/>
+        <rect x="2.8" y="-10" width="14.6" height="11.4" rx="3.2"/>
+        <path d="M-2.8,-5.6 C-1.4,-6.9 1.4,-6.9 2.8,-5.6" fill="none"/>
+        <path d="M-17.4,-6.6 -23.2,-7.6" fill="none"/><path d="M17.4,-6.6 23.2,-7.6" fill="none"/>
+      </g>` : '';
+    const stubble = L.stubble ? `
+      <path d="M-19.6,4 C-18,17 -10,28 0,29.6 C10,28 18,17 19.6,4
+               C17,14 10,21.6 0,22.6 C-10,21.6 -17,14 -19.6,4 Z"
+            fill="${shade(L.hair, 10)}" opacity=".22"/>` : '';
+
+    return `
+      ${h.back}
+      <ellipse cx="-23" cy="1" rx="4" ry="6.4" fill="${shade(L.skin, -10)}"/>
+      <ellipse cx="23" cy="1" rx="4" ry="6.4" fill="${shade(L.skin, -10)}"/>
+      <path d="M0,-31 C14,-31 23.5,-22 23.5,-6 C23.5,8 19,22 8,28.5 C5,30.2 -5,30.2 -8,28.5
+               C-19,22 -23.5,8 -23.5,-6 C-23.5,-22 -14,-31 0,-31 Z" fill="url(#face${id})"/>
+      <path d="M-23.5,-6 C-23.5,6 -20,17 -13,24 C-18,14 -20,4 -20,-6 Z" fill="rgba(0,0,0,.13)"/>
+      <path d="M23.5,-6 C23.5,6 20,17 13,24 C18,14 20,4 20,-6 Z" fill="rgba(255,255,255,.05)"/>
+      ${stubble}
+      <ellipse cx="-10" cy="9" rx="6" ry="3.6" fill="${L.lips}" opacity=".13"/>
+      <ellipse cx="10" cy="9" rx="6" ry="3.6" fill="${L.lips}" opacity=".13"/>
+      <path class="c-brow l" d="${brow(-1)}" fill="${shade(L.hair, 12)}"/>
+      <path class="c-brow r" d="${brow(1)}" fill="${shade(L.hair, 12)}"/>
+      ${eye(-9.6, L, id, 'a')}${eye(9.6, L, id, 'b')}
+      <path d="M-1.6,-6 C-2.6,0 -3.6,4.4 -4.8,6.8" fill="none" stroke="rgba(0,0,0,.11)" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M-4.8,7 C-3,9 3,9 4.8,7" fill="none" stroke="${shade(L.skin, -34)}" stroke-width="1.3" stroke-linecap="round"/>
+      <ellipse cx="-3.3" cy="7.6" rx="1.15" ry="0.75" fill="${shade(L.skin, -52)}" opacity=".72"/>
+      <ellipse cx="3.3" cy="7.6" rx="1.15" ry="0.75" fill="${shade(L.skin, -52)}" opacity=".72"/>
+      <ellipse cx="0.4" cy="5.4" rx="2.1" ry="1.5" fill="#fff" opacity=".12"/>
+      <g transform="translate(0,16)">
+        <g class="c-lips">
+          <path d="M-9.6,0 C-6.4,-2.9 -2.8,-2.3 0,-0.8 C2.8,-2.3 6.4,-2.9 9.6,0 C6,-1 -6,-1 -9.6,0 Z" fill="${shade(L.lips, -18)}"/>
+          <path d="M-9.6,0.5 C-6,-0.2 6,-0.2 9.6,0.5 C7,6.6 -7,6.6 -9.6,0.5 Z" fill="${L.lips}"/>
+          <path d="M-4.4,4 C-2,5.1 2,5.1 4.4,4" fill="none" stroke="rgba(255,255,255,.24)" stroke-width="1.1" stroke-linecap="round"/>
+        </g>
+        <path class="c-mouth" d="${VISEMES.REST}" fill="#3a1f24"/>
+        <path class="c-teeth" d="M-5.6,-0.4 Q0,-1.9 5.6,-0.4 Q0,1.5 -5.6,-0.4 Z" fill="#fdfaf6" opacity="0"/>
+      </g>
+      <path d="M-6,26 C-3,28.4 3,28.4 6,26" fill="none" stroke="rgba(0,0,0,.10)" stroke-width="1.4" stroke-linecap="round"/>
+      ${glasses}
+      ${h.front}`;
+  }
+
+  /* ---- shared gradients + per-eye clip paths ---- */
+  function defs(L, id) {
+    const eyeClip = (cx, i) => `
+      <clipPath id="eye${id}_${i}">
+        <path d="M${cx - 6.2},-3.8 C${cx - 4.8},-6.7 ${cx - 2},-7.7 ${cx + 0.3},-7.6
+                 C${cx + 3.1},-7.5 ${cx + 5.1},-6.1 ${cx + 6.2},-3.8
+                 C${cx + 4.8},-1.5 ${cx + 2.6},-0.6 ${cx + 0.2},-0.7
+                 C${cx - 2.6},-0.8 ${cx - 4.8},-1.7 ${cx - 6.2},-3.8 Z"/>
+      </clipPath>`;
     return `<defs>
-      <radialGradient id="face${id}" cx="38%" cy="30%" r="78%">
-        <stop offset="0%" stop-color="${shade(look.skin, 16)}"/>
-        <stop offset="70%" stop-color="${look.skin}"/>
-        <stop offset="100%" stop-color="${shade(look.skin, -20)}"/>
+      <radialGradient id="face${id}" cx="36%" cy="26%" r="82%">
+        <stop offset="0%" stop-color="${shade(L.skin, 11)}"/>
+        <stop offset="55%" stop-color="${L.skin}"/>
+        <stop offset="100%" stop-color="${shade(L.skin, -24)}"/>
       </radialGradient>
-      <linearGradient id="suit${id}" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="${shade(look.suit2 || look.suit, 12)}"/>
-        <stop offset="100%" stop-color="${shade(look.suit, -14)}"/>
+      <linearGradient id="suit${id}" x1="0.15" y1="0" x2="0.85" y2="1">
+        <stop offset="0%" stop-color="${shade(L.suit2 || L.suit, 14)}"/>
+        <stop offset="55%" stop-color="${L.suit}"/>
+        <stop offset="100%" stop-color="${shade(L.suit, -20)}"/>
       </linearGradient>
       <linearGradient id="rim${id}" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0%" stop-color="rgba(150,190,255,.35)"/>
-        <stop offset="55%" stop-color="rgba(150,190,255,0)"/>
+        <stop offset="0%" stop-color="rgba(168,200,255,.14)"/>
+        <stop offset="60%" stop-color="rgba(168,200,255,0)"/>
       </linearGradient>
+      ${eyeClip(-9.6, 'a')}${eyeClip(9.6, 'b')}
     </defs>`;
   }
 
-  /* --- standing presenter (knees up) --- */
+  /* ---- tailoring, shared by the standing and seated bodies ----
+     Local space: (0,0) is the base of the neck; shoulders at y≈4. */
+  function attire(L, id, w, bot) {
+    const sh = 46 * w, hip = 38 * w;
+    const tie = L.attire === 'suit-tie';
+    const open = L.attire === 'blazer-open';
+    const vy = tie ? 36 : open ? 46 : 40;           // depth of the neckline
+    const vx = open ? 15 : 12;                      // half-width at the collar
+    const lapel = shade(L.suit, 20);
+    return `
+      <path d="M${-sh},30 C${-sh},11 ${-sh * 0.44},0 0,-2 C${sh * 0.44},0 ${sh},11 ${sh},30
+               L${hip},${bot} L${-hip},${bot} Z" fill="url(#suit${id})"/>
+      <path d="M${-vx},0 L0,${vy} L${vx},0 Z" fill="${L.shirt}"/>
+      ${tie ? `<path d="M-4.2,1 L4.2,1 L5.4,7 L-5.4,7 Z" fill="${shade(L.accent, -26)}"/>
+               <path d="M-5.4,7 L5.4,7 L2.4,${vy - 4} L0,${vy - 1} L-2.4,${vy - 4} Z" fill="${L.accent}"/>` : ''}
+      ${!tie && !open ? `<path d="M0,${vy - 13} L3.6,${vy - 7.5} L0,${vy - 2} L-3.6,${vy - 7.5} Z" fill="${L.accent}" opacity=".9"/>
+               <path d="M0,${vy - 20} C-3,${vy - 17} -3,${vy - 15} 0,${vy - 13}" fill="none" stroke="${L.accent}" stroke-width="0.7" opacity=".7"/>` : ''}
+      <path d="M${-vx},0 L0,${vy} L${-vx - 9},${vy * 0.54} L${-vx - 14},3 Z" fill="${lapel}"/>
+      <path d="M${vx},0 L0,${vy} L${vx + 9},${vy * 0.54} L${vx + 14},3 Z" fill="${lapel}"/>
+      <path d="M0,${vy} L0,${bot}" stroke="rgba(0,0,0,.22)" stroke-width="1"/>
+      <circle cx="0" cy="${vy + 9}" r="1.7" fill="rgba(0,0,0,.34)"/>
+      <path d="M${-vx},0 L${-vx - 3},-4.5 L-2.5,2.5 L0,6 L2.5,2.5 L${vx + 3},-4.5 L${vx},0 L4,4.5 L0,7.5 L-4,4.5 Z" fill="${shade(L.shirt, 8)}"/>
+      <path d="M${-sh},30 C${-sh},11 ${-sh * 0.44},0 0,-2 L0,3
+               C${-sh * 0.4},5 ${-sh + 4},14 ${-sh + 4},31 Z" fill="url(#rim${id})"/>`;
+  }
+
+  /* ---- standing presenter (knees up) ---- */
   function presenterSVG(spec) {
     const id = spec.uid, L = spec.look;
-    const w = L.build === 'broad' ? 1.1 : L.build === 'slim' ? .92 : 1;
-    const sh = 36 * w;                    // half shoulder width
-    const hip = 30 * w;                   // half hip width
+    const w = L.build === 'broad' ? 1.06 : L.build === 'slim' ? .94 : 1;
+    const sh = 46 * w, hip = 38 * w;
     return `<svg class="char" viewBox="0 0 200 320" preserveAspectRatio="xMidYMax meet"
         data-viseme="REST" data-emotion="neutral" data-gesture="rest" role="img"
         aria-label="${esc(spec.name)}, ${esc(spec.role)}">
       ${defs(L, id)}
-      <!-- legs -->
       <g>
-        <path d="M${100 - hip + 2},236 L${100 - 3},236 L${100 - 5},320 L${100 - hip},320 Z" fill="${shade(L.suit, -14)}"/>
-        <path d="M${100 + 3},236 L${100 + hip - 2},236 L${100 + hip},320 L${100 + 5},320 Z" fill="${shade(L.suit, -8)}"/>
+        <path d="M${100 - hip + 1},200 L${100 - 2.5},200 L${100 - 6},320 L${100 - hip * 0.68},320 Z" fill="${shade(L.trousers || L.suit, -18)}"/>
+        <path d="M${100 + 2.5},200 L${100 + hip - 1},200 L${100 + hip * 0.68},320 L${100 + 6},320 Z" fill="${shade(L.trousers || L.suit, -11)}"/>
+        <path d="M${100 - 2.5},200 L${100 + 2.5},200 L${100 + 6},320 L${100 - 6},320 Z" fill="rgba(0,0,0,.25)"/>
       </g>
       <g class="c-torso">
-        <rect x="93" y="92" width="14" height="20" rx="6" fill="${shade(L.skin, -20)}"/>
-        <!-- jacket -->
-        <path d="M${100 - sh},134 C${100 - sh},118 ${100 - 17 * w},108 100,108
-                 C${100 + 17 * w},108 ${100 + sh},118 ${100 + sh},134
-                 L${100 + hip},242 L${100 - hip},242 Z" fill="url(#suit${id})"/>
-        <!-- shirt + tie -->
-        <path d="M${100 - 12},110 L100,146 L${100 + 12},110 L${100 + 17},114 L${100 + 12},176 L${100 - 12},176 L${100 - 17},114 Z" fill="${L.shirt}"/>
-        <path d="M100,146 L105,155 L100,192 L95,155 Z" fill="${L.accent}"/>
-        <!-- lapels -->
-        <path d="M${100 - 12},110 L100,146 L${100 - 24},134 L${100 - 28},114 Z" fill="${shade(L.suit, 12)}"/>
-        <path d="M${100 + 12},110 L100,146 L${100 + 24},134 L${100 + 28},114 Z" fill="${shade(L.suit, 12)}"/>
-        <!-- rim light -->
-        <path d="M${100 - sh},134 C${100 - sh},118 ${100 - 17 * w},108 100,108 L100,116
-                 C${100 - 15 * w},116 ${100 - sh + 4},124 ${100 - sh + 4},136 Z" fill="url(#rim${id})"/>
+        <rect x="93" y="88" width="14" height="18" rx="6" fill="${shade(L.skin, -20)}"/>
+        <path d="M93,88 h14 v8 a7 7 0 0 1 -14 0 Z" fill="rgba(0,0,0,.26)"/>
+        <g transform="translate(100,100)">${attire(L, id, w, 104)}</g>
       </g>
-      <!-- sleeves sit on the jacket edge so the swing reads as a real arm -->
       <g class="c-arm l">
-        <rect x="${100 - sh - 1}" y="120" width="15" height="100" rx="7.5" fill="${shade(L.suit, -8)}"/>
-        <circle cx="${100 - sh + 6.5}" cy="224" r="7.5" fill="${shade(L.skin, -4)}"/>
+        <rect x="${100 - sh + 1}" y="124" width="16" height="84" rx="8" fill="url(#suit${id})"/>
+        <rect x="${100 - sh + 1}" y="124" width="16" height="84" rx="8" fill="rgba(0,0,0,.14)"/>
+        <path d="M${100 - sh + 17},128 v76" stroke="rgba(0,0,0,.3)" stroke-width="1"/>
+        <ellipse cx="${100 - sh + 9}" cy="211" rx="6" ry="7.4" fill="${shade(L.skin, -8)}"/>
       </g>
       <g class="c-arm r">
-        <rect x="${100 + sh - 14}" y="120" width="15" height="100" rx="7.5" fill="${shade(L.suit, -8)}"/>
-        <circle cx="${100 + sh - 6.5}" cy="224" r="7.5" fill="${shade(L.skin, -4)}"/>
+        <rect x="${100 + sh - 17}" y="124" width="16" height="84" rx="8" fill="url(#suit${id})"/>
+        <rect x="${100 + sh - 17}" y="124" width="16" height="84" rx="8" fill="rgba(0,0,0,.14)"/>
+        <path d="M${100 + sh - 17},128 v76" stroke="rgba(0,0,0,.3)" stroke-width="1"/>
+        <ellipse cx="${100 + sh - 9}" cy="211" rx="6" ry="7.4" fill="${shade(L.skin, -8)}"/>
       </g>
-      <g transform="translate(100,64) scale(1.1)"><g class="c-head">${head(L, id)}</g></g>
+      <g transform="translate(100,56) scale(1.13)"><g class="c-head">${head(L, id)}</g></g>
     </svg>`;
   }
 
-  /* --- seated audience member --- */
+  /* ---- seated audience member ---- */
   function seatedSVG(spec) {
     const id = spec.uid, L = spec.look;
+    const w = L.build === 'broad' ? 1.05 : L.build === 'slim' ? .96 : 1;
     const prop = spec.prop ? `
       <g class="c-prop">
-        <rect x="52" y="128" width="46" height="30" rx="4" fill="#f3f1ea" opacity=".92"/>
-        <path d="M58,136 h30 M58,142 h34 M58,148 h22" stroke="#b9b6ac" stroke-width="1.6" stroke-linecap="round"/>
+        <rect x="50" y="130" width="50" height="32" rx="3" fill="#f4f2ec" opacity=".93"/>
+        <rect x="50" y="130" width="50" height="32" rx="3" fill="none" stroke="rgba(0,0,0,.18)" stroke-width="0.8"/>
+        <path d="M56,139 h34 M56,146 h38 M56,153 h24" stroke="#b7b4aa" stroke-width="1.5" stroke-linecap="round"/>
       </g>` : '';
     return `<svg class="char" viewBox="0 0 150 170" preserveAspectRatio="xMidYMax meet"
         data-viseme="REST" data-emotion="neutral" data-gesture="rest" role="img"
         aria-label="${esc(spec.name)}, ${esc(spec.role)}">
       ${defs(L, id)}
-      <g class="c-arm l" transform-origin="34 116">
-        <rect x="18" y="112" width="15" height="52" rx="7.5" fill="${shade(L.suit, -8)}"/>
+      <g class="c-arm l">
+        <rect x="23" y="118" width="15.5" height="52" rx="7.75" fill="url(#suit${id})"/>
+        <rect x="23" y="118" width="15.5" height="52" rx="7.75" fill="rgba(0,0,0,.16)"/>
       </g>
-      <g class="c-arm r" transform-origin="116 116">
-        <rect x="117" y="112" width="15" height="52" rx="7.5" fill="${shade(L.suit, -8)}"/>
-        <circle cx="124" cy="160" r="7" fill="${shade(L.skin, -6)}"/>
+      <g class="c-arm r">
+        <rect x="111.5" y="118" width="15.5" height="52" rx="7.75" fill="url(#suit${id})"/>
+        <rect x="111.5" y="118" width="15.5" height="52" rx="7.75" fill="rgba(0,0,0,.16)"/>
+        <ellipse cx="119" cy="166" rx="5.6" ry="6.6" fill="${shade(L.skin, -8)}"/>
       </g>
       <g class="c-torso">
-        <rect x="66" y="82" width="18" height="20" rx="7" fill="${shade(L.skin, -18)}"/>
-        <path d="M26,170 C26,124 46,104 75,104 C104,104 124,124 124,170 Z" fill="url(#suit${id})"/>
-        <path d="M63,104 L75,136 L87,104 L94,109 L88,170 L62,170 L56,109 Z" fill="${L.shirt}"/>
-        <path d="M75,136 L80,145 L75,170 L70,145 Z" fill="${L.accent}"/>
-        <path d="M63,104 L75,136 L60,128 L54,110 Z" fill="${shade(L.suit, 10)}"/>
-        <path d="M87,104 L75,136 L90,128 L96,110 Z" fill="${shade(L.suit, 10)}"/>
+        <rect x="68.5" y="76" width="13" height="19" rx="5.5" fill="${shade(L.skin, -20)}"/>
+        <path d="M68.5,76 h13 v7 a6.5 6.5 0 0 1 -13 0 Z" fill="rgba(0,0,0,.26)"/>
+        <g transform="translate(75,96) scale(${(1.02 * w).toFixed(3)})">${attire(L, id, 1, 74)}</g>
       </g>
       ${prop}
-      <g transform="translate(75,56) scale(1.02)"><g class="c-head">${head(L, id)}</g></g>
+      <g transform="translate(75,50) scale(1.03)"><g class="c-head">${head(L, id)}</g></g>
     </svg>`;
   }
 
-  /* --- controller returned per character --- */
-  function controller(root) {
-    const mouth = $('.c-mouth', root);
-    const pupils = $$('.c-pupil', root);
-    const svg = root.matches('svg') ? root : $('svg', root);
+  /* ---- shared DOM control surface ---- */
+  function domController(root, spec) {
+    const svg = root.matches && root.matches('svg') ? root : $('svg', root);
+    if (!svg) return null;
+    const mouth = $('.c-mouth', svg);
+    const pupils = $$('.c-pupil', svg);
+    const headEl = $('.c-head', svg);
     let blinkTimer = null, alive = true;
 
     const api = {
+      id: spec.id,
+      spec,
       el: svg,
+      renderer: activeRenderer,
       setViseme(v) {
         if (!mouth) return;
-        const d = VISEMES[v] || VISEMES.REST;
-        mouth.setAttribute('d', d);
+        mouth.setAttribute('d', VISEMES[v] || VISEMES.REST);
         svg.dataset.viseme = v;
       },
       setEmotion(e) { svg.dataset.emotion = e || 'neutral'; },
       setGesture(g) { svg.dataset.gesture = g || 'rest'; },
-      /** gaze targets: camera | screen | audience | presenter | questioner | down */
+      /** camera | screen | audience | presenter | questioner | down | left | right */
       setGaze(target) {
         const map = {
           camera: [0, 0], screen: [-2.2, -.6], audience: [0, .8],
@@ -2452,10 +2666,9 @@ const CharacterEngine = (function () {
         };
         const [x, y] = map[target] || [0, 0];
         pupils.forEach(p => { p.style.transform = `translate(${x}px, ${y}px)`; });
-        const hd = $('.c-head', svg);
-        if (hd) {
+        if (headEl) {
           const rot = { screen: -5, audience: 2, questioner: -6, presenter: 4, camera: 0, down: 3 }[target] || 0;
-          hd.style.rotate = rot + 'deg';
+          headEl.style.rotate = rot + 'deg';
         }
       },
       blinkOnce() {
@@ -2467,7 +2680,7 @@ const CharacterEngine = (function () {
           if (!alive) return;
           blinkTimer = setTimeout(() => {
             api.blinkOnce();
-            if (Math.random() < .18) setTimeout(api.blinkOnce, 190); // occasional double blink
+            if (Math.random() < .18) setTimeout(api.blinkOnce, 190);
             loop();
           }, rnd(2200, 6400));
         };
@@ -2478,20 +2691,35 @@ const CharacterEngine = (function () {
     return api;
   }
 
+  /* the built-in renderer */
+  renderers.set('vector', {
+    build: spec => (spec.kind === 'presenter' ? presenterSVG(spec) : seatedSVG(spec)),
+    wire: domController
+  });
+
   return {
+    /** register an alternative renderer (canvas, three.js, VRM, portrait assets) */
+    registerRenderer(name, impl) { renderers.set(name, impl); },
+    setRenderer(name) { if (renderers.has(name)) activeRenderer = name; },
+    get renderer() { return activeRenderer; },
+    listRenderers() { return Array.from(renderers.keys()); },
+
+    /** create one independent character component bound to a mount element */
     create(spec, mount) {
-      spec.uid = ++uid;
-      mount.innerHTML = spec.kind === 'presenter' ? presenterSVG(spec) : seatedSVG(spec);
-      const ctl = controller(mount);
-      ctl.startBlinking();
+      const r = renderers.get(activeRenderer) || renderers.get('vector');
+      spec = Object.assign({}, spec, { uid: ++uid });
+      mount.innerHTML = r.build(spec);
+      const ctl = (r.wire || domController)(mount, spec) || domController(mount, spec);
+      if (ctl && ctl.startBlinking) ctl.startBlinking();
       return ctl;
     },
-    /** small avatar used in the roster panel */
+
+    /** head-and-shoulders portrait used in the roster panel */
     avatar(spec) {
       spec = Object.assign({}, spec, { uid: ++uid });
       const L = spec.look;
-      return `<svg viewBox="30 20 90 90" preserveAspectRatio="xMidYMid meet">${defs(L, spec.uid)}
-        <g transform="translate(75,62) scale(1.15)">${head(L, spec.uid)}</g></svg>`;
+      return `<svg viewBox="42 20 66 74" preserveAspectRatio="xMidYMid meet">${defs(L, spec.uid)}
+        <g transform="translate(75,56)">${head(L, spec.uid)}</g></svg>`;
     },
     shade
   };
@@ -2807,7 +3035,8 @@ const TTSEngine = (function () {
    hangs open. Replaceable by a real phoneme aligner later.
    -------------------------------------------------------------------------- */
 const LipSyncEngine = (function () {
-  let target = null, timer = null, queue = [], idleShapes = ['OPEN','WIDE','ROUND','OPEN','SMILE'];
+  let target = null, timer = null, queue = [], held = false;
+  const idleShapes = ['OPEN','WIDE','ROUND','OPEN','SMILE'];
 
   function visemesFor(word) {
     const seq = [];
@@ -2828,7 +3057,7 @@ const LipSyncEngine = (function () {
   }
 
   function step() {
-    if (!target) return;
+    if (!target || held) return;
     let v = queue.shift();
     if (!v) v = Math.random() < .22 ? 'REST' : pick(idleShapes);
     target.setViseme(v);
@@ -2837,10 +3066,11 @@ const LipSyncEngine = (function () {
 
   return {
     attach(ctl) { this.detach(); target = ctl; },
-    detach() { clearTimeout(timer); timer = null; if (target) target.setViseme('REST'); target = null; queue = []; },
+    detach() { clearTimeout(timer); timer = null; held = false; if (target) target.setViseme('REST'); target = null; queue = []; },
     start(ctl) {
       this.attach(ctl);
       queue = [];
+      held = false;
       clearTimeout(timer);
       step();
     },
@@ -2849,9 +3079,20 @@ const LipSyncEngine = (function () {
       queue = visemesFor(w).concat(Math.random() < .3 ? ['REST'] : []);
     },
     stop() {
-      clearTimeout(timer); timer = null; queue = [];
-      if (target) { target.setViseme('REST'); }
+      clearTimeout(timer); timer = null; queue = []; held = false;
+      if (target) target.setViseme('REST');
       target = null;
+    },
+    /** freeze the mouth closed without dropping the speaker (pause) */
+    hold() {
+      held = true;
+      clearTimeout(timer); timer = null; queue = [];
+      if (target) target.setViseme('REST');
+    },
+    release() {
+      if (!held) return;
+      held = false;
+      if (target) { clearTimeout(timer); step(); }
     }
   };
 })();
@@ -3362,7 +3603,10 @@ const AudienceEngine = (function () {
           const candidates = Cast.room.filter(p => p.id !== speakingId);
           if (candidates.length) {
             const p = pick(candidates);
-            const kind = pick(['nod', 'lean', 'note', 'shift', 'nod']);
+            // bias each executive toward their own signature movement
+            const kind = (p.behavior && Math.random() < .45)
+              ? p.behavior.tell
+              : pick(['nod', 'lean', 'note', 'shift', 'nod']);
             act(p.id, kind);
             const c = ctls.get(p.id);
             if (c) {
@@ -3389,22 +3633,38 @@ const AudienceEngine = (function () {
         setTimeout(() => { const c = ctls.get(p.id); if (c) c.setGaze(target); }, i * rnd(70, 220));
       });
     },
-    /** collective reaction to an important statement */
-    react(kind) {
+    /** collective reaction to an important statement.
+        Executives whose behavioural focus matches the scene's topics react
+        first, more often, and with their own signature movement. */
+    react(kind, topics) {
       const n = Cast.room.length;
-      const count = kind === 'applaud' ? n : clamp(Math.round(n * (kind === 'nod' ? .6 : .4)), 1, n);
-      const chosen = Cast.room.slice().sort(() => Math.random() - .5).slice(0, count);
+      if (!n) return;
+      const interested = Cast.interestedIn(topics);
+      const rest = Cast.room.filter(p => interested.indexOf(p) < 0);
+      const shuffle = a => a.slice().sort(() => Math.random() - .5);
+      let chosen;
+      if (kind === 'applaud') {
+        chosen = shuffle(Cast.room);
+      } else {
+        const base = clamp(Math.round(n * (kind === 'nod' ? .55 : .38)), 1, n);
+        const count = clamp(Math.max(base, Math.min(interested.length, 2)), 1, n);
+        chosen = shuffle(interested).concat(shuffle(rest)).slice(0, count);
+      }
       chosen.forEach((p, i) => {
+        const engaged = interested.indexOf(p) >= 0;
+        // an engaged executive answers in character rather than generically
+        const move = (kind === 'applaud') ? 'nod'
+          : (engaged && p.behavior && Math.random() < .7) ? p.behavior.tell : kind;
         setTimeout(() => {
-          act(p.id, kind === 'applaud' ? 'nod' : kind);
+          act(p.id, move);
           const c = ctls.get(p.id);
           if (c) {
-            if (kind === 'applaud' || kind === 'lean') c.setEmotion('happy');
-            else if (kind === 'think') c.setEmotion('thinking');
-            else if (kind === 'note') c.setEmotion('neutral');
+            if (kind === 'applaud' || move === 'lean') c.setEmotion('happy');
+            else if (move === 'think') c.setEmotion('thinking');
+            else if (engaged && p.id === 'cfo') c.setEmotion('skeptical');
             setTimeout(() => c.setEmotion('neutral'), 3200);
           }
-          if (Math.random() < .45 && p.reactions) showReaction(p.id, pick(p.reactions));
+          if (p.reactions && Math.random() < (engaged ? .8 : .3)) showReaction(p.id, pick(p.reactions));
         }, i * rnd(120, 380));
       });
     },
@@ -3663,7 +3923,7 @@ const Director = (function () {
   }
 
   /** deliver one scripted line with its camera / gesture / reveal beat */
-  async function runLine(line, my) {
+  async function runLine(line, my, scene) {
     if (!await gate(my)) return false;
     CameraEngine.set(line.cam || 'presenter');
     Presenter.setGaze(line.gaze || 'audience');
@@ -3673,7 +3933,7 @@ const Director = (function () {
     if (typeof line.step === 'number') SlideEngine.step(line.step);
     const r = await speakAs('presenter', line.t);
     if (!alive(my)) return false;
-    if (line.react) AudienceEngine.react(line.react);
+    if (line.react) AudienceEngine.react(line.react, scene && scene.topics);
     await sleep(line.react ? 620 : 340);
     return alive(my);
   }
@@ -3723,7 +3983,7 @@ const Director = (function () {
       await sleep(260);
     }
 
-    if (inter.reaction) AudienceEngine.react(inter.reaction);
+    if (inter.reaction) AudienceEngine.react(inter.reaction, SCENES[Store.state.sceneIndex].topics);
     if (qc) qc.setEmotion('happy');
     setTimeout(() => qc && qc.setEmotion('neutral'), 2600);
 
@@ -3764,7 +4024,7 @@ const Director = (function () {
 
     for (let i = opts.resume ? clamp(opts.from || 0, 0, scene.lines.length - 1) : 0; i < scene.lines.length; i++) {
       Store.state.lineIndex = i;
-      const ok = await runLine(scene.lines[i], my);
+      const ok = await runLine(scene.lines[i], my, scene);
       if (!ok) return;
       if (scene.interject && scene.interject.after === i) {
         const cont = await runInterjection(scene.interject, my);
@@ -3776,6 +4036,14 @@ const Director = (function () {
     if (!alive(my)) return;
 
     if (index < SCENES.length - 1) {
+      if (Store.settings.advance === 'manual') {
+        Store.state.phase = 'awaiting';
+        UI.setPlayButton(false);
+        UI.setAwaiting(true);
+        AudienceEngine.gazeAll('presenter');
+        Presenter.state('listening');
+        return;
+      }
       runScene(index + 1, my);
     } else {
       finish(my);
@@ -3818,6 +4086,7 @@ const Director = (function () {
     },
     start(index) {
       const my = ++token;
+      UI.setAwaiting(false);
       TTSEngine.cancel();
       Store.state.phase = 'playing';
       UI.setPlayButton(true);
@@ -3825,9 +4094,11 @@ const Director = (function () {
       runScene(typeof index === 'number' ? index : Store.state.sceneIndex, my);
     },
     play() {
+      if (Store.state.phase === 'awaiting') { this.next(); return; }
       if (Store.state.phase === 'paused') {
         Store.state.phase = 'playing';
         TTSEngine.resume();
+        LipSyncEngine.release();
         UI.setPlayButton(true);
         return;
       }
@@ -3838,10 +4109,18 @@ const Director = (function () {
       if (Store.state.phase !== 'playing' && Store.state.phase !== 'qa') return;
       Store.state.phase = 'paused';
       TTSEngine.pause();
+      LipSyncEngine.hold();          // settle the mouth closed while paused
       Presenter.state('listening');
       UI.setPlayButton(false);
     },
     toggle() { (Store.state.phase === 'playing' || Store.state.phase === 'qa') ? this.pause() : this.play(); },
+    /** switch between automatic and manual slide advance mid-session */
+    setAdvance(mode) {
+      Store.settings.advance = mode;
+      Store.save();
+      if (mode === 'auto' && Store.state.phase === 'awaiting') this.next();
+      else UI.setAwaiting(Store.state.phase === 'awaiting');
+    },
     next() {
       const i = Math.min(SCENES.length - 1, Store.state.sceneIndex + 1);
       this.goto(i);
@@ -4370,11 +4649,21 @@ const UI = (function () {
     if (on) closeAll();
   }
 
+  /** in manual mode the deck holds at the end of a scene until the user advances */
+  function setAwaiting(on) {
+    const hint = $('#advanceHint');
+    if (hint) hint.hidden = !on;
+    $('#btnPlay').classList.toggle('await', !!on);
+    if (on) $('#playLabel').textContent = 'Next scene';
+  }
+
   function setPlayButton(playing) {
     $('#playIcon').innerHTML = playing
       ? '<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>'
       : '<path d="M7 4.5v15l13-7.5z"/>';
-    $('#playLabel').textContent = playing ? 'Pause' : (Store.state.phase === 'ended' ? 'Replay' : 'Play');
+    $('#playLabel').textContent = playing ? 'Pause'
+      : Store.state.phase === 'ended' ? 'Replay'
+      : Store.state.phase === 'awaiting' ? 'Next scene' : 'Play';
     $('#btnPlay').setAttribute('aria-label', playing ? 'Pause presentation' : 'Play presentation');
     $('#pbPlay').innerHTML = $('#btnPlay').querySelector('svg').outerHTML;
   }
@@ -4558,6 +4847,14 @@ const UI = (function () {
     segment('#setPresenter', 'presenter', () => { Presenter.build(); renderVoices(); });
     segment('#setSeats', 'seats', () => { rebuild(false); });
     segment('#setCamera', 'camera', () => {});
+    segment('#setAdvance', 'advance', v => {
+      Director.setAdvance(v);
+      $('#btnAdvance').classList.toggle('on', v === 'manual');
+      $('#advanceLabel').textContent = v === 'manual' ? 'Manual' : 'Auto';
+      toast(v === 'manual'
+        ? 'Manual mode — the deck holds at the end of each scene until you advance.'
+        : 'Auto mode — scenes advance on their own.');
+    });
     segment('#setInteract', 'interaction', () => {});
     segment('#setRecMode', 'recMode', v => syncSetup());
     segment('#setRes', 'recRes', () => syncSetup());
@@ -4641,6 +4938,17 @@ const UI = (function () {
     $('#btnMute').addEventListener('click', () => setMuted(!Store.settings.muted));
     $('#btnCaptions').addEventListener('click', () => Captions.toggle(!Store.settings.captions));
     $('#btnAsk').addEventListener('click', openAsk);
+    $('#btnAdvance').addEventListener('click', () => {
+      const next = Store.settings.advance === 'manual' ? 'auto' : 'manual';
+      $$('#setAdvance button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.val === next)));
+      Director.setAdvance(next);
+      $('#btnAdvance').classList.toggle('on', next === 'manual');
+      $('#advanceLabel').textContent = next === 'manual' ? 'Manual' : 'Auto';
+      toast(next === 'manual'
+        ? 'Manual mode — the deck holds at the end of each scene until you advance.'
+        : 'Auto mode — scenes advance on their own.');
+    });
+    $('#advanceHint').addEventListener('click', () => Director.next());
     $('#btnFull').addEventListener('click', toggleFullscreen);
     $('#btnFullTop').addEventListener('click', toggleFullscreen);
 
@@ -4722,6 +5030,9 @@ const UI = (function () {
     Captions.toggle(Store.settings.captions);
     setMuted(Store.settings.muted, true);
     setPlayButton(false);
+    setAwaiting(false);
+    $('#btnAdvance').classList.toggle('on', Store.settings.advance === 'manual');
+    $('#advanceLabel').textContent = Store.settings.advance === 'manual' ? 'Manual' : 'Auto';
     syncSetup();
 
     Presenter.build();
@@ -4765,7 +5076,7 @@ const UI = (function () {
   }
 
   return {
-    init, toast, openPanel, closeAll, setProductionMode, setPlayButton, syncCaptionOffset,
+    init, toast, openPanel, closeAll, setProductionMode, setPlayButton, setAwaiting, syncCaptionOffset,
     renderVoices, renderRoster, rebuild, startExperience, showRecordingResult
   };
 })();

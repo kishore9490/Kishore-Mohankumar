@@ -13,8 +13,10 @@ paid or external AI API.
 | | |
 |---|---|
 | **12 keynote scenes** | Purpose-built animated visuals (never PDF pages) covering the problem, the transaction layer, the capability matrix, positioning, architecture, payer intelligence, denial intelligence, prior auth & appeals, the roadmap and the conclusion. |
-| **AI presenter** | Parametric SVG character with visemes, blinking, gaze, gestures, breathing and speaking/listening/thinking states. |
-| **AI audience** | 3 / 5 / 7 distinct executives (CFO, CTO, RCM Director, Payer & Regulatory Expert, Investor, Provider COO, Compliance Counsel) with their own personalities, question styles, wardrobes, seating depth and sparse, human-paced idle behaviour. |
+| **AI presenter** | A male or female executive presenter built from a data spec — tailored suit or blazer, age-appropriate features, visemes, blinking, gaze, gestures, breathing and speaking/listening/thinking states. |
+| **AI audience** | 3 / 5 / 7 executives drawn to the character reference — CFO (blonde, glasses), CTO (dark hair, glasses), RCM Director (hair tied back), Healthcare/Payer Expert (grey-haired, 40s–60s), Investor, plus a Provider COO and Compliance Counsel for a seven-seat room. Distinct wardrobes, seating depth and sparse, human-paced idle behaviour. |
+| **Behavioural profiles** | Each executive declares a `behavior` block: the scene topics that pull their attention, their signature movement, and what they push back on. Scenes declare topics; the audience engine matches the two, so the CFO reaches for her notes on an economics beat while the CTO leans in on an architecture one. No role is special-cased in code. |
+| **Auto & manual advance** | Automatic runs the deck end to end. Manual delivers a scene, then holds — the stage shows a **Next scene** prompt and the transport relabels — so you can present live or take questions between scenes. Switchable mid-session. |
 | **Interruptions** | Executives raise a hand, ask a question in character, and the presenter answers — with camera cuts to the questioner and a two-shot. Frequency follows the Low / Medium / High interaction setting. |
 | **Ask the Meeting** | Put your own question to the room by voice or text; the presenter answers and an executive may follow up, then the presentation resumes where it left off. |
 | **Browser TTS** | `speechSynthesis` with dynamic voice loading, per-character voice assignment, language, rate, pitch and volume, sentence chunking (works around the Chrome utterance cut-off) and a silent fallback so the session never stalls. |
@@ -47,7 +49,7 @@ App
 ├── Store              settings + session state (persisted)
 ├── ScenePlan          data-driven scenes, script lines, beats, interjections
 ├── Cast               presenter + audience personas
-├── CharacterEngine    parametric SVG humans → swappable for GLB / VRM / three.js
+├── CharacterEngine    renderer registry → SVG today, GLB / VRM / three.js next
 ├── LipSyncEngine      viseme scheduling → swappable for a phoneme aligner
 ├── TTSEngine          speechSynthesis → swappable for a real TTS service
 ├── AudioBus           Web Audio ambience, cues and the recording audio graph
@@ -59,8 +61,24 @@ App
 └── UI                 shell, panels, captions, shortcuts, responsive glue
 ```
 
-`InteractionEngine.adapter = async (question, ctx) => ({ answer: [...] })` is the single seam
-needed to move from the local knowledge base to a real model.
+Two seams carry the prototype forward without touching the presentation engine:
+
+```js
+// swap the local knowledge base for a real model
+InteractionEngine.adapter = async (question, ctx) => ({ answer: [...] });
+
+// swap the vector characters for 3D avatars or generated portrait assets
+CharacterEngine.registerRenderer('vrm', { build, wire });
+CharacterEngine.setRenderer('vrm');
+```
+
+Each character is an independent component created from a pure data spec and bound to its own
+mount element. A renderer supplies `build(spec)` and, optionally, `wire(root, spec)`; anything
+it does not supply falls back to the shared DOM controller, so a renderer that keeps the part
+class names (`.c-head`, `.c-mouth`, `.c-pupil`, `.c-lid`, `.c-brow`, `.c-arm`) needs no wiring
+code at all. Every renderer exposes the same control surface — `setViseme`, `setEmotion`,
+`setGesture`, `setGaze`, `blinkOnce`, `startBlinking`, `destroy` — which is all the
+presentation engine ever calls.
 
 ## Content provenance
 
