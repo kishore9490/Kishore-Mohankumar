@@ -38,6 +38,9 @@ export function Hero() {
     const section = sectionRef.current!;
     const frameEl = frameRef.current!;
     const animated = caps.tier !== "static";
+    // A url() inside a custom property can resolve against the stylesheet that uses it;
+    // an absolute URL keeps the silhouette mask working under any base path.
+    section.style.setProperty("--cutout", `url("${new URL(CUTOUT, document.baseURI).href}")`);
     const interactive = caps.finePointer && animated;
 
     const s: EngineState = {
