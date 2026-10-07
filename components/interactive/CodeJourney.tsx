@@ -136,9 +136,6 @@ function Stacked() {
         <h3 className="heading mt-3 text-3xl sm:text-4xl">{c.title}</h3>
         <p className="mt-3 max-w-xl text-[16px] leading-relaxed text-muted">{c.text}</p>
       </div>
-      <div className="mt-6 max-w-xl">
-        <JourneyVisual stage={i} compact />
-      </div>
       <div className="mt-6 flex items-center gap-3">
         <button
           type="button"
@@ -157,6 +154,9 @@ function Stacked() {
         >
           {i === N - 1 ? "Journey complete" : `Next: ${codeJourney[i + 1].kicker.split("· ")[1]} →`}
         </button>
+      </div>
+      <div className="mt-6 max-w-xl">
+        <JourneyVisual stage={i} compact />
       </div>
     </div>
   );

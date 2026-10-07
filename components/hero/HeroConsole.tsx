@@ -76,15 +76,15 @@ export function HeroConsole({ onStage, startDelay = 1.1 }: { onStage?: (s: HeroS
             <span className="absolute inline-flex h-full w-full animate-[pulse-dot_1.8s_ease-in-out_infinite] rounded-full bg-cyan" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-cyan" />
           </span>
-          <span className="label !text-[10px]">{heroCase.label}</span>
+          <span className="label !text-[10px] !tracking-[0.1em]">{heroCase.label}</span>
         </div>
         <button
           type="button"
           onClick={replay}
-          className="label !text-[10px] rounded-md px-1.5 py-1 transition-colors hover:text-ink"
+          className="label shrink-0 !text-[10px] rounded-md px-1.5 py-1 transition-colors hover:text-ink"
           aria-label="Replay the demonstration"
         >
-          ↻ Replay
+          ↻<span className="hidden sm:inline"> Replay</span>
         </button>
       </div>
 
@@ -110,7 +110,7 @@ export function HeroConsole({ onStage, startDelay = 1.1 }: { onStage?: (s: HeroS
         ))}
       </div>
 
-      <div className="grid gap-0 sm:grid-cols-[1.25fr_1fr]">
+      <div className="grid gap-0 sm:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
         {/* Clinical note */}
         <div className="border-b border-line p-4 sm:border-b-0 sm:border-r md:p-5">
           <p className="label !text-[10px]">Clinical documentation</p>
@@ -210,8 +210,8 @@ export function HeroConsole({ onStage, startDelay = 1.1 }: { onStage?: (s: HeroS
 function Row({ k, v }: { k: string; v: string }) {
   return (
     <div className="flex items-baseline justify-between gap-3 border-b border-dashed border-line pb-1.5 text-[13px]">
-      <span className="text-muted">{k}</span>
-      <span className="text-right font-medium text-ink">{v}</span>
+      <span className="shrink-0 text-muted">{k}</span>
+      <span className="min-w-0 text-right font-medium text-ink">{v}</span>
     </div>
   );
 }

@@ -36,10 +36,19 @@ export function Header() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 transition-[background,border-color,backdrop-filter] duration-300",
-        scrolled || open ? "border-b border-line bg-white/85 backdrop-blur-xl" : "border-b border-transparent bg-white/0",
+        "sticky top-0 z-50 border-b transition-[border-color] duration-300",
+        scrolled || open ? "border-line" : "border-transparent",
       )}
     >
+      {/* Blur lives on its own layer: backdrop-filter on the header would trap the fixed mobile menu. */}
+      <div
+        aria-hidden="true"
+        className={cn(
+          "absolute inset-0 -z-10 transition-opacity duration-300",
+          open ? "bg-white" : "bg-white/85 backdrop-blur-xl",
+          scrolled || open ? "opacity-100" : "opacity-0",
+        )}
+      />
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-3 focus:z-50 focus:rounded-md focus:bg-ink focus:px-3 focus:py-2 focus:text-white"

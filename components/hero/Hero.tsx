@@ -12,9 +12,9 @@ import { IntroModal } from "./IntroModal";
 const DataFlowScene = dynamic(() => import("@/components/3d/DataFlowScene"), { ssr: false });
 
 const PIPE = [
-  { label: "Clinical information", stages: [0, 1] },
-  { label: "Medical coding", stages: [2, 3] },
-  { label: "Revenue cycle", stages: [4] },
+  { label: "Clinical information", short: "Clinical info", stages: [0, 1] },
+  { label: "Medical coding", short: "Coding", stages: [2, 3] },
+  { label: "Revenue cycle", short: "Revenue cycle", stages: [4] },
 ];
 
 const ease = [0.16, 1, 0.3, 1] as const;
@@ -157,12 +157,13 @@ export function Hero() {
                 <li key={p.label} className="flex flex-col items-center gap-2">
                   <span
                     className={cn(
-                      "label !text-[9.5px] sm:!text-[10.5px] rounded-full border px-2.5 py-1 transition-all duration-500",
+                      "label whitespace-nowrap !text-[9.5px] !tracking-[0.08em] sm:!text-[10.5px] sm:!tracking-[0.14em] rounded-full border px-2.5 py-1 transition-all duration-500",
                       on ? "border-cyan bg-white !text-ink shadow-[0_0_0_4px_rgba(18,181,212,.12)]" : "border-line bg-white/80",
                       done && "!text-ink",
                     )}
                   >
-                    {p.label}
+                    <span className="sm:hidden">{p.short}</span>
+                    <span className="hidden sm:inline">{p.label}</span>
                   </span>
                   <span className="font-mono text-[10px] text-muted/70">{String(i + 1).padStart(2, "0")}</span>
                 </li>
@@ -170,8 +171,6 @@ export function Hero() {
             })}
           </ol>
 
-          {/* Mobile / reduced-motion light-weight flow */}
-          {!show3D && <MiniFlow stage={stage} />}
 
           <motion.div
             initial={{ opacity: 0, y: reduce ? 0 : 30 }}
@@ -192,15 +191,5 @@ export function Hero() {
 
       <IntroModal open={introOpen} onClose={() => setIntroOpen(false)} />
     </section>
-  );
-}
-
-/** A tiny CSS-only flow line for phones and reduced-motion users. */
-function MiniFlow({ stage }: { stage: number }) {
-  const pct = (stage / 4) * 100;
-  return (
-    <div className="relative z-10 mx-[16%] -mt-11 mb-9 h-px bg-line" aria-hidden="true">
-      <div className="absolute inset-y-0 left-0 bg-cyan transition-[width] duration-700" style={{ width: `${pct}%` }} />
-    </div>
   );
 }
