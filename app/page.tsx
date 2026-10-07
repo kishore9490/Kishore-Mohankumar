@@ -1,3 +1,15 @@
+import { Hero } from "@/components/hero/Hero";
+import { IntentSelector } from "@/components/home/IntentSelector";
+import { FeaturedStory } from "@/components/home/FeaturedStory";
+import { TestRideBand } from "@/components/home/TestRideBand";
+
 export default function Home() {
-  return <div className="h-[200vh] pt-40 container-x"><h1 className="font-display text-display-xl">Your next ride<br/>starts here.</h1></div>;
+  return (
+    <>
+      <Hero />
+      <IntentSelector />
+      <FeaturedStory />
+      <TestRideBand />
+    </>
+  );
 }

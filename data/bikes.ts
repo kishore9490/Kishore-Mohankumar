@@ -517,3 +517,8 @@ export const budgetBands = [
 
 /** The model shown in the homepage hero. */
 export const heroBikeSlug = "hornet-2-0";
+/** Colour used for the homepage hero presentation. */
+export const heroColorId = "sports-red";
+
+/** Model featured in the homepage product story. */
+export const featuredStory = { slug: "activa-125", colorId: "pearl-siren-blue" };
