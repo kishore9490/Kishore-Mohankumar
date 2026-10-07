@@ -6,7 +6,7 @@
  * calls (see `lib/api.ts`) requires no UI changes.
  */
 
-export type BikeCategory = "scooter" | "commuter" | "sport" | "adventure";
+export type BikeCategory = "scooter" | "commuter" | "sport" | "adventure" | "premium";
 export type RideUsage = "commute" | "family" | "long-rides" | "weekend" | "performance" | "city";
 export type RidePriority = "mileage" | "performance" | "comfort" | "style" | "features";
 

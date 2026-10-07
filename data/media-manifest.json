@@ -1,1 +1,30 @@
-{}
+{
+  "activa-110": {
+    "colors": {},
+    "hero": "/bikes/activa-110/hero.webp"
+  },
+  "cb125-hornet": {
+    "colors": {},
+    "hero": "/bikes/cb125-hornet/hero.webp"
+  },
+  "cb300r": {
+    "colors": {},
+    "hero": "/bikes/cb300r/hero.webp"
+  },
+  "cb350rs": {
+    "colors": {},
+    "hero": "/bikes/cb350rs/hero.webp"
+  },
+  "cb750-hornet": {
+    "colors": {},
+    "hero": "/bikes/cb750-hornet/hero.webp"
+  },
+  "nx200": {
+    "colors": {},
+    "hero": "/bikes/nx200/hero.webp"
+  },
+  "sp-125": {
+    "colors": {},
+    "hero": "/bikes/sp-125/hero.webp"
+  }
+}

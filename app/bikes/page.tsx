@@ -86,7 +86,7 @@ export default function BikesPage() {
                     }}
                   >
                     <div style={{ opacity: [0.42, 0.7, 1][i], filter: i < 2 ? "saturate(0.7)" : undefined }}>
-                      <BikeVisual bike={b} priority={i === 2} sizes="40vw" />
+                      <BikeVisual bike={b} priority={i === 2} sizes="40vw" showPlaceholderLabel={false} />
                     </div>
                   </Reveal>
                 ))}

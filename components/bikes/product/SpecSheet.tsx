@@ -10,7 +10,7 @@ const decimalsOf = (n: number) => Math.min(2, (n.toString().split(".")[1] ?? "")
 export function SpecSheet({ bike, index = "02" }: { bike: Bike; index?: string }) {
   const s = bike.specs;
   const stats = [
-    { label: "Displacement", value: s.displacementCc, decimals: 0, unit: "cc", note: `${formatNumber(s.displacementCc)} cc` },
+    { label: "Displacement", value: s.displacementCc, decimals: 0, unit: "cc", note: s.engine.split(",")[0] },
     { label: "Power", value: s.powerPs, decimals: decimalsOf(s.powerPs), unit: "PS", note: s.powerRpm ? `@ ${formatNumber(s.powerRpm)} rpm` : undefined },
     { label: "Torque", value: s.torqueNm, decimals: decimalsOf(s.torqueNm), unit: "Nm", note: s.torqueRpm ? `@ ${formatNumber(s.torqueRpm)} rpm` : undefined },
     ...(s.mileageKmpl

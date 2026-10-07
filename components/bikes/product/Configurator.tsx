@@ -10,6 +10,7 @@ import { ChoiceGroup } from "@/components/ui/Field";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { Button, ButtonLink } from "@/components/ui/Button";
+import { Icon } from "@/components/ui/Icon";
 import { useLeads } from "@/components/leads/LeadProvider";
 import { BikeVisual } from "../BikeVisual";
 import { testRideHref, useBikeConfig } from "./ConfigContext";
@@ -17,6 +18,7 @@ import { ColorSwatches } from "./ColorSwatches";
 import { Availability, availabilityLabel } from "./Availability";
 
 const inr = (n: number) => formatINR(n);
+const ACC_PREVIEW = 4;
 
 function Step({ n, title, aside, children }: { n: string; title: string; aside?: React.ReactNode; children: React.ReactNode }) {
   return (
@@ -42,6 +44,7 @@ export function Configurator({ index = "03" }: { index?: string }) {
   const reduce = useReducedMotion();
   const summaryRef = useRef<HTMLDivElement>(null);
   const [summaryInView, setSummaryInView] = useState(false);
+  const [allAccessories, setAllAccessories] = useState(false);
 
   useEffect(() => {
     const el = summaryRef.current;
@@ -58,11 +61,11 @@ export function Configurator({ index = "03" }: { index?: string }) {
   const showBar = !heroInView && !summaryInView;
   const href = testRideHref(cfg);
 
-  const visual = (
-    <div className="relative overflow-hidden rounded-[24px] bg-ink px-4 pb-4 pt-10 text-bone">
+  const visual = (compact: boolean) => (
+    <div className={cn("relative overflow-hidden rounded-[24px] bg-ink text-bone", compact ? "px-4 pb-2 pt-8" : "px-4 pb-4 pt-10")}>
       <div className="studio-glow absolute inset-0" aria-hidden />
       <div className="absolute inset-x-6 bottom-[20%] h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" aria-hidden />
-      <div className="relative">
+      <div className={cn("relative", compact && "mx-auto max-w-[72%]")}>
         <BikeVisual bike={bike} color={color} accessories={accessoryIds} sizes="(min-width: 1024px) 34vw, 92vw" />
       </div>
       <p className="eyebrow absolute left-5 top-4 text-bone/45">
@@ -86,7 +89,7 @@ export function Configurator({ index = "03" }: { index?: string }) {
         <div className="mt-14 grid gap-12 md:mt-20 lg:grid-cols-12 lg:gap-14">
           {/* steps */}
           <div className="flex flex-col gap-12 lg:col-span-7">
-            <div className="lg:hidden">{visual}</div>
+            <div className="lg:hidden">{visual(false)}</div>
 
             <Step n="01" title="Variant" aside={<span className="text-[13px] opacity-55">{bike.variants.length} available</span>}>
               <ChoiceGroup
@@ -137,23 +140,37 @@ export function Configurator({ index = "03" }: { index?: string }) {
                   columns="sm:grid-cols-2"
                   value={accessoryIds}
                   onChange={cfg.toggleAccessory}
-                  options={accessories.map((a) => ({
+                  options={(allAccessories ? accessories : accessories.slice(0, ACC_PREVIEW)).map((a) => ({
                     value: a.id,
                     label: a.name,
                     description: a.description,
                     meta: <span className="mt-2 text-sm font-medium tabular">+ {formatINR(a.price)}*</span>,
                   }))}
                 />
+                {accessories.length > ACC_PREVIEW && (
+                  <button
+                    type="button"
+                    onClick={() => setAllAccessories((v) => !v)}
+                    aria-expanded={allAccessories}
+                    className="mt-4 inline-flex h-11 items-center gap-2 rounded-full border border-current/20 px-5 text-sm font-medium transition-colors hover:border-current/50"
+                  >
+                    {allAccessories ? "Show fewer" : `Show all ${accessories.length} accessories`}
+                    <Icon name="chevron-down" size={16} className={cn("transition-transform", allAccessories && "rotate-180")} />
+                  </button>
+                )}
+                <p className="mt-4 text-[12px] opacity-55">
+                  Prices are indicative; any fitment charges are confirmed by our team.
+                </p>
               </Step>
             )}
           </div>
 
           {/* summary */}
           <div className="lg:col-span-5">
-            <div ref={summaryRef} className="lg:sticky lg:top-24">
+            <div ref={summaryRef} className="lg:sticky lg:top-20">
               <div className="overflow-hidden rounded-[28px] bg-ink text-bone shadow-[0_40px_80px_-40px_rgb(0_0_0/0.6)]">
-                <div className="hidden p-2 lg:block">{visual}</div>
-                <div className="p-6 md:p-8 lg:pt-5">
+                <div className="hidden p-2 lg:block">{visual(true)}</div>
+                <div className="p-6 md:p-8 lg:px-7 lg:pb-7 lg:pt-4">
                   <p className="eyebrow text-bone/50">Your configuration</p>
                   <p className="mt-3 font-display text-2xl leading-tight md:text-3xl">Honda {bike.name}</p>
                   <p className="mt-1 text-sm text-bone/60">
@@ -215,15 +232,15 @@ export function Configurator({ index = "03" }: { index?: string }) {
                   <div className="mt-6 grid grid-cols-2 gap-4">
                     <div>
                       <p className="text-[12px] text-bone/55">Estimated on-road*</p>
-                      <p className="mt-1 font-display-wide text-[1.65rem] leading-none tabular md:text-3xl">
+                      <p className="mt-1 font-display-wide text-[1.3rem] leading-none tabular xs:text-[1.5rem] md:text-3xl">
                         <AnimatedNumber value={onRoad} format={inr} />
                       </p>
                     </div>
                     <div className="border-l border-white/10 pl-4">
                       <p className="text-[12px] text-bone/55">Estimated EMI*</p>
-                      <p className="mt-1 font-display-wide text-[1.65rem] leading-none tabular md:text-3xl">
+                      <p className="mt-1 font-display-wide text-[1.3rem] leading-none tabular xs:text-[1.5rem] md:text-3xl">
                         <AnimatedNumber value={emi} format={inr} />
-                        <span className="ml-1 font-sans text-sm font-normal normal-case tracking-normal text-bone/50">/mo</span>
+                        <span className="ml-1 font-sans text-xs font-normal normal-case tracking-normal text-bone/50">/mo</span>
                       </p>
                     </div>
                   </div>
@@ -232,13 +249,13 @@ export function Configurator({ index = "03" }: { index?: string }) {
                   </p>
 
                   <div className="mt-6 flex flex-col gap-3 sm:flex-row lg:flex-col xl:flex-row">
-                    <ButtonLink href={href} size="lg" icon="arrow-right" className="flex-1">
+                    <ButtonLink href={href} size="lg" icon="arrow-right" className="sm:flex-1">
                       Book test ride
                     </ButtonLink>
                     <Button
                       size="lg"
                       variant="outline"
-                      className="flex-1"
+                      className="sm:flex-1"
                       onClick={() => openOnRoadPrice({ bikeSlug: bike.slug, source: "pdp_configurator" })}
                     >
                       Get on-road price

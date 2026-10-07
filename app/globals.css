@@ -61,6 +61,7 @@
     color-scheme: dark;
     --header-h: 4rem;
     --surface-bg: var(--color-ink);
+    --surface-fg: var(--color-bone);
     --bottom-nav-h: 4.25rem;
   }
 
@@ -159,6 +160,7 @@
     color: var(--color-ink);
     color-scheme: light;
     --surface-bg: var(--color-paper);
+    --surface-fg: var(--color-ink);
   }
 
   .hairline {

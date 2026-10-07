@@ -178,13 +178,13 @@ function budgetNote(bike: Bike, id: BudgetId, fit: BudgetFit) {
   const band = budgetBand(id);
   switch (fit) {
     case "within":
-      return `Starts at ${formatINR(p)} ex-showroom* — within your budget (${band.label}).`;
+      return `Within your budget (${band.label}).`;
     case "under":
-      return `Starts at ${formatINR(p)} ex-showroom* — comfortably under your budget, leaving room for accessories.`;
+      return `Comfortably under your budget (${band.label}) — leaving room for accessories.`;
     case "stretch":
-      return `Starts at ${formatINR(p)} ex-showroom* — about ${formatINR(p - band.max)} above your budget. An EMI plan can bridge the gap.`;
+      return `About ${formatINR(p - band.max)} above your budget. An EMI plan can bridge the gap.`;
     case "over":
-      return `Starts at ${formatINR(p)} ex-showroom* — above your budget. Ask us about finance options.`;
+      return `Above your budget (${band.label}). Ask us about finance options.`;
   }
 }
 

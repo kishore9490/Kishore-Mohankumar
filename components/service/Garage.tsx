@@ -355,7 +355,8 @@ function VehicleSections({ data, bookings }: { data: GarageVehicle; bookings: Ga
 
       {/* ── Shortcuts ── */}
       <section className="bg-ink py-16 md:py-20" aria-label="More for your Honda">
-        <div className="container-x grid grid-cols-1 border-t border-white/10 md:grid-cols-3">
+        <div className="container-x">
+        <div className="grid grid-cols-1 border-t border-white/10 md:grid-cols-3">
           <ShortcutLink href="/accessories" icon="helmet" title="Accessories" body={`Genuine add-ons that fit your ${vehicle.bikeName}.`} />
           <button
             type="button"
@@ -372,6 +373,7 @@ function VehicleSections({ data, bookings }: { data: GarageVehicle; bookings: Ga
             <ShortcutBody icon="sparkle" title="Ask about current offers" body="Service, exchange or accessory offers — we'll tell you what applies today." />
           </button>
           <ShortcutLink href={`/service/track?reg=${regKey}`} icon="clock" title="Track a service" body="See live status whenever your bike is with us." className="md:border-l md:px-8" />
+        </div>
         </div>
       </section>
     </>

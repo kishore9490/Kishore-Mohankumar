@@ -44,7 +44,7 @@ export default function ServicePage() {
           className="pointer-events-none absolute -left-40 bottom-0 size-[40rem] rounded-full bg-[radial-gradient(closest-side,rgb(255_255_255/0.05),transparent)]"
           aria-hidden
         />
-        <div className="container-x relative grid gap-14 lg:grid-cols-[1.2fr_1fr] lg:items-end lg:gap-20">
+        <div className="container-x relative grid grid-cols-1 gap-14 lg:grid-cols-[1.2fr_1fr] lg:items-end lg:gap-20">
           <div>
             <Reveal className="eyebrow mb-6 flex items-center gap-3 opacity-70">
               <Icon name="wrench" size={14} />
@@ -91,7 +91,7 @@ export default function ServicePage() {
       {/* ───────── Service menu ───────── */}
       <section className="surface-paper py-20 md:py-32" aria-label="Service menu">
         <div className="container-x">
-          <div className="grid gap-10 lg:grid-cols-[1fr_1.6fr] lg:gap-20">
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1fr_1.6fr] lg:gap-20">
             <div className="lg:sticky lg:top-[calc(var(--header-h)+2rem)] lg:self-start">
               <SectionHeading
                 index="01"
@@ -169,7 +169,7 @@ export default function ServicePage() {
 
       {/* ───────── Hours & contact ───────── */}
       <section className="surface-paper bg-paper-2 py-20 md:py-28" aria-labelledby="desk-title">
-        <div className="container-x grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:gap-20">
+        <div className="container-x grid grid-cols-1 gap-12 lg:grid-cols-[1.1fr_1fr] lg:gap-20">
           <div>
             <p className="eyebrow mb-5 flex items-center gap-3 opacity-70">
               <span className="tabular opacity-60">03</span>

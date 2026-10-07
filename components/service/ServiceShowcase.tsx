@@ -38,7 +38,7 @@ export function ServiceShowcase({ index = "05", className, id = "service" }: { i
         aria-hidden
       />
       <div className="container-x relative">
-        <div className="grid gap-14 lg:grid-cols-[1.05fr_1fr] lg:items-end lg:gap-20">
+        <div className="grid grid-cols-1 gap-14 lg:grid-cols-[1.05fr_1fr] lg:items-end lg:gap-20">
           <div>
             <Reveal className="eyebrow mb-6 flex items-center gap-3 opacity-70">
               <span className="tabular opacity-60">{index}</span>

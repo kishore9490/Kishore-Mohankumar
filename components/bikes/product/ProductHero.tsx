@@ -75,7 +75,7 @@ export function ProductHero() {
         <h1
           id="product-title"
           className="mt-4 whitespace-nowrap text-center font-display-wide leading-[0.84] md:mt-6"
-          style={{ fontSize: `min(11rem, calc((min(100vw, 88rem) - 2.5rem) / ${(letters * 0.9 + 0.4).toFixed(2)}))` }}
+          style={{ fontSize: `min(10rem, calc((min(100vw, 88rem) - 2.5rem) / ${(letters * 0.74 + 0.3).toFixed(2)}))` }}
         >
           <span className="sr-only">Honda </span>
           <motion.span
@@ -87,17 +87,9 @@ export function ProductHero() {
             {bike.name}
           </motion.span>
         </h1>
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          className="mx-auto mt-4 max-w-md text-center text-base text-bone/65 md:mt-5 md:text-lg"
-        >
-          {bike.tagline}
-        </motion.p>
 
         {/* stage */}
-        <div className="relative mx-auto mt-2 max-w-5xl md:-mt-2">
+        <div className="relative z-10 mx-auto -mt-[2%] max-w-[50rem] md:-mt-[4.5rem]">
           <div className="pointer-events-none absolute inset-x-[8%] bottom-[6%] h-[30%] rounded-[50%] bg-[radial-gradient(closest-side,rgb(255_255_255/0.09),transparent)]" aria-hidden />
           <motion.div
             initial={{ opacity: 0, x: reduce ? 0 : 80 }}
@@ -109,33 +101,34 @@ export function ProductHero() {
               <AnimatePresence initial={false}>
                 <motion.div
                   key={color.id}
-                  className="[grid-area:1/1]"
+                  className="relative [grid-area:1/1]"
                   initial={{ opacity: 0, filter: reduce ? "none" : "brightness(1.6)" }}
                   animate={{ opacity: 1, filter: "brightness(1)" }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.6, ease }}
                 >
                   <BikeVisual bike={bike} color={color} priority sizes="(min-width: 1024px) 64rem, 100vw" />
-                  {/* floor reflection — geometry tuned to the silhouette's ground line */}
-                  {!bike.heroImage && (
+                  {/* floor reflection — photos and placeholder share a 5:3 frame with the ground at ~90% */}
+                  {(
                   <div
-                    className="pointer-events-none -mt-[12.5%] -scale-y-100 opacity-30 [mask-image:linear-gradient(to_top,black,transparent_38%)]"
+                    className="pointer-events-none absolute inset-x-0 top-[79.2%] -scale-y-100 opacity-[0.22] [mask-image:linear-gradient(to_top,black,transparent_32%)]"
                     aria-hidden
                   >
-                    <BikeVisual bike={bike} color={color} sizes="(min-width: 1024px) 64rem, 100vw" />
+                    <BikeVisual bike={bike} color={color} sizes="(min-width: 1024px) 64rem, 100vw" showPlaceholderLabel={false} />
                   </div>
                   )}
                 </motion.div>
               </AnimatePresence>
             </div>
           </motion.div>
-          <div className="absolute inset-x-0 bottom-[22%] h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" aria-hidden />
+          <div className="absolute inset-x-0 bottom-[10%] h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" aria-hidden />
         </div>
 
         {/* deck */}
-        <div className={cn("relative grid gap-8 border-t border-white/10 pt-6 md:pt-8 lg:grid-cols-12 lg:items-center", bike.heroImage ? "mt-6" : "-mt-[14%] sm:-mt-[12%]")}>
+        <div className={cn("relative grid gap-8 border-t border-white/10 pt-6 md:pt-8 lg:grid-cols-12 lg:items-center", "mt-6 md:mt-8")}>
           <div className="lg:col-span-4">
-            <p className="text-sm text-bone/55">Starting</p>
+            <p className="text-base text-bone/75 md:text-lg">{bike.tagline}</p>
+            <p className="mt-3 text-sm text-bone/55">Starting</p>
             <p className="mt-1 flex flex-wrap items-baseline gap-x-2">
               <span className="font-display-wide text-3xl tabular md:text-4xl">{formatINR(startingPrice(bike))}</span>
               <span className="text-sm text-bone/55">ex-showroom*</span>

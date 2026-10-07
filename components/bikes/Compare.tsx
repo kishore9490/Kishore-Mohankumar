@@ -89,7 +89,7 @@ export function CompareTray({
                     {b ? (
                       <span className="group/chip flex items-center gap-1 rounded-full bg-white/[0.06] py-1 pl-1 pr-1">
                         <span className="w-11 shrink-0 overflow-hidden" aria-hidden>
-                          <BikeVisual bike={b} sizes="44px" />
+                          <BikeVisual bike={b} sizes="44px" showPlaceholderLabel={false} />
                         </span>
                         <span className="hidden max-w-[7rem] truncate text-[13px] lg:inline">{b.name}</span>
                         <button
@@ -127,6 +127,7 @@ type Row = {
   /** Numeric value used to flag the best figure in the row. */
   num?: (b: Bike) => number | undefined;
   best?: "max" | "min";
+  badge?: string;
   note?: string;
 };
 
@@ -135,7 +136,7 @@ const rows: { group: string; rows: Row[] }[] = [
     group: "Price",
     rows: [
       {
-        label: "Ex-showroom, from*",
+        badge: "Lowest", label: "Ex-showroom, from*",
         value: (b) => formatINR(startingPrice(b)),
         num: (b) => startingPrice(b),
         best: "min",
@@ -145,33 +146,33 @@ const rows: { group: string; rows: Row[] }[] = [
   {
     group: "Performance",
     rows: [
-      { label: "Displacement", value: (b) => `${formatNumber(b.specs.displacementCc)} cc`, num: (b) => b.specs.displacementCc, best: "max" },
+      { badge: "Largest", label: "Displacement", value: (b) => `${formatNumber(b.specs.displacementCc)} cc`, num: (b) => b.specs.displacementCc, best: "max" },
       {
-        label: "Power",
+        badge: "Most", label: "Power",
         value: (b) => `${formatNumber(b.specs.powerPs)} PS`,
         num: (b) => b.specs.powerPs,
         best: "max",
       },
-      { label: "Torque", value: (b) => `${formatNumber(b.specs.torqueNm)} Nm`, num: (b) => b.specs.torqueNm, best: "max" },
+      { badge: "Most", label: "Torque", value: (b) => `${formatNumber(b.specs.torqueNm)} Nm`, num: (b) => b.specs.torqueNm, best: "max" },
     ],
   },
   {
     group: "Efficiency",
     rows: [
       {
-        label: "Mileage*",
+        badge: "Highest", label: "Mileage*",
         value: (b) => (b.specs.mileageKmpl ? `~${b.specs.mileageKmpl} km/l` : "Ask us"),
         num: (b) => b.specs.mileageKmpl,
         best: "max",
         note: "Indicative real-world figure, not an official claim.",
       },
-      { label: "Fuel tank", value: (b) => `${formatNumber(b.specs.fuelLitres)} L`, num: (b) => b.specs.fuelLitres, best: "max" },
+      { badge: "Largest", label: "Fuel tank", value: (b) => `${formatNumber(b.specs.fuelLitres)} L`, num: (b) => b.specs.fuelLitres, best: "max" },
     ],
   },
   {
     group: "Chassis",
     rows: [
-      { label: "Kerb weight", value: (b) => `${formatNumber(b.specs.kerbKg)} kg`, num: (b) => b.specs.kerbKg, best: "min" },
+      { badge: "Lightest", label: "Kerb weight", value: (b) => `${formatNumber(b.specs.kerbKg)} kg`, num: (b) => b.specs.kerbKg, best: "min" },
       { label: "Front brake", value: (b) => b.specs.brakesFront },
       { label: "Rear brake", value: (b) => b.specs.brakesRear },
       { label: "Transmission", value: (b) => b.specs.transmission },
@@ -209,7 +210,7 @@ export function CompareSheet({ open, onClose, items }: { open: boolean; onClose:
               <th key={b.slug} scope="col" className="min-w-0 align-top font-normal">
                 <div className="overflow-hidden rounded-2xl bg-ink px-2 pb-2 pt-5 text-bone">
                   <div className="studio-glow">
-                    <BikeVisual bike={b} sizes="200px" />
+                    <BikeVisual bike={b} sizes="200px" showPlaceholderLabel={false} />
                   </div>
                 </div>
                 <p className="mt-3 font-display text-[1.05rem] leading-tight md:text-xl">{b.name}</p>
@@ -243,7 +244,7 @@ export function CompareSheet({ open, onClose, items }: { open: boolean; onClose:
                       {row.value(b)}
                       {i === best && (
                         <span className="ml-1.5 inline-block translate-y-[-1px] rounded-full bg-go-soft px-1.5 py-0.5 align-middle text-[10px] font-medium text-go">
-                          {row.best === "min" ? (row.label.startsWith("Ex") ? "Lowest" : "Lightest") : "Best"}
+                          {row.badge}
                         </span>
                       )}
                     </td>

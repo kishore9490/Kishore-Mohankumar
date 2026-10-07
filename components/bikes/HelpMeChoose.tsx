@@ -272,7 +272,7 @@ function Option({ n, label, hint, selected, onSelect }: { n: number; label: stri
         selected ? "border-bone/80 bg-white/[0.07]" : "border-white/10 hover:border-white/30 hover:bg-white/[0.03]",
       )}
     >
-      <span className="eyebrow tabular w-5 text-bone/35">{String.fromCharCode(65 + n)}</span>
+      <span className="eyebrow tabular w-5 text-bone/35" aria-hidden>{String.fromCharCode(65 + n)}</span>
       <span className="min-w-0 flex-1">
         <span className="block text-[15px] font-medium sm:text-base">{label}</span>
         <span className="mt-0.5 block text-[13px] text-bone/55">{hint}</span>
@@ -375,7 +375,6 @@ function Result({
             </motion.div>
             <p className="eyebrow relative mt-2 flex items-center justify-between text-bone/45">
               <span>{categoryLabels[b.category]}</span>
-              <span>{b.heroImage ? "" : "Studio illustration"}</span>
             </p>
           </div>
         </div>
@@ -433,7 +432,7 @@ function Result({
                   className="group/alt flex items-center gap-4 rounded-2xl border border-white/10 p-3 pr-5 transition-colors hover:border-white/30 hover:bg-white/[0.03]"
                 >
                   <span className="w-28 shrink-0 rounded-xl bg-ink-2 px-2 py-1.5 sm:w-36" aria-hidden>
-                    <BikeVisual bike={r.bike} sizes="144px" />
+                    <BikeVisual bike={r.bike} sizes="144px" showPlaceholderLabel={false} />
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block font-display text-lg leading-tight">{r.bike.name}</span>

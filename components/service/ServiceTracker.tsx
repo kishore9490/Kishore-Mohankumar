@@ -1,7 +1,6 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
-import { useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 import { BikeVisual } from "@/components/bikes/BikeVisual";
 import { Button, ButtonLink } from "@/components/ui/Button";
@@ -50,7 +49,6 @@ export interface ServiceTrackerProps {
 }
 
 export function ServiceTracker({ initialQuery = "" }: ServiceTrackerProps) {
-  const router = useRouter();
   const inputId = useId();
   const initialKey = normaliseRegistration(initialQuery);
   const [query, setQuery] = useState(initialKey ? displayKey(initialKey) : "");
@@ -89,7 +87,8 @@ export function ServiceTracker({ initialQuery = "" }: ServiceTrackerProps) {
     if (err) return;
     setQuery(displayKey(key));
     setResult({ status: "loading", key });
-    router.replace(`/service/track?reg=${encodeURIComponent(key)}`, { scroll: false });
+    // Shallow URL sync (shareable link) without a server round-trip.
+    window.history.replaceState(null, "", `/service/track?reg=${encodeURIComponent(key)}`);
     void fetchJob(key);
     requestAnimationFrame(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
   }

@@ -31,17 +31,17 @@ export function FinanceTeaser({ bike }: { bike: Bike }) {
           <dl className="grid grid-cols-3 gap-4 md:col-span-5">
             <div>
               <dt className="text-[12px] opacity-55">From</dt>
-              <dd className="mt-1 font-display-wide text-xl tabular md:text-2xl">{formatINR(emi)}</dd>
+              <dd className="mt-1 font-display-wide text-lg tabular xs:text-xl md:text-2xl">{formatINR(emi)}</dd>
               <dd className="text-[12px] opacity-55">per month*</dd>
             </div>
             <div>
               <dt className="text-[12px] opacity-55">Down payment</dt>
-              <dd className="mt-1 font-display-wide text-xl tabular md:text-2xl">{formatINR(down)}</dd>
+              <dd className="mt-1 font-display-wide text-lg tabular xs:text-xl md:text-2xl">{formatINR(down)}</dd>
               <dd className="text-[12px] opacity-55">{Math.round(EMI_DEFAULTS.downPaymentPct * 100)}% of on-road*</dd>
             </div>
             <div>
               <dt className="text-[12px] opacity-55">Tenure</dt>
-              <dd className="mt-1 font-display-wide text-xl tabular md:text-2xl">{EMI_DEFAULTS.tenureMonths}</dd>
+              <dd className="mt-1 font-display-wide text-lg tabular xs:text-xl md:text-2xl">{EMI_DEFAULTS.tenureMonths}</dd>
               <dd className="text-[12px] opacity-55">months</dd>
             </div>
           </dl>

@@ -116,14 +116,21 @@ export function SelectField({
 export function TextArea({
   label,
   hint,
+  error,
   optional,
   className,
   ...rest
-}: { label: string; hint?: string; optional?: boolean } & ComponentProps<"textarea">) {
+}: { label: string; hint?: string; error?: string | null; optional?: boolean } & ComponentProps<"textarea">) {
   const id = useId();
   return (
-    <FieldShell id={id} label={label} hint={hint} optional={optional} className={className}>
-      <textarea id={id} className={cn(fieldBox, "min-h-24 py-3")} {...rest} />
+    <FieldShell id={id} label={label} hint={hint} error={error} optional={optional} className={className}>
+      <textarea
+        id={id}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? `${id}-error` : hint ? `${id}-hint` : undefined}
+        className={cn(fieldBox, "min-h-24 py-3")}
+        {...rest}
+      />
     </FieldShell>
   );
 }
@@ -189,7 +196,7 @@ export function ChoiceGroup<T extends string>({
                 checked={on}
                 disabled={o.disabled}
                 onChange={() => onChange(o.value)}
-                className="sr-only"
+                className="absolute inset-0 m-0 cursor-pointer opacity-0"
               />
               {layout === "chips" ? (
                 <>
@@ -277,8 +284,8 @@ export function DateStrip({
             <label
               key={iso}
               className={cn(
-                "flex w-[4.25rem] shrink-0 snap-start cursor-pointer flex-col items-center gap-0.5 rounded-2xl border py-3 transition-colors duration-200 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-signal",
-                on ? "border-current bg-current text-[color:var(--surface-bg,var(--color-ink))]" : "border-current/15 hover:border-current/40",
+                "relative flex w-[4.25rem] shrink-0 snap-start cursor-pointer flex-col items-center gap-0.5 rounded-2xl border py-3 transition-colors duration-200 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-signal",
+                on ? "border-[color:var(--surface-fg)] bg-[color:var(--surface-fg)] text-[color:var(--surface-bg)]" : "border-current/15 hover:border-current/40",
                 disabled && "pointer-events-none opacity-30",
               )}
             >
@@ -289,7 +296,7 @@ export function DateStrip({
                 checked={on}
                 disabled={disabled}
                 onChange={() => onChange(iso)}
-                className="sr-only"
+                className="absolute inset-0 m-0 cursor-pointer opacity-0"
                 aria-label={d.toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" }) + (disabled ? " — unavailable" : "")}
               />
               <span className="eyebrow text-[10px] opacity-70">{d.toLocaleDateString("en-IN", { weekday: "short" })}</span>
@@ -343,8 +350,8 @@ export function SlotGrid({
               <label
                 key={s.slot}
                 className={cn(
-                  "flex h-11 cursor-pointer items-center justify-center rounded-full border text-sm tabular transition-colors duration-200 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-signal",
-                  on ? "border-current bg-current text-[color:var(--surface-bg,var(--color-ink))]" : "border-current/15 hover:border-current/40",
+                  "relative flex h-11 cursor-pointer items-center justify-center rounded-full border text-sm tabular transition-colors duration-200 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-signal",
+                  on ? "border-[color:var(--surface-fg)] bg-[color:var(--surface-fg)] text-[color:var(--surface-bg)]" : "border-current/15 hover:border-current/40",
                   !s.available && "pointer-events-none line-through opacity-30",
                 )}
               >
@@ -355,7 +362,7 @@ export function SlotGrid({
                   checked={on}
                   disabled={!s.available}
                   onChange={() => onChange(s.slot)}
-                  className="sr-only"
+                  className="absolute inset-0 m-0 cursor-pointer opacity-0"
                   aria-label={`${formatSlot(s.slot)}${s.available ? "" : " — fully booked"}`}
                 />
                 {formatSlot(s.slot)}

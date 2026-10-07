@@ -474,6 +474,175 @@ const inventory: Bike[] = [
     accessoryIds: ["crash-guard", "seat-cover", "body-cover", "tank-pad", "mobile-holder", "helmet", "tank-bag", "top-box", "frame-slider", "knee-pads"],
     testRideAvailable: true,
   },
+  {
+    slug: "cb125-hornet",
+    name: "CB125 Hornet",
+    tagline: "125cc. Zero compromise on attitude.",
+    story:
+      "Streetfighter looks in a 125. Golden upside-down forks, bold colour-pop alloys and a sharp LED face — with the easy running costs of a 125cc commuter.",
+    category: "sport",
+    silhouette: "naked",
+    usage: ["city", "commute", "weekend"],
+    scores: { mileage: 4, performance: 3, comfort: 3, style: 5, features: 4 },
+    variants: [
+      { id: "std", name: "Standard", exShowroom: 1_12_000, highlights: ["Golden USD forks", "Single-channel ABS", "4.2\" TFT with navigation"], availability: "in-stock" },
+    ],
+    colors: [
+      { id: "black-yellow", name: "Pearl Igneous Black with Yellow", hex: "#16171a", accent: "#d7e81a" },
+      { id: "black-orange", name: "Pearl Siren Blue with Orange", hex: "#1f4f8f", accent: "#ef7d22" },
+      { id: "black-red", name: "Imperial Red Metallic", hex: "#a3141d", accent: "#16171a" },
+    ],
+    specs: {
+      engine: "Single-cylinder, 4-stroke, air-cooled, PGM-FI",
+      displacementCc: 123.94,
+      powerPs: 11.1,
+      powerRpm: 7500,
+      torqueNm: 11.2,
+      torqueRpm: 6000,
+      mileageKmpl: 50,
+      transmission: "5-speed manual",
+      fuelLitres: 11.2,
+      kerbKg: 124,
+      brakesFront: "240 mm disc, single-channel ABS",
+      brakesRear: "130 mm drum",
+      tyreFront: "90/80-17 tubeless",
+      tyreRear: "110/80-17 tubeless",
+    },
+    features: [
+      { id: "usd", kind: "comfort", title: "Golden USD forks", body: "Upside-down forks — rare in a 125 — for sharper steering and a planted front end.", x: 74, y: 50 },
+      { id: "tft", kind: "technology", title: "Connected TFT", body: "Navigation and call alerts via the Honda RoadSync app on a 4.2-inch colour display.", x: 70, y: 20 },
+      { id: "safety", kind: "safety", title: "Single-channel ABS", body: "Keeps the front wheel from locking under hard braking.", x: 78, y: 74 },
+      { id: "led", kind: "lighting", title: "Twin-LED face", body: "A sharp LED headlamp and tail lamp give it real presence at night.", x: 84, y: 34 },
+    ],
+    accessoryIds: ["crash-guard", "seat-cover", "body-cover", "tank-pad", "mobile-holder", "helmet", "frame-slider"],
+    testRideAvailable: true,
+  },
+  {
+    slug: "cb300r",
+    name: "CB300R",
+    tagline: "Neo Sports Café. All muscle, no excess.",
+    story:
+      "A lightweight, premium streetfighter built around a revvy 286cc DOHC engine. Minimal bodywork, round LED headlamp and golden forks — modern café styling with real performance.",
+    category: "premium",
+    silhouette: "naked",
+    usage: ["performance", "weekend", "city"],
+    scores: { mileage: 3, performance: 5, comfort: 3, style: 5, features: 4 },
+    variants: [
+      { id: "std", name: "Standard", exShowroom: 2_19_000, highlights: ["286cc DOHC engine", "Dual-channel ABS", "Assist & slipper clutch"], availability: "on-order" },
+    ],
+    colors: [
+      { id: "matte-grey", name: "Matte Steel Grey", hex: "#55595f", accent: "#c8a24a" },
+      { id: "pearl-red", name: "Pearl Spartan Red", hex: "#a8161e", accent: "#121316" },
+    ],
+    specs: {
+      engine: "Single-cylinder, 4-stroke, liquid-cooled, DOHC",
+      displacementCc: 286.01,
+      powerPs: 31.1,
+      powerRpm: 9000,
+      torqueNm: 27.5,
+      torqueRpm: 7500,
+      mileageKmpl: 30,
+      transmission: "6-speed manual, assist & slipper clutch",
+      fuelLitres: 10,
+      kerbKg: 146,
+      brakesFront: "296 mm radial disc, dual-channel ABS",
+      brakesRear: "220 mm disc, dual-channel ABS",
+      tyreFront: "110/70-17 radial",
+      tyreRear: "150/60-17 radial",
+      seatHeightMm: 799,
+    },
+    features: [
+      { id: "engine", kind: "engine", title: "286cc DOHC", body: "Liquid-cooled and eager to rev, with a broad, usable spread of torque.", x: 50, y: 62 },
+      { id: "safety", kind: "safety", title: "Dual-channel ABS", body: "Radial-mount front caliper and ABS on both wheels.", x: 80, y: 74 },
+      { id: "usd", kind: "comfort", title: "41 mm USD forks", body: "Premium suspension for precise handling.", x: 76, y: 50 },
+      { id: "led", kind: "lighting", title: "Round LED headlamp", body: "A signature Neo Sports Café face, fully LED.", x: 82, y: 30 },
+    ],
+    accessoryIds: ["frame-slider", "tank-pad", "body-cover", "mobile-holder", "helmet", "tank-bag"],
+    testRideAvailable: true,
+  },
+  {
+    slug: "cb350rs",
+    name: "CB350RS",
+    tagline: "Classic soul. Street-scrambler spirit.",
+    story:
+      "A 350cc long-stroke single with a deep, unhurried thump, wrapped in a sporty scrambler-style design with block-pattern tyres and a short, purposeful stance.",
+    category: "premium",
+    silhouette: "commuter",
+    usage: ["weekend", "long-rides", "city"],
+    scores: { mileage: 3, performance: 4, comfort: 4, style: 5, features: 4 },
+    variants: [
+      { id: "std", name: "Standard", exShowroom: 2_02_000, highlights: ["348cc long-stroke engine", "Dual-channel ABS", "Honda Selectable Torque Control"], availability: "in-stock" },
+    ],
+    colors: [
+      { id: "matte-grey", name: "Matte Axis Grey Metallic", hex: "#b9bdc0", accent: "#d7e81a" },
+      { id: "pearl-black", name: "Pearl Igneous Black", hex: "#141518", accent: "#c0262d" },
+    ],
+    specs: {
+      engine: "Single-cylinder, 4-stroke, air-cooled, OHC",
+      displacementCc: 348.36,
+      powerPs: 21,
+      powerRpm: 5500,
+      torqueNm: 30,
+      torqueRpm: 3000,
+      mileageKmpl: 35,
+      transmission: "5-speed manual, assist & slipper clutch",
+      fuelLitres: 15,
+      kerbKg: 179,
+      brakesFront: "310 mm disc, dual-channel ABS",
+      brakesRear: "240 mm disc, dual-channel ABS",
+      tyreFront: "100/90-19 block pattern",
+      tyreRear: "130/70-18 block pattern",
+      seatHeightMm: 800,
+    },
+    features: [
+      { id: "engine", kind: "engine", title: "348cc long-stroke", body: "Strong low-end torque and that unmistakable thump.", x: 46, y: 62 },
+      { id: "safety", kind: "safety", title: "Torque control + ABS", body: "Honda Selectable Torque Control and dual-channel ABS for grip on every surface.", x: 80, y: 74 },
+      { id: "led", kind: "lighting", title: "Round LED headlamp", body: "Classic shape, modern LED performance.", x: 84, y: 34 },
+      { id: "comfort", kind: "comfort", title: "Ribbed seat", body: "A long, ribbed seat with room for two.", x: 34, y: 34 },
+    ],
+    accessoryIds: ["crash-guard", "seat-cover", "body-cover", "tank-pad", "mobile-holder", "helmet", "back-rest"],
+    testRideAvailable: true,
+  },
+  {
+    slug: "cb750-hornet",
+    name: "CB750 Hornet",
+    tagline: "The Hornet, unleashed.",
+    story:
+      "A 755cc parallel-twin streetfighter with a red steel frame, ride modes and Honda Selectable Torque Control — light, agile and seriously quick.",
+    category: "premium",
+    silhouette: "naked",
+    usage: ["performance", "weekend"],
+    scores: { mileage: 2, performance: 5, comfort: 3, style: 5, features: 5 },
+    variants: [
+      { id: "std", name: "Standard", exShowroom: 8_60_000, highlights: ["755cc parallel twin", "Ride modes & torque control", "5\" TFT with smartphone voice control"], availability: "on-order" },
+    ],
+    colors: [{ id: "graphite-black", name: "Graphite Black with red frame", hex: "#1a1b1e", accent: "#b3121c" }],
+    specs: {
+      engine: "Parallel-twin, 4-stroke, liquid-cooled, Unicam",
+      displacementCc: 755,
+      powerPs: 92,
+      powerRpm: 9500,
+      torqueNm: 75,
+      torqueRpm: 7250,
+      mileageKmpl: 22,
+      transmission: "6-speed manual, assist & slipper clutch",
+      fuelLitres: 15.2,
+      kerbKg: 190,
+      brakesFront: "Twin 296 mm discs, radial calipers, ABS",
+      brakesRear: "240 mm disc, ABS",
+      tyreFront: "120/70-17 radial",
+      tyreRear: "160/60-17 radial",
+      seatHeightMm: 795,
+    },
+    features: [
+      { id: "engine", kind: "engine", title: "755cc twin", body: "A punchy 270° parallel twin with a character-rich pulse.", x: 52, y: 60 },
+      { id: "tech", kind: "technology", title: "Ride modes", body: "Sport, Standard, Rain and User modes with torque control and engine-brake settings.", x: 72, y: 20 },
+      { id: "brakes", kind: "brakes", title: "Twin radial discs", body: "Dual 296 mm front discs with radial four-piston calipers and ABS.", x: 80, y: 74 },
+      { id: "comfort", kind: "comfort", title: "Showa SFF-BP forks", body: "Premium separate-function forks for control on fast roads.", x: 76, y: 48 },
+    ],
+    accessoryIds: ["frame-slider", "tank-pad", "body-cover", "mobile-holder", "helmet", "tank-bag"],
+    testRideAvailable: true,
+  }
 ];
 
 type Media = Record<string, { hero?: string; colors: Record<string, string> }>;
@@ -494,6 +663,7 @@ export const categoryLabels: Record<BikeCategory, string> = {
   commuter: "Commuter",
   sport: "Sport",
   adventure: "Adventure-tourer",
+  premium: "Premium (BigWing)",
 };
 
 export const usageLabels: Record<RideUsage, string> = {
@@ -530,9 +700,9 @@ export const budgetBands = [
 ] as const;
 
 /** The model shown in the homepage hero. */
-export const heroBikeSlug = "hornet-2-0";
+export const heroBikeSlug = "cb125-hornet";
 /** Colour used for the homepage hero presentation. */
-export const heroColorId = "sports-red";
+export const heroColorId = "black-yellow";
 
 /** Model featured in the homepage product story. */
-export const featuredStory = { slug: "activa-125", colorId: "pearl-siren-blue" };
+export const featuredStory = { slug: "activa-110", colorId: "decent-blue" };

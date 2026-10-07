@@ -30,8 +30,9 @@ export function WhyThisBike({ index = "01" }: { index?: string }) {
   const spots = useMemo(() => hotspotLayout(bike), [bike]);
   const features = bike.features;
   const f = features[active];
-  // Hotspot anchors are tuned for the studio silhouette. With real photography
-  // the feature list/rail carries the story and on-image hotspots are omitted.
+  // Hotspot anchors are tuned for the silhouette frame. With real photography
+  // the feature list/rail carries the story and on-image hotspots are omitted
+  // (photo framing varies, so pins could land on the wrong part).
   const hotspots = !bike.heroImage;
   const spot = spots[active];
 
@@ -135,7 +136,7 @@ export function WhyThisBike({ index = "01" }: { index?: string }) {
               </div>
             </div>
             <p className="eyebrow mt-4 text-center text-bone/35 lg:text-left">
-              {hotspots ? "Tap a number to explore · Studio illustration" : "Select a feature to explore"}
+              {hotspots ? "Tap a number to explore" : "Select a feature to explore"}
             </p>
           </div>
 

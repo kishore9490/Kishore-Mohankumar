@@ -15,7 +15,7 @@ export function FeelTheRide({ bike }: { bike: Bike }) {
     <section aria-labelledby="feel-title" className="relative isolate overflow-hidden bg-ink py-24 text-bone md:py-36">
       <div className="pointer-events-none absolute inset-0 grain" aria-hidden />
       <div className="pointer-events-none absolute -right-[10%] bottom-0 -z-10 w-[85%] opacity-25 md:w-[60%]" aria-hidden>
-        <BikeVisual bike={bike} color={cfg.color} sizes="60vw" />
+        <BikeVisual bike={bike} color={cfg.color} sizes="60vw" showPlaceholderLabel={false} />
       </div>
       <div className="container-x">
         <Reveal className="eyebrow mb-6 flex items-center gap-3 text-bone/55">
@@ -27,7 +27,7 @@ export function FeelTheRide({ bike }: { bike: Bike }) {
         </h2>
         <Reveal delay={0.15} className="mt-8 max-w-md text-base leading-relaxed text-bone/65 md:text-lg">
           <p>
-            Numbers only go so far. Choose a time, bring your driving licence, and ride the {cfg.variant.name} {bike.name} for yourself — no obligation.
+            Numbers only go so far. Choose a time, bring your driving licence, and ride the {bike.name}{bike.variants.length > 1 ? ` ${cfg.variant.name}` : ""} for yourself — no obligation.
           </p>
         </Reveal>
         <Reveal delay={0.25} className="mt-10 flex flex-col gap-3 sm:flex-row">
