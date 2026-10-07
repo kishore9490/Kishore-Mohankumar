@@ -36,7 +36,8 @@ Everything below is **sample content** and is clearly isolated:
 | File | What to replace |
 |---|---|
 | `data/dealership.ts` | Name, logo (`logo`), address, coordinates, phones, WhatsApp, hours, site URL. Set `isSampleData: false` to remove the preview notice and enable price structured data. Add `metrics` **only** with verified numbers. |
-| `data/bikes.ts` | Current price list, variants, colours and Honda-published specifications. Add licensed photography (`heroImage`, `colors[].image`) — the UI swaps from studio silhouettes to photos automatically. |
+| `data/bikes.ts` | Current price list, variants, colours and Honda-published specifications. |
+| `public/bikes/<slug>/` | Bike photography: `hero.webp` and optional `<colour-id>.webp`. Run `python3 scripts/prepare-bike-photo.py <photo> public/bikes/<slug>/hero.webp` to remove a white background and normalise framing. Models without photos show a "Photo coming soon" outline. |
 | `data/accessories.ts` | Genuine accessory price list and images. |
 | `data/offers.ts` | Approved offers with terms (section is hidden while empty). |
 | `data/stories.ts` | Real customer stories with consent (an honest invitation renders while empty). |
