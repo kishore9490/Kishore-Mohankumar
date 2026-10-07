@@ -75,7 +75,7 @@ export function SiteFooter() {
               </TrackedLink>
             </li>
             <li>
-              <a href={`mailto:${dealership.email}`} className="hover:text-bone">
+              <a href={`mailto:${dealership.email}`} className="break-all hover:text-bone">
                 {dealership.email}
               </a>
             </li>
@@ -109,9 +109,9 @@ export function SiteFooter() {
 
 function FooterCol({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="md:col-span-2">
+    <div className="min-w-0 md:col-span-2">
       <h2 className="eyebrow mb-5 text-bone/45">{title}</h2>
-      <ul className="flex flex-col gap-3 text-sm text-bone/70">{children}</ul>
+      <ul className="flex min-w-0 flex-col gap-3 text-sm text-bone/70">{children}</ul>
     </div>
   );
 }

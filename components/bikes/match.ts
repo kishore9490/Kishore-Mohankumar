@@ -57,7 +57,8 @@ export function relatedBikes(bike: Bike, count = 3, list: Bike[] = allBikes) {
     .filter((b) => b.slug !== bike.slug)
     .map((b) => ({
       b,
-      rank: (b.category === bike.category ? 0 : 1) * 1_000_000 + Math.abs(startingPrice(b) - price),
+      // Same category first, then closest price; photographed models get a nudge.
+      rank: (b.category === bike.category ? 0 : 1) * 1_000_000 + Math.abs(startingPrice(b) - price) + (b.heroImage ? 0 : 60_000),
     }))
     .sort((a, b) => a.rank - b.rank)
     .slice(0, count)

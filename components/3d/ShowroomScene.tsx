@@ -1,6 +1,6 @@
 "use client";
 
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Canvas, useFrame } from "@react-three/fiber";
 import { MeshReflectorMaterial, Sparkles } from "@react-three/drei";
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
@@ -54,12 +54,12 @@ export default function ShowroomScene({
 }
 
 function Rig({ pointer }: { pointer: React.RefObject<{ x: number; y: number }> }) {
-  const { camera } = useThree();
   const target = useMemo(() => new THREE.Vector3(0.15, 0.05, 0), []);
   useFrame((state, delta) => {
     const p = pointer.current ?? { x: 0, y: 0 };
     const t = state.clock.elapsedTime;
     const k = 1 - Math.exp(-delta * 2.2);
+    const camera = state.camera;
     camera.position.x = THREE.MathUtils.lerp(camera.position.x, p.x * 0.9 + Math.sin(t * 0.12) * 0.15, k);
     camera.position.y = THREE.MathUtils.lerp(camera.position.y, 1.1 + p.y * 0.3, k);
     camera.lookAt(target);
