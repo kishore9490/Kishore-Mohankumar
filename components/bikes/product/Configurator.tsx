@@ -182,6 +182,28 @@ export function Configurator({ index = "03" }: { index?: string }) {
                         )}
                       </dd>
                     </div>
+                    {selectedAccessories.length > 0 && (
+                      <div className="py-3">
+                        <dt className="sr-only">Accessories selected</dt>
+                        <dd>
+                          <ul className="flex flex-wrap gap-1.5">
+                            {selectedAccessories.map((a) => (
+                              <li key={a.id}>
+                                <button
+                                  type="button"
+                                  onClick={() => cfg.toggleAccessory(a.id)}
+                                  className="inline-flex h-8 items-center gap-1.5 rounded-full border border-white/15 px-3 text-[12px] text-bone/80 hover:border-white/40"
+                                  aria-label={`Remove ${a.name}`}
+                                >
+                                  {a.name}
+                                  <span aria-hidden className="text-bone/45">×</span>
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                        </dd>
+                      </div>
+                    )}
                     <div className="flex items-baseline justify-between gap-4 py-3">
                       <dt className="text-bone/60">Availability</dt>
                       <dd>

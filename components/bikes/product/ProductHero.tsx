@@ -74,8 +74,8 @@ export function ProductHero() {
         {/* name */}
         <h1
           id="product-title"
-          className="mt-4 text-center font-display-wide leading-[0.84] md:mt-6"
-          style={{ fontSize: `min(11rem, calc((min(100vw, 88rem) - 2.5rem) / ${(letters * 0.78).toFixed(2)}))` }}
+          className="mt-4 whitespace-nowrap text-center font-display-wide leading-[0.84] md:mt-6"
+          style={{ fontSize: `min(11rem, calc((min(100vw, 88rem) - 2.5rem) / ${(letters * 0.9 + 0.4).toFixed(2)}))` }}
         >
           <span className="sr-only">Honda </span>
           <motion.span
@@ -116,13 +116,15 @@ export function ProductHero() {
                   transition={{ duration: 0.6, ease }}
                 >
                   <BikeVisual bike={bike} color={color} priority sizes="(min-width: 1024px) 64rem, 100vw" />
-                  {/* floor reflection */}
+                  {/* floor reflection — geometry tuned to the silhouette's ground line */}
+                  {!bike.heroImage && (
                   <div
                     className="pointer-events-none -mt-[12.5%] -scale-y-100 opacity-30 [mask-image:linear-gradient(to_top,black,transparent_38%)]"
                     aria-hidden
                   >
                     <BikeVisual bike={bike} color={color} sizes="(min-width: 1024px) 64rem, 100vw" />
                   </div>
+                  )}
                 </motion.div>
               </AnimatePresence>
             </div>
@@ -131,7 +133,7 @@ export function ProductHero() {
         </div>
 
         {/* deck */}
-        <div className="relative -mt-[14%] grid gap-8 border-t border-white/10 pt-6 sm:-mt-[12%] md:pt-8 lg:grid-cols-12 lg:items-center">
+        <div className={cn("relative grid gap-8 border-t border-white/10 pt-6 md:pt-8 lg:grid-cols-12 lg:items-center", bike.heroImage ? "mt-6" : "-mt-[14%] sm:-mt-[12%]")}>
           <div className="lg:col-span-4">
             <p className="text-sm text-bone/55">Starting</p>
             <p className="mt-1 flex flex-wrap items-baseline gap-x-2">

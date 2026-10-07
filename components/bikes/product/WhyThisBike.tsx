@@ -26,16 +26,20 @@ export function WhyThisBike({ index = "01" }: { index?: string }) {
   const uid = useId();
   const [active, setActive] = useState(0);
   const rail = useRef<HTMLDivElement>(null);
-  const lockUntil = useRef(0);
+  const locked = useRef(false);
   const spots = useMemo(() => hotspotLayout(bike), [bike]);
   const features = bike.features;
   const f = features[active];
+  // Hotspot anchors are tuned for the studio silhouette. With real photography
+  // the feature list/rail carries the story and on-image hotspots are omitted.
+  const hotspots = !bike.heroImage;
   const spot = spots[active];
 
   function select(i: number, scrollRail = true) {
     setActive(i);
     if (!scrollRail) return;
-    lockUntil.current = performance.now() + 700;
+    locked.current = true;
+    window.setTimeout(() => (locked.current = false), 700);
     const el = rail.current?.children[i] as HTMLElement | undefined;
     if (el && rail.current && getComputedStyle(rail.current).display !== "none") {
       rail.current.scrollTo({ left: el.offsetLeft - parseFloat(getComputedStyle(rail.current).paddingLeft), behavior: reduce ? "auto" : "smooth" });
@@ -44,7 +48,7 @@ export function WhyThisBike({ index = "01" }: { index?: string }) {
 
   function onRailScroll() {
     const r = rail.current;
-    if (!r || performance.now() < lockUntil.current) return;
+    if (!r || locked.current) return;
     const cards = Array.from(r.children) as HTMLElement[];
     const centre = r.scrollLeft + r.clientWidth / 2;
     let best = 0;
@@ -73,6 +77,7 @@ export function WhyThisBike({ index = "01" }: { index?: string }) {
               <div className="studio-glow pointer-events-none absolute inset-0" aria-hidden />
               <div className="relative">
                 <BikeVisual bike={bike} color={color} sizes="(min-width: 1024px) 60vw, 100vw" />
+                {hotspots && (
                 <ul className="absolute inset-0" aria-label="Feature hotspots">
                   {features.map((feat, i) => {
                     const s = spots[i];
@@ -105,7 +110,9 @@ export function WhyThisBike({ index = "01" }: { index?: string }) {
                     );
                   })}
                 </ul>
+                )}
                 {/* desktop callout next to the active hotspot */}
+                {hotspots && (
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={f.id}
@@ -124,9 +131,12 @@ export function WhyThisBike({ index = "01" }: { index?: string }) {
                     {f.title}
                   </motion.div>
                 </AnimatePresence>
+                )}
               </div>
             </div>
-            <p className="eyebrow mt-4 text-center text-bone/35 lg:text-left">Tap a number to explore · Studio illustration</p>
+            <p className="eyebrow mt-4 text-center text-bone/35 lg:text-left">
+              {hotspots ? "Tap a number to explore · Studio illustration" : "Select a feature to explore"}
+            </p>
           </div>
 
           {/* desktop list */}

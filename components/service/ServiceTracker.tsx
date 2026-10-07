@@ -117,12 +117,12 @@ export function ServiceTracker({ initialQuery = "" }: ServiceTrackerProps) {
           compact ? "pb-8 md:pb-12" : "pb-16 md:pb-24",
         )}
       >
-        <div className="container-x relative grid gap-10 lg:grid-cols-[1fr_minmax(0,32rem)] lg:items-end lg:gap-20">
+        <div className="container-x relative grid grid-cols-1 gap-10 lg:grid-cols-[1fr_minmax(0,32rem)] lg:items-end lg:gap-20">
           <div>
             <p className="eyebrow mb-5 flex items-center gap-3 opacity-70">
               <Icon name="clock" size={14} />
               Service tracking
-              {isDemoMode && <DemoBadge className="ml-1" />}
+              {isDemoMode && result.status !== "found" && <DemoBadge className="ml-1" />}
             </p>
             <h1 className="font-display text-display-lg">
               <HeroTitle lines={["Track your", "service."]} />
@@ -134,7 +134,7 @@ export function ServiceTracker({ initialQuery = "" }: ServiceTrackerProps) {
             )}
           </div>
 
-          <form onSubmit={search} noValidate role="search" aria-label="Track a service">
+          <form onSubmit={search} noValidate role="search" aria-label="Track a service" className="min-w-0">
             <label htmlFor={inputId} className="mb-2.5 block text-sm font-medium">
               Registration or job card number
             </label>
@@ -157,7 +157,7 @@ export function ServiceTracker({ initialQuery = "" }: ServiceTrackerProps) {
                   inputError && "border-alert",
                 )}
               />
-              <Button type="submit" size="lg" variant="light" loading={result.status === "loading"} className="px-6">
+              <Button type="submit" size="lg" variant="light" loading={result.status === "loading"} className="shrink-0 px-6">
                 Track
               </Button>
             </div>

@@ -4,6 +4,10 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import type { Bike, BikeColor } from "@/lib/types";
 import { BikeVisual } from "@/components/bikes/BikeVisual";
 import { cn } from "@/lib/format";
+import { accessories as catalogue } from "@/data/accessories";
+
+/** True when licensed photography replaces the silhouette (accessories are then not drawn). */
+export const hasPhoto = (bike: Bike, color?: BikeColor) => !!((color ?? bike.colors[0])?.image ?? bike.heroImage);
 
 /** Accessories the studio silhouette can actually draw. Others are "not pictured". */
 export const DRAWABLE_ACCESSORIES = new Set([
@@ -40,7 +44,9 @@ export function AccessoryStudio({
   priority?: boolean;
 }) {
   const reduce = useReducedMotion();
-  const drawn = accessoryIds.filter((id) => DRAWABLE_ACCESSORIES.has(id)).sort();
+  const photo = hasPhoto(bike, color);
+  const drawn = photo ? [] : accessoryIds.filter((id) => DRAWABLE_ACCESSORIES.has(id)).sort();
+  const fittedNames = photo ? catalogue.filter((a) => accessoryIds.includes(a.id)).map((a) => a.name) : [];
   const buildKey = `${bike.slug}:${color?.id ?? ""}:${drawn.join(",")}`;
 
   return (
@@ -72,6 +78,16 @@ export function AccessoryStudio({
           </motion.div>
         </AnimatePresence>
       </div>
+      {/* Photography can't show accessories, so list them on the stage instead. */}
+      {fittedNames.length > 0 && (
+        <ul aria-label="Fitted accessories" className="absolute inset-x-0 bottom-16 flex flex-wrap gap-1.5 px-5 md:bottom-20 md:px-7">
+          {fittedNames.map((n) => (
+            <li key={n} className="rounded-full border border-white/15 bg-ink/60 px-3 py-1 text-xs text-bone/80 backdrop-blur-md">
+              + {n}
+            </li>
+          ))}
+        </ul>
+      )}
       {children}
     </div>
   );

@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { accessories as catalogue, accessoryCategoryLabels } from "@/data/accessories";
 import { bikes, getBike, startingPrice } from "@/data/bikes";
 import type { Accessory, AccessoryCategory, Bike } from "@/lib/types";
-import { BikeSilhouette } from "@/components/bikes/BikeSilhouette";
+import { BikeVisual } from "@/components/bikes/BikeVisual";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { Icon, WhatsAppGlyph } from "@/components/ui/Icon";
@@ -15,7 +15,7 @@ import { useLeads } from "@/components/leads/LeadProvider";
 import { track } from "@/lib/analytics";
 import { whatsappUrl } from "@/lib/whatsapp";
 import { cn, formatINR } from "@/lib/format";
-import { AccessoryStudio, DRAWABLE_ACCESSORIES } from "./AccessoryStudio";
+import { AccessoryStudio, DRAWABLE_ACCESSORIES, hasPhoto } from "./AccessoryStudio";
 
 const CATEGORY_ORDER: AccessoryCategory[] = ["protection", "comfort", "touring", "styling", "utility"];
 const DISCLAIMER = "Indicative prices for genuine accessories; fitment and availability vary by model.";
@@ -40,7 +40,7 @@ export function AccessoryConfigurator({ initialBikeSlug }: { initialBikeSlug?: s
 
   const bike = getBike(slug) ?? bikes[0];
   const color = bike.colors.find((c) => c.id === colorId) ?? bike.colors[0];
-  const available = useMemo(() => fitsBike(bike), [bike]);
+  const available = fitsBike(bike);
   const categories = CATEGORY_ORDER.filter((c) => available.some((a) => a.category === c));
   const activeFilter = filter !== "all" && !categories.includes(filter) ? "all" : filter;
   const visible = activeFilter === "all" ? available : available.filter((a) => a.category === activeFilter);
@@ -50,6 +50,7 @@ export function AccessoryConfigurator({ initialBikeSlug }: { initialBikeSlug?: s
   const total = chosen.reduce((s, a) => s + a.price, 0);
   const bikeFrom = startingPrice(bike);
   const list = chosen.map((a) => a.name).join(", ");
+  const photo = hasPhoto(bike, color);
 
   const pickerRef = useRef<HTMLDivElement>(null);
   // Bring a deep-linked (?bike=) model into view inside the horizontal picker.
@@ -154,12 +155,10 @@ export function AccessoryConfigurator({ initialBikeSlug }: { initialBikeSlug?: s
                         onChange={() => chooseBike(b.slug)}
                         className="sr-only"
                       />
-                      <BikeSilhouette
-                        shape={b.silhouette}
-                        color={b.colors[0]?.hex}
-                        accent={b.colors[0]?.accent}
-                        className={cn("h-auto w-full transition-opacity duration-300", on ? "opacity-100" : "opacity-55 group-hover:opacity-85")}
-                        title={`Honda ${b.name}`}
+                      <BikeVisual
+                        bike={b}
+                        sizes="140px"
+                        className={cn("w-full transition-opacity duration-300", on ? "opacity-100" : "opacity-55 group-hover:opacity-85")}
                       />
                       <span className="mt-1 flex items-center justify-between gap-2">
                         <span className="truncate text-sm font-medium">{b.name}</span>
@@ -231,7 +230,9 @@ export function AccessoryConfigurator({ initialBikeSlug }: { initialBikeSlug?: s
                   </div>
                 </AccessoryStudio>
                 <p className="mt-3 text-xs leading-relaxed text-bone/45">
-                  Studio illustration. Parts marked &ldquo;not pictured&rdquo; are included in your build but not drawn.
+                  {photo
+                    ? "Accessories aren\u2019t shown on product photography — your build sheet lists everything you\u2019ve added."
+                    : "Studio illustration. Parts marked \u201cnot pictured\u201d are included in your build but not drawn."}
                 </p>
               </div>
             </div>
@@ -290,7 +291,7 @@ export function AccessoryConfigurator({ initialBikeSlug }: { initialBikeSlug?: s
                           <span className="min-w-0 flex-1">
                             <span className="eyebrow flex items-center gap-2 text-bone/45">
                               {accessoryCategoryLabels[a.category]}
-                              {!DRAWABLE_ACCESSORIES.has(a.id) && <span className="text-bone/30">· not pictured</span>}
+                              {!photo && !DRAWABLE_ACCESSORIES.has(a.id) && <span className="text-bone/30">· not pictured</span>}
                             </span>
                             <span className="mt-1.5 block text-[17px] font-medium leading-snug">{a.name}</span>
                             <span className="mt-1 block text-sm leading-relaxed text-bone/55">{a.description}</span>

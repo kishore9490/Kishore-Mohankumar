@@ -375,7 +375,7 @@ function Result({
             </motion.div>
             <p className="eyebrow relative mt-2 flex items-center justify-between text-bone/45">
               <span>{categoryLabels[b.category]}</span>
-              <span>Studio illustration</span>
+              <span>{b.heroImage ? "" : "Studio illustration"}</span>
             </p>
           </div>
         </div>
