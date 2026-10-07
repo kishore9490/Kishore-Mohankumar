@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { forwardRef, useRef, type ComponentProps, type ReactNode } from "react";
+import { forwardRef, type ComponentProps, type ReactNode } from "react";
 import { cn } from "@/lib/format";
 import { Icon, type IconName } from "./Icon";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
@@ -57,25 +57,20 @@ function Inner({ icon, iconLeft, loading, children }: Pick<Common, "icon" | "ico
 }
 
 function useMagnet(enabled: boolean) {
-  const ref = useRef<HTMLElement | null>(null);
   const reduced = usePrefersReducedMotion();
-  const active = enabled && !reduced;
+  if (!enabled || reduced) return { onPointerMove: undefined, onPointerLeave: undefined };
   return {
-    ref,
-    onPointerMove: active
-      ? (e: React.PointerEvent<HTMLElement>) => {
-          if (e.pointerType !== "mouse" || !ref.current) return;
-          const r = ref.current.getBoundingClientRect();
-          const x = (e.clientX - r.left - r.width / 2) * 0.18;
-          const y = (e.clientY - r.top - r.height / 2) * 0.28;
-          ref.current.style.transform = `translate(${x}px, ${y}px)`;
-        }
-      : undefined,
-    onPointerLeave: active
-      ? () => {
-          if (ref.current) ref.current.style.transform = "";
-        }
-      : undefined,
+    onPointerMove: (e: React.PointerEvent<HTMLElement>) => {
+      if (e.pointerType !== "mouse") return;
+      const el = e.currentTarget;
+      const r = el.getBoundingClientRect();
+      const x = (e.clientX - r.left - r.width / 2) * 0.18;
+      const y = (e.clientY - r.top - r.height / 2) * 0.28;
+      el.style.transform = `translate(${x}px, ${y}px)`;
+    },
+    onPointerLeave: (e: React.PointerEvent<HTMLElement>) => {
+      e.currentTarget.style.transform = "";
+    },
   };
 }
 
@@ -86,11 +81,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   const m = useMagnet(!!magnetic);
   return (
     <button
-      ref={(el) => {
-        m.ref.current = el;
-        if (typeof forwarded === "function") forwarded(el);
-        else if (forwarded) forwarded.current = el;
-      }}
+      ref={forwarded}
       onPointerMove={m.onPointerMove}
       onPointerLeave={m.onPointerLeave}
       className={cn(base, variants[variant], sizes[size], className)}
@@ -126,9 +117,6 @@ export function ButtonLink({
   if (external || /^(https?:|tel:|mailto:)/.test(href)) {
     return (
       <a
-        ref={(el) => {
-          m.ref.current = el;
-        }}
         href={href}
         className={cls}
         onPointerMove={m.onPointerMove}
@@ -142,9 +130,6 @@ export function ButtonLink({
   }
   return (
     <Link
-      ref={(el) => {
-        m.ref.current = el;
-      }}
       href={href}
       className={cls}
       onPointerMove={m.onPointerMove}

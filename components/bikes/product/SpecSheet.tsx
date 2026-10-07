@@ -64,8 +64,8 @@ export function SpecSheet({ bike, index = "02" }: { bike: Bike; index?: string }
               className="flex flex-col border-b border-current/10 py-7 pr-4 even:border-l even:pl-5 md:py-10 lg:border-b-0 lg:border-l lg:pl-8 lg:first:border-l-0 lg:first:pl-0"
             >
               <dt className="eyebrow order-1 opacity-55">{st.label}</dt>
-              <dd className="order-2 mt-4 flex items-baseline gap-1.5">
-                <StatNumber value={st.value} decimals={st.decimals} className="font-display-wide tabular text-[clamp(2.6rem,1.6rem+4vw,5.5rem)] leading-none" />
+              <dd className="order-2 mt-4 flex flex-wrap items-baseline gap-x-1.5">
+                <StatNumber value={st.value} decimals={st.decimals} className="font-display-wide tabular text-[clamp(2.1rem,1.1rem+4.4vw,5.5rem)] leading-none" />
                 <span className="text-base font-medium opacity-60 md:text-lg">{st.unit}</span>
               </dd>
               {st.note && <dd className="order-3 mt-2 text-[13px] opacity-55">{st.note}</dd>}

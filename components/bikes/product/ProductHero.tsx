@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import { categoryLabels, startingPrice } from "@/data/bikes";
 import { track } from "@/lib/analytics";
 import { whatsappUrl } from "@/lib/whatsapp";
@@ -38,6 +38,26 @@ export function ProductHero() {
   }, [setHeroInView]);
 
   const letters = bike.name.length;
+  const nameRef = useRef<HTMLHeadingElement>(null);
+  const baseFont = `min(10rem, calc((min(100vw, 88rem) - 2.5rem) / ${(letters * 0.8 + 0.3).toFixed(2)}))`;
+
+  // Fit the name to one line: the CSS estimate is per-character, so wide
+  // glyphs (M, W, H) can overflow — measure and scale down if needed.
+  useLayoutEffect(() => {
+    const el = nameRef.current;
+    if (!el) return;
+    const fit = () => {
+      el.style.fontSize = baseFont;
+      const line = el.querySelector<HTMLElement>("[data-name]");
+      if (!line) return;
+      const ratio = el.clientWidth / line.scrollWidth;
+      if (ratio < 1) el.style.fontSize = `${parseFloat(getComputedStyle(el).fontSize) * ratio * 0.98}px`;
+    };
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [baseFont]);
   const ease = [0.16, 1, 0.3, 1] as const;
 
   return (
@@ -74,14 +94,16 @@ export function ProductHero() {
         {/* name */}
         <h1
           id="product-title"
+          ref={nameRef}
           className="mt-4 whitespace-nowrap text-center font-display-wide leading-[0.84] md:mt-6"
-          style={{ fontSize: `min(10rem, calc((min(100vw, 88rem) - 2.5rem) / ${(letters * 0.74 + 0.3).toFixed(2)}))` }}
+          style={{ fontSize: baseFont }}
         >
           <span className="sr-only">Honda </span>
           <motion.span
-            className="block"
-            initial={{ opacity: 0, y: reduce ? 0 : "0.25em", letterSpacing: reduce ? "-0.03em" : "0.04em" }}
-            animate={{ opacity: 1, y: 0, letterSpacing: "-0.03em" }}
+            data-name
+            className="inline-block"
+            initial={{ opacity: 0, y: reduce ? 0 : "0.25em" }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, ease }}
           >
             {bike.name}

@@ -648,15 +648,18 @@ const inventory: Bike[] = [
 type Media = Record<string, { hero?: string; colors: Record<string, string> }>;
 
 /** Inventory merged with photography found in /public/bikes (see scripts/media-manifest.mjs). */
-export const bikes: Bike[] = inventory.map((bike) => {
-  const m = (media as Media)[bike.slug];
-  if (!m) return bike;
-  return {
-    ...bike,
-    heroImage: bike.heroImage ?? m.hero ?? Object.values(m.colors)[0],
-    colors: bike.colors.map((c) => ({ ...c, image: c.image ?? m.colors[c.id] })),
-  };
-});
+export const bikes: Bike[] = inventory
+  .map((bike) => {
+    const m = (media as Media)[bike.slug];
+    if (!m) return bike;
+    return {
+      ...bike,
+      heroImage: bike.heroImage ?? m.hero ?? Object.values(m.colors)[0],
+      colors: bike.colors.map((c) => ({ ...c, image: c.image ?? m.colors[c.id] })),
+    };
+  })
+  // Models with real photography lead every listing.
+  .sort((a, b) => Number(!!b.heroImage) - Number(!!a.heroImage));
 
 export const categoryLabels: Record<BikeCategory, string> = {
   scooter: "Scooter",
