@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="48" viewBox="0 0 200 48" role="img" aria-label="EMC placeholder logo — replace with official logo">
+  <title>EMC (placeholder — replace with official logo)</title>
+  <rect x="1" y="7" width="34" height="34" rx="8" fill="none" stroke="#071a33" stroke-width="2"/>
+  <path d="M10 24h6l3-7 4 14 3-7h3" fill="none" stroke="#12b5d4" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="46" y="27" font-family="Helvetica, Arial, sans-serif" font-size="22" font-weight="700" letter-spacing="1" fill="#071a33">EMC</text>
+  <text x="46" y="40" font-family="Helvetica, Arial, sans-serif" font-size="6.6" letter-spacing="0.4" fill="#52637a">EXPERTS MEDICAL CODING ACADEMY</text>
+</svg>
