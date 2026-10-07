@@ -1,6 +1,12 @@
 "use client";
 
-import { useId, type ComponentProps, type ReactNode } from "react";
+import { useId, useSyncExternalStore, type ComponentProps, type ReactNode } from "react";
+
+const noop = () => () => {};
+/** True only in the browser — avoids date/locale hydration mismatches. */
+function useIsClient() {
+  return useSyncExternalStore(noop, () => true, () => false);
+}
 import { cn, formatSlot } from "@/lib/format";
 import { Icon } from "./Icon";
 
@@ -255,11 +261,14 @@ export function DateStrip({
   error?: string | null;
   count?: number;
 }) {
-  const dates = upcomingDates(count);
+  const isClient = useIsClient();
+  const dates = isClient ? upcomingDates(count) : [];
   return (
     <fieldset className="min-w-0">
       <legend className="mb-3 text-sm font-medium">{legend}</legend>
-      <div className="no-scrollbar -mx-1 flex snap-x gap-2 overflow-x-auto px-1 pb-1">
+      <div className="no-scrollbar -mx-1 flex min-h-[5.6rem] snap-x gap-2 overflow-x-auto px-1 pb-1">
+        {!isClient &&
+          Array.from({ length: 7 }).map((_, i) => <div key={i} className="h-[5.4rem] w-[4.25rem] shrink-0 animate-pulse rounded-2xl bg-current/[0.06]" />)}
         {dates.map((iso) => {
           const d = new Date(`${iso}T00:00:00`);
           const disabled = isDisabled?.(iso);

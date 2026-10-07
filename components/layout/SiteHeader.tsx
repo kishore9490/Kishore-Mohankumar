@@ -18,6 +18,8 @@ export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
   const { openOnRoadPrice } = useLeads();
+  // Pages whose first section is a dark studio can start with a transparent header.
+  const darkTop = pathname === "/" || pathname.startsWith("/bikes/") || pathname === "/test-ride";
 
   useEffect(() => {
     let last = window.scrollY;
@@ -37,7 +39,7 @@ export function SiteHeader() {
     <header
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-[transform,background-color,border-color] duration-500 ease-[var(--ease-out-expo)]",
-        scrolled ? "border-b border-white/[0.07] bg-ink/80 backdrop-blur-xl backdrop-saturate-150" : "border-b border-transparent",
+        scrolled || !darkTop ? "border-b border-white/[0.07] bg-ink/80 backdrop-blur-xl backdrop-saturate-150" : "border-b border-transparent",
         hidden && "-translate-y-full",
       )}
     >

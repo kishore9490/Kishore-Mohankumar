@@ -21,6 +21,8 @@ import type { GarageProfile, LeadReceipt, LeadRequest, ServiceJob, Vehicle } fro
 
 const BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
 export const isDemoMode = !BASE;
+/** Demo mode only: submitting with this mobile number simulates a server failure. */
+export const DEMO_FAILURE_MOBILE = "9000000000";
 
 export class ApiError extends Error {
   constructor(
@@ -79,7 +81,7 @@ export async function submitLead(lead: LeadRequest): Promise<LeadReceipt> {
 
   await wait(900);
   // Demo hook: this number simulates a server failure so error states can be reviewed.
-  if (lead.mobile.endsWith("0000000000")) {
+  if (lead.mobile.endsWith(DEMO_FAILURE_MOBILE)) {
     throw new ApiError("We couldn't send your request just now. Please try again, or call us directly.", "server");
   }
   return { reference: reference(prefixes[lead.type]), receivedAt: payload.createdAt };

@@ -1,11 +1,13 @@
 import { dealership } from "@/data/dealership";
 
-export type WhatsAppIntent = "sales" | "service" | "bike" | "directions" | "accessories" | "general";
+export type WhatsAppIntent = "sales" | "service" | "bike" | "test_ride" | "directions" | "accessories" | "general";
 
 export function whatsappMessage(intent: WhatsAppIntent, context?: string) {
   switch (intent) {
     case "bike":
       return `Hi ${dealership.shortName}, I'm interested in the Honda ${context}. Could you share the on-road price and availability?`;
+    case "test_ride":
+      return `Hi ${dealership.shortName}, I've requested a test ride${context ? ` (${context})` : ""}. Could you confirm my slot?`;
     case "sales":
       return `Hi ${dealership.shortName}, I'd like to talk to your sales team about a new Honda.`;
     case "service":

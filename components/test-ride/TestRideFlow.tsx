@@ -440,7 +440,8 @@ export function TestRideFlow({ initialBike, initialVariant, initialColor, source
                       </div>
                     }
                   >
-                    {state.message} Your details are saved.
+                    {state.message}
+                    {!/details/i.test(state.message) && " Your details are saved — just try again."}
                   </Notice>
                 )}
               </div>

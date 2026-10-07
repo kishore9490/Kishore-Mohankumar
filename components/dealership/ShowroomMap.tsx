@@ -7,10 +7,8 @@ import { ButtonLink, Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { track } from "@/lib/analytics";
 import { cn } from "@/lib/format";
+import { directionsUrl, mapEmbedUrl } from "./links";
 
-const { lat, lng } = dealership.geo;
-export const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
-const embedUrl = `https://www.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
 
 /* Deterministic street network for the stylised map (800 × 600). */
 const MINOR_V = [70, 150, 215, 300, 360, 470, 540, 610, 690, 760];
@@ -28,9 +26,9 @@ export function ShowroomMap({ className, source = "dealership" }: { className?: 
     <div className={cn("relative isolate overflow-hidden rounded-[28px] border border-white/[0.08] bg-ink-2 text-bone", className)}>
       {live ? (
         <iframe
-          src={embedUrl}
+          src={mapEmbedUrl}
           title={`Map showing ${dealership.name}, ${dealership.address.city}`}
-          className="absolute inset-0 size-full border-0 grayscale-[0.35]"
+          className="absolute inset-0 size-full border-0 bg-ink-2 grayscale-[0.35]"
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
           allowFullScreen

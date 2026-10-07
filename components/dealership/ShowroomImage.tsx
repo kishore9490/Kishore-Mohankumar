@@ -45,16 +45,14 @@ export function ShowroomImage({ className, sizes = "(min-width: 1024px) 40vw, 10
           ))}
           <line x1="90" y1="300" x2="710" y2="290" strokeOpacity="0.08" />
         </g>
-        {/* bikes on the floor, as abstract wheel pairs */}
-        <g fill="none" stroke="#efece6" strokeOpacity="0.22" strokeWidth="3">
-          {[170, 380, 590].map((x) => (
-            <g key={x}>
-              <circle cx={x} cy={404} r={22} />
-              <circle cx={x + 74} cy={404} r={22} />
-              <path d={`M ${x} 404 L ${x + 30} 378 L ${x + 60} 378 L ${x + 74} 404`} strokeOpacity="0.14" />
-            </g>
-          ))}
-        </g>
+        {/* display plinths under ceiling spots */}
+        {[200, 400, 600].map((x) => (
+          <g key={x}>
+            <path d={`M ${x - 8} ${180 - ((x - 90) / 620) * 26} L ${x + 8} ${180 - ((x - 90) / 620) * 26} L ${x + 70} 410 L ${x - 70} 410 Z`} fill="#fff6e6" fillOpacity="0.045" />
+            <circle cx={x} cy={178 - ((x - 90) / 620) * 26} r="3" fill="#fff6e6" fillOpacity="0.7" />
+            <ellipse cx={x} cy={414} rx="74" ry="9" fill="#efece6" fillOpacity="0.1" stroke="#efece6" strokeOpacity="0.22" />
+          </g>
+        ))}
         {/* ground + reflection */}
         <line x1="0" y1="430" x2="800" y2="430" stroke="#efece6" strokeOpacity="0.25" />
         <rect x="90" y="431" width="620" height="120" fill="url(#sr-floor)" />

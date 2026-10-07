@@ -4,8 +4,8 @@ import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect, useId, useRef, useState } from "react";
 import { BikeVisual } from "@/components/bikes/BikeVisual";
-import { Button, ButtonLink } from "@/components/ui/Button";
-import { ChoiceGroup, DateStrip, StepProgress, TextArea, TextField, upcomingDates } from "@/components/ui/Field";
+import { Button } from "@/components/ui/Button";
+import { ChoiceGroup, StepProgress, TextArea, TextField, upcomingDates } from "@/components/ui/Field";
 import { Icon } from "@/components/ui/Icon";
 import { DemoBadge, Notice } from "@/components/ui/Notice";
 import { SuccessMark, SummaryList } from "@/components/ui/SuccessMark";
@@ -82,6 +82,7 @@ export function ServiceBookingFlow({ initialRegistration = "", initialServiceId,
   const topRef = useRef<HTMLDivElement>(null);
   const firstRender = useRef(true);
   const slotReq = useRef(0);
+  const lookupReq = useRef(0);
 
   function markStarted() {
     if (started.current) return;
@@ -115,15 +116,18 @@ export function ServiceBookingFlow({ initialRegistration = "", initialServiceId,
     const err = validators.registration(reg);
     setErrors((e) => ({ ...e, reg: err }));
     if (err) return;
+    const req = ++lookupReq.current;
     setLookup({ status: "loading" });
     setConfirmed(null);
     setModel(null);
     setLive("Looking up your bike…");
     try {
       const v = await lookupVehicle(reg);
+      if (req !== lookupReq.current) return;
       setLookup({ status: "found", vehicle: v });
       setLive(`Found a Honda ${v.bikeName} in ${v.colorName}. Please confirm it's yours.`);
     } catch (e) {
+      if (req !== lookupReq.current) return;
       if (e instanceof ApiError && e.code === "not_found") {
         setLookup({ status: "not_found" });
         setLive("We don't have this bike on record yet. Please choose your model.");
@@ -139,7 +143,8 @@ export function ServiceBookingFlow({ initialRegistration = "", initialServiceId,
     markStarted();
     setReg(v.toUpperCase());
     if (errors.reg) setErrors((e) => ({ ...e, reg: null }));
-    if (lookup.status !== "idle" && lookup.status !== "loading") {
+    if (lookup.status !== "idle") {
+      lookupReq.current++;
       setLookup({ status: "idle" });
       setConfirmed(null);
       setModel(null);
@@ -511,7 +516,7 @@ export function ServiceBookingFlow({ initialRegistration = "", initialServiceId,
             {step === 2 && (
               <div className="mt-7 flex flex-col gap-8">
                 <div>
-                  <DateStrip legend="Day" name={`${uid}-date`} value={date} onChange={pickDate} isDisabled={isWorkshopClosed} error={errors.date} />
+                  <DayStrip name={`${uid}-date`} value={date} onChange={pickDate} error={errors.date} />
                   <p className="mt-2.5 flex items-center gap-1.5 text-[13px] opacity-55">
                     <Icon name="info" size={14} />
                     Workshop closed on Sundays
@@ -766,8 +771,8 @@ function SlotPicker({
                   <label
                     key={s.slot}
                     className={cn(
-                      "flex h-11 cursor-pointer items-center justify-center rounded-full border text-sm tabular transition-colors duration-200 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-signal",
-                      on ? "border-current bg-current text-[color:var(--surface-bg,var(--color-ink))]" : "border-current/15 hover:border-current/40",
+                      "relative flex h-11 cursor-pointer items-center justify-center rounded-full border text-sm tabular transition-colors duration-200 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-signal",
+                      on ? "border-ink bg-ink text-paper" : "border-current/15 hover:border-current/40",
                       !s.available && "pointer-events-none line-through opacity-30",
                     )}
                   >
@@ -778,7 +783,7 @@ function SlotPicker({
                       checked={on}
                       disabled={!s.available}
                       onChange={() => onChange(s.slot)}
-                      className="sr-only"
+                      className="absolute inset-0 size-full cursor-pointer opacity-0"
                       aria-label={`${formatSlot(s.slot)}${s.available ? "" : " — fully booked"}`}
                     />
                     {formatSlot(s.slot)}
@@ -788,6 +793,56 @@ function SlotPicker({
             </div>
           </div>
         ))}
+      </div>
+      {error && (
+        <p className="mt-2 flex items-center gap-1.5 text-[13px] text-alert" role="alert">
+          <Icon name="alert" size={14} />
+          {error}
+        </p>
+      )}
+    </fieldset>
+  );
+}
+
+/**
+ * Day picker (local variant of the shared DateStrip with an explicit
+ * ink-on-paper selected state). Sundays are disabled — workshop closed.
+ */
+function DayStrip({ name, value, onChange, error }: { name: string; value: string | null; onChange: (d: string) => void; error?: string | null }) {
+  const dates = upcomingDates(14);
+  return (
+    <fieldset className="min-w-0">
+      <legend className="mb-3 text-sm font-medium">Day</legend>
+      <div className="no-scrollbar -mx-1 flex snap-x gap-2 overflow-x-auto px-1 py-1">
+        {dates.map((iso) => {
+          const d = new Date(`${iso}T00:00:00`);
+          const closed = isWorkshopClosed(iso);
+          const on = value === iso;
+          return (
+            <label
+              key={iso}
+              className={cn(
+                "relative flex w-[4.25rem] shrink-0 snap-start cursor-pointer flex-col items-center gap-0.5 rounded-2xl border py-3 transition-colors duration-200 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-signal",
+                on ? "border-ink bg-ink text-paper" : "border-current/15 hover:border-current/40",
+                closed && "pointer-events-none border-dashed opacity-35",
+              )}
+            >
+              <input
+                type="radio"
+                name={name}
+                value={iso}
+                checked={on}
+                disabled={closed}
+                onChange={() => onChange(iso)}
+                className="absolute inset-0 size-full cursor-pointer opacity-0"
+                aria-label={d.toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" }) + (closed ? " — workshop closed" : "")}
+              />
+              <span className="eyebrow text-[10px] opacity-70">{d.toLocaleDateString("en-IN", { weekday: "short" })}</span>
+              <span className="font-display text-xl tabular">{d.getDate()}</span>
+              <span className="text-[11px] opacity-60">{closed ? "Closed" : d.toLocaleDateString("en-IN", { month: "short" })}</span>
+            </label>
+          );
+        })}
       </div>
       {error && (
         <p className="mt-2 flex items-center gap-1.5 text-[13px] text-alert" role="alert">

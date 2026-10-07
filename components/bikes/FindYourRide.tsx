@@ -191,7 +191,7 @@ export function FindYourRide({
                       options={budgetOptions}
                       value={filters.budget}
                       onChange={(v) => update("budget", v as BudgetId | "any")}
-                      className=legendCls
+                      className={legendCls}
                     />
                     <ChoiceGroup
                       legend="I ride for"
@@ -199,7 +199,7 @@ export function FindYourRide({
                       options={usageOptions}
                       value={filters.usage}
                       onChange={(v) => update("usage", v as DiscoveryFilters["usage"])}
-                      className=legendCls
+                      className={legendCls}
                     />
                     <ChoiceGroup
                       legend="What matters most — sort by"
@@ -207,7 +207,7 @@ export function FindYourRide({
                       options={priorityOptions}
                       value={filters.priority}
                       onChange={(v) => update("priority", v as DiscoveryFilters["priority"])}
-                      className=legendCls
+                      className={legendCls}
                     />
                   </div>
                 </>

@@ -195,6 +195,10 @@ export interface TestRideRequest extends LeadBase {
   date: string;
   slot: string;
   locationId: string;
+  /** Locality for doorstep rides. */
+  area?: string;
+  variantId?: string;
+  colorId?: string;
 }
 
 export interface OnRoadPriceRequest extends LeadBase {

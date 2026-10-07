@@ -38,7 +38,7 @@ hooks/                   shared hooks
 * UI never fetches directly. All mutations and lookups go through `lib/api.ts`. With `NEXT_PUBLIC_API_BASE_URL` unset it serves demo data with realistic latency; when set, the same functions call REST endpoints (documented at the top of the file).
 * **Demo data is labelled.** Anything served from `data/demo-service.ts` is shown with `<DemoBadge />` when `isDemoMode` is true.
 * **Never fabricate**: testimonials (`data/stories.ts`), offers (`data/offers.ts`), metrics (`dealership.metrics`) are empty/null until real values are supplied; their sections hide or render an honest placeholder.
-* Demo hooks for reviewing error states: mobile `0000000000` → submission failure; registration `TN37AB1234` → in-progress service, `TN66C4521` → ready; `TN38BZ7788` → known vehicle, no active job; Sundays → workshop closed; some slots are booked.
+* Demo hooks for reviewing error states: mobile `9000000000` → submission failure; registration `TN37AB1234` → in-progress service, `TN66C4521` → ready; `TN38BZ7788` → known vehicle, no active job; Sundays → workshop closed; some slots are booked.
 
 ## 4. Analytics
 

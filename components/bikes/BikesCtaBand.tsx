@@ -14,7 +14,7 @@ export function BikesCtaBand({
   source = "bikes_cta",
   eyebrow = "Next step",
   title = ["Ride it", "before you decide."],
-  lede = "A test ride takes about 20 minutes. Bring your licence — we'll handle the rest. Prefer numbers first? Get an exact on-road price for your city, with no obligation.",
+  lede = "Pick a time that suits you and bring your driving licence — we'll have the bike ready. Prefer numbers first? Get an exact on-road price for your city, with no obligation.",
   className,
 }: {
   bikeSlug?: string;

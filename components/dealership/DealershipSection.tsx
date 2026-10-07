@@ -7,7 +7,8 @@ import { whatsappUrl } from "@/lib/whatsapp";
 import { cn, formatPhone } from "@/lib/format";
 import type { OpeningHours } from "@/lib/types";
 import { OpenStatus } from "./OpenStatus";
-import { ShowroomMap, directionsUrl } from "./ShowroomMap";
+import { ShowroomMap } from "./ShowroomMap";
+import { directionsUrl } from "./links";
 import { ShowroomImage } from "./ShowroomImage";
 import { formatRange, parseDays } from "./hours";
 

@@ -29,7 +29,7 @@ export default async function BookServicePage({ searchParams }: { searchParams: 
 
   return (
     <section className="relative bg-ink pb-16 pt-[calc(var(--header-h)+2.5rem)] md:pb-28 md:pt-[calc(var(--header-h)+4.5rem)]">
-      <div className="container-x grid gap-10 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-20">
+      <div className="container-x grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-20">
         <header className="lg:sticky lg:top-[calc(var(--header-h)+3rem)] lg:self-start">
           <p className="eyebrow mb-5 flex items-center gap-3 opacity-70">
             <Icon name="wrench" size={14} />
@@ -61,7 +61,7 @@ export default async function BookServicePage({ searchParams }: { searchParams: 
           </div>
         </header>
 
-        <div className="surface-paper -mx-5 rounded-t-[28px] px-5 pb-6 pt-7 sm:mx-0 sm:rounded-[28px] sm:p-8 md:p-12">
+        <div className="surface-paper min-w-0 -mx-5 rounded-t-[28px] px-5 pb-6 pt-7 sm:mx-0 sm:rounded-[28px] sm:p-8 md:p-12">
           <ServiceBookingFlow initialRegistration={reg} initialServiceId={service} />
         </div>
 

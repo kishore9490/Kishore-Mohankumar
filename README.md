@@ -51,7 +51,7 @@ All reads/writes go through `lib/api.ts`. With `NEXT_PUBLIC_API_BASE_URL` unset 
 Demo helpers for reviewing states:
 
 * Service registrations: `TN 37 AB 1234` (in progress), `TN 66 C 4521` (ready), `TN 38 BZ 7788` (known bike, no active job); anything else → not found.
-* Mobile `0000000000` → simulated submission failure.
+* Mobile `9000000000` → simulated submission failure.
 * Workshop closed on Sundays; some slots show as booked.
 
 ## Analytics
