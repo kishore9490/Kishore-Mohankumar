@@ -1,4 +1,5 @@
 import type { Bike, BikeCategory, RidePriority, RideUsage } from "@/lib/types";
+import media from "./media-manifest.json";
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -15,7 +16,7 @@ import type { Bike, BikeCategory, RidePriority, RideUsage } from "@/lib/types";
  *  `heroImage` (and `colors[].image`) — the UI switches from the studio
  *  silhouette to the photograph automatically.
  */
-export const bikes: Bike[] = [
+const inventory: Bike[] = [
   {
     slug: "activa-125",
     name: "Activa 125",
@@ -474,6 +475,19 @@ export const bikes: Bike[] = [
     testRideAvailable: true,
   },
 ];
+
+type Media = Record<string, { hero?: string; colors: Record<string, string> }>;
+
+/** Inventory merged with photography found in /public/bikes (see scripts/media-manifest.mjs). */
+export const bikes: Bike[] = inventory.map((bike) => {
+  const m = (media as Media)[bike.slug];
+  if (!m) return bike;
+  return {
+    ...bike,
+    heroImage: bike.heroImage ?? m.hero ?? Object.values(m.colors)[0],
+    colors: bike.colors.map((c) => ({ ...c, image: c.image ?? m.colors[c.id] })),
+  };
+});
 
 export const categoryLabels: Record<BikeCategory, string> = {
   scooter: "Scooter",
