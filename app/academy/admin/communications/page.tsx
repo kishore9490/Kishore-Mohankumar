@@ -24,7 +24,7 @@ const STEPS = [
 ];
 
 export default async function AdminCommunicationsPage() {
-  const user = await requirePermission("communications.send");
+  const user = await requirePermission("communications.view");
   const ov = communicationsOverview();
   const total = ov.byChannel.reduce((s, c) => s + c.total, 0);
 

@@ -36,6 +36,7 @@ export type Permission =
   | "campaigns.manage"
   | "marketing.content"
   | "communications.send"
+  | "communications.view"
   | "templates.manage"
   | "analytics.view"
   | "finance.view"

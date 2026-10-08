@@ -17,7 +17,7 @@ export const metadata: Metadata = { title: "Communication center · EMC Academy"
 const PER_PAGE = 30;
 
 export default async function CommunicationsPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
-  await requirePermission("communications.send");
+  await requirePermission("communications.view");
   const raw = await searchParams;
   const channel = COMM_CHANNELS.some((c) => c.key === raw.channel) ? (raw.channel as CommChannel) : undefined;
   const status = COMM_STATUSES.includes(raw.status as CommStatus) ? (raw.status as CommStatus) : undefined;

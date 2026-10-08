@@ -25,8 +25,10 @@ export async function GET(req: Request) {
     for (const c of d.certificates.filter((c) => c.studentId === user.id && m(c.id))) out.push({ type: "Certificate", label: c.id, sub: c.status, href: "/academy/student/certificates" });
   }
   if (has("students.view") || has("users.manage")) {
+    // Without users.manage, people search is limited to students in batches this user teaches.
+    const myStudents = new Set(d.batches.filter((b) => b.facultyIds.includes(user.id)).flatMap((b) => b.studentIds));
     for (const u of d.users.filter((u) => m(u.name, u.email))) {
-      if (u.role !== "student" && !has("users.manage")) continue;
+      if (!has("users.manage") && (u.role !== "student" || !myStudents.has(u.id))) continue;
       out.push({ type: u.role === "student" ? "Student" : "User", label: u.name, sub: u.email, href: has("users.manage") ? `/academy/admin/users?q=${encodeURIComponent(u.name)}` : `/academy/faculty/students/${u.id}` });
     }
   }
@@ -37,7 +39,8 @@ export async function GET(req: Request) {
   if (has("leads.view")) for (const l of d.leads.filter((l) => m(l.name, l.email, l.phone))) out.push({ type: "Lead", label: l.name, sub: `${l.status.replace(/_/g, " ")} · ${l.source}`, href: `/academy/marketing/leads/${l.id}` });
   if (has("campaigns.manage")) for (const c of d.campaigns.filter((c) => m(c.name))) out.push({ type: "Campaign", label: c.name, sub: c.channel, href: "/academy/marketing/campaigns" });
   if (has("certificates.manage")) for (const c of d.certificates.filter((c) => m(c.id))) out.push({ type: "Certificate", label: c.id, sub: c.status, href: "/academy/admin/certificates" });
-  if (has("communications.send")) for (const c of d.communications.filter((c) => m(c.preview)).slice(0, 5)) out.push({ type: "Message", label: c.preview.slice(0, 60), sub: `${c.channel} · ${c.status}`, href: has("users.manage") ? "/academy/admin/communications" : "/academy/marketing/communications" });
+  // Message history includes leads' and students' contact history: growth team and admins only.
+  if (has("communications.view")) for (const c of d.communications.filter((c) => m(c.preview)).slice(0, 5)) out.push({ type: "Message", label: c.preview.slice(0, 60), sub: `${c.channel} · ${c.status}`, href: has("users.manage") ? "/academy/admin/communications" : "/academy/marketing/communications" });
 
   return NextResponse.json({ results: out.slice(0, 12) }, { headers: { "Cache-Control": "private, no-store" } });
 }

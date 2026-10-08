@@ -348,7 +348,7 @@ export async function toggleCampaign(form: FormData): Promise<void> {
 /* ------------------------------------------------------------------ */
 
 export async function retryCommunication(_prev: FormState, form: FormData): Promise<FormState> {
-  const g = await guard("communications.send");
+  const g = await guard("communications.view");
   if (!g.user) return { ok: false, error: g.error };
   const d = db();
   const orig = d.communications.find((c) => c.id === str(form, "id", 60));

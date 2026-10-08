@@ -57,7 +57,7 @@ export const NAV: Record<RoleKey, NavGroup[]> = {
       { label: "Campaigns", href: "/academy/marketing/campaigns", icon: "target", permission: "campaigns.manage" },
     ] },
     { label: "Engage", items: [
-      { label: "Communication center", href: "/academy/marketing/communications", icon: "message", permission: "communications.send" },
+      { label: "Communication center", href: "/academy/marketing/communications", icon: "message", permission: "communications.view" },
       { label: "Templates", href: "/academy/marketing/templates", icon: "file", permission: "templates.manage" },
       { label: "Content studio", href: "/academy/marketing/content", icon: "pen", permission: "marketing.content" },
     ] },
@@ -78,7 +78,7 @@ export const NAV: Record<RoleKey, NavGroup[]> = {
     ] },
     { label: "Growth", items: [
       { label: "Leads", href: "/academy/marketing/leads", icon: "target", permission: "leads.view" },
-      { label: "Communications", href: "/academy/admin/communications", icon: "message", permission: "communications.send" },
+      { label: "Communications", href: "/academy/admin/communications", icon: "message", permission: "communications.view" },
     ] },
     { label: "Platform", items: [
       { label: "Integrations", href: "/academy/admin/integrations", icon: "plug", permission: "integrations.manage" },
@@ -131,7 +131,7 @@ export const COMMANDS: { label: string; href: string; icon: IconName; permission
   { label: "Create announcement", href: "/academy/faculty/announcements", icon: "megaphone", permission: "communications.send", roles: ["faculty", "admin"] },
   { label: "Create assessment", href: "/academy/faculty/assessments/new", icon: "file", permission: "assessments.manage" },
   { label: "Review assignments", href: "/academy/faculty/reviews", icon: "clipboard", permission: "assignments.review" },
-  { label: "Send communication", href: "/academy/marketing/communications", icon: "message", permission: "communications.send", roles: ["marketing", "admin"] },
+  { label: "Send communication", href: "/academy/marketing/communications", icon: "message", permission: "communications.view", roles: ["marketing", "admin"] },
   { label: "View analytics", href: "/academy/marketing/analytics", icon: "chart", permission: "analytics.view" },
   { label: "Open courses", href: "/academy/admin/courses", icon: "book", permission: "courses.view", roles: ["admin"] },
   { label: "Manage users", href: "/academy/admin/users", icon: "users", permission: "users.manage" },
