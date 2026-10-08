@@ -1,6 +1,26 @@
 # EMC — Experts Medical Coding Academy
 
-Website for EMC: a professional gateway into medical coding. It's built with Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4, Motion and React Three Fiber.
+One product with two doors:
+
+- **Public website** (`app/(site)`): a professional gateway into medical coding.
+- **EMC Academy** (`app/academy`): the learning platform, with role-based experiences for **students** (learn), **faculty** (teach), **marketing** (grow) and **super admin** (operate).
+
+It's built with Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4, Motion and React Three Fiber.
+
+## EMC Academy — quick start
+
+Run `npm run dev`, open http://localhost:3000/login and click one of the **demo accounts**. Every person, lead, score and amount in demo mode is fictional.
+
+| Role | Email | Password |
+| --- | --- | --- |
+| Student | student@demo.emc | Student@2026 |
+| Faculty | faculty@demo.emc | Faculty@2026 |
+| Marketing | marketing@demo.emc | Growth@2026 |
+| Super Admin | admin@demo.emc | Admin@2026 |
+
+The role comes from the account; there's no role picker. Demo mode keeps data in memory, so changes reset when the server restarts. Demo accounts disappear once `DATABASE_URL` is set.
+
+See [`docs/PLATFORM.md`](docs/PLATFORM.md) for architecture and conventions.
 
 ```bash
 npm install
@@ -34,7 +54,43 @@ The site does not make up facts. Anything EMC hasn't confirmed shows an honest f
 | Legal pages | `app/privacy`, `app/terms`, `app/disclaimer` | Template text that needs legal review |
 | Insights articles | `data/insights.ts` | General explainers that EMC should review and attribute |
 
-## Architecture
+## Platform architecture
+
+```
+app/(site)          public website (unchanged design, now in a route group)
+app/(auth)          login, forgot/reset password
+app/academy         authenticated platform (shell + role areas)
+app/verify/[id]     public certificate verification
+app/api             leads (website → CRM), search, files (signed URLs), webhooks
+proxy.ts            optimistic auth gate for /academy
+lib/platform        domain types, permissions (RBAC), navigation, formatting
+server/auth         sessions (signed httpOnly cookie + server-side session store), passwords (scrypt), rate limiting
+server/db           store (demo in-memory) + seed  →  prisma/schema.prisma for PostgreSQL
+server/repositories read models used by screens
+server/actions      server actions (each checks a permission, validates, audits, emits events)
+server/events       domain event bus
+server/services     notification engine, communication service, templates, AI service, audit, leads
+server/jobs         background job queue (in-process; swap for BullMQ/Cloud Tasks)
+integrations/       email · whatsapp · sms · ai · storage · payments · analytics — interface + adapters
+design-system/      shared tokens + components for website and academy
+```
+
+- **Authorization is by permission, not role.** Roles are bundles of permissions (`lib/platform/rbac.ts`), and each page and action checks the permission it needs on the server.
+- **Events drive communication.** Business code emits events such as `lead.created` or `certificate.issued`. The notification engine matches templates, respects preferences, opt-in and template approval, picks the channel, and calls `CommunicationService`, which uses whichever provider adapter is configured. Business logic never names a provider.
+- **AI is provider-agnostic and permission-scoped.** `AIService` builds a minimal context from records the user may access, adds a safety preamble, returns drafts only, and logs requests without storing their content. No provider is configured, so AI features show a clear "not switched on" state.
+- **Secrets stay on the server.** Every provider credential is a server env var (see `.env.example`), and the Integrations screen shows variable names only, never values.
+
+### Going live (what's still needed)
+
+1. **Database.** Install Prisma, set `DATABASE_URL`, run the migration from `prisma/schema.prisma`, then implement `server/repositories/*` and the store writes against Prisma. The screens don't change.
+2. **Production secrets.** Set `AUTH_SECRET`.
+3. **Two-step verification for admins.** MFA is modelled (`mfaEnabled`) but not enforced. Add TOTP or your identity provider before launch.
+4. **OTP, Google and Microsoft sign-in.** Plug in an auth provider behind `server/auth`.
+5. **Providers.** Choose them (email, WhatsApp, SMS, storage, payments, AI), add their adapters in `integrations/*`, and set the env vars.
+6. **Job queue.** Swap `server/jobs/queue.ts` for a durable queue.
+7. **Rate limiting.** It's in-memory now; use a shared store such as Redis when running more than one server instance.
+
+## Website architecture
 
 ```
 app/                 routes (/, /programs, /programs/[slug], /medical-coding, /career, /faculty,

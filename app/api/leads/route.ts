@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { Lead, LeadType } from "@/lib/types";
+import { captureWebsiteLead } from "@/server/services/leads";
 
 const TYPES: LeadType[] = ["demo", "counselling", "enquiry", "contact", "quiz"];
 const clip = (v: unknown, n = 500) => (typeof v === "string" ? v.trim().slice(0, n) : undefined);
@@ -39,6 +40,16 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Please enter a valid phone number." }, { status: 422 });
   if (!lead.consent) return NextResponse.json({ error: "Please allow us to contact you." }, { status: 422 });
 
+  // Same-origin check: this endpoint only accepts submissions from the EMC website itself.
+  const origin = req.headers.get("origin");
+  if (origin && new URL(origin).host !== req.headers.get("host")) {
+    return NextResponse.json({ error: "Invalid request." }, { status: 403 });
+  }
+
+  // 1. Into the EMC Growth Center (CRM): creates or updates the lead and notifies the growth team.
+  await captureWebsiteLead(lead);
+
+  // 2. Optional mirror to an external CRM / automation tool.
   const hook = process.env.LEADS_WEBHOOK_URL;
   if (hook) {
     try {
@@ -52,8 +63,6 @@ export async function POST(req: Request) {
       console.error("[leads] webhook failed", e);
       return NextResponse.json({ error: "We couldn't submit right now. Please try again shortly." }, { status: 502 });
     }
-  } else {
-    console.info("[leads] received (no LEADS_WEBHOOK_URL configured)", { type: lead.type, source: lead.source });
   }
 
   return NextResponse.json({ ok: true });

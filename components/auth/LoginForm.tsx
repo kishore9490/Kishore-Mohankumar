@@ -1,6 +1,9 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
+import { AnimatePresence, motion } from "motion/react";
 import { useActionState, useRef, useState } from "react";
+import { site } from "@/data/site";
 import { loginAction, type LoginState } from "@/server/actions/auth";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
@@ -27,6 +30,28 @@ export function LoginForm({ next, demoAccounts }: { next: string; demoAccounts: 
 
   return (
     <>
+      {/* Brand transition: website → academy, carried by the EMC logo. */}
+      <AnimatePresence>
+        {pending && (
+          <motion.div
+            className="fixed inset-0 z-[80] flex flex-col items-center justify-center bg-white"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            role="status"
+            aria-live="polite"
+          >
+            <motion.div initial={{ scale: 0.96, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}>
+              <Image src={site.logo.src} alt={site.logo.alt} width={site.logo.width} height={site.logo.height} unoptimized={site.logo.src.endsWith(".svg")} className="h-12 w-auto" priority />
+            </motion.div>
+            <div className="mt-8 h-[2px] w-40 overflow-hidden rounded-full bg-line">
+              <motion.div className="h-full w-1/3 rounded-full bg-cyan" animate={{ x: ["-100%", "300%"] }} transition={{ duration: 1.1, repeat: Infinity, ease: "easeInOut" }} />
+            </div>
+            <p className="label mt-5">Opening EMC Academy</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <form action={action} className="grid gap-4" noValidate>
         <input type="hidden" name="next" value={next} />
         <div>
