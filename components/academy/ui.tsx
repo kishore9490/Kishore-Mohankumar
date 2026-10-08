@@ -128,7 +128,7 @@ export function Metrics({ items, className }: { items: { label: string; value: R
           <>
             <dt className="label !text-[10.5px]">{m.label}</dt>
             <dd className="mt-3 text-[30px] font-semibold leading-none tracking-[-0.03em] tabular-nums md:text-[34px]">{m.value}</dd>
-            {m.hint && <p className="mt-2 text-[12.5px] text-muted">{m.hint}</p>}
+            {m.hint && <div className="mt-2 text-[12.5px] text-muted">{m.hint}</div>}
           </>
         );
         return (

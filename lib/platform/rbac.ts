@@ -42,6 +42,7 @@ export const ALL_PERMISSIONS: { key: Permission; group: string; label: string }[
   { key: "templates.manage", group: "Communication", label: "Manage message templates" },
   { key: "analytics.view", group: "Insights", label: "View analytics" },
   { key: "finance.view", group: "Finance", label: "View finance" },
+  { key: "finance.manage", group: "Finance", label: "Record payments and send reminders" },
   { key: "audit.view", group: "Platform", label: "View audit log" },
   { key: "integrations.manage", group: "Platform", label: "Manage integrations" },
   { key: "settings.manage", group: "Platform", label: "Manage settings" },

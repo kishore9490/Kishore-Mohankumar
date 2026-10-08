@@ -152,7 +152,7 @@ export function buildSeed(): DB {
   const mk = (id: string, name: string, email: string, role: T.RoleKey, title: string | null, pwd?: string): T.User => ({
     id, name, email, phone: `+91 9${int(100000000, 999999999)}`, role, extraPermissions: [], status: "active",
     passwordHash: pwd ? hashPassword(pwd) : "!", mfaEnabled: role === "admin", title,
-    createdAt: at(-int(30, 200)), lastLoginAt: at(-int(0, 6), int(8, 19)),
+    createdAt: at(-int(30, 200)), lastLoginAt: new Date(Math.min(Date.now() - 3600_000, new Date(at(-int(0, 6), int(8, 19))).getTime())).toISOString(),
   });
   const [stu, fac, mkt, adm] = DEMO_ACCOUNTS;
   db.users.push(
@@ -461,8 +461,9 @@ export function buildSeed(): DB {
   );
 
   /* audit (seed a little history) */
+  let auditSeq = 0;
   const audit = (userId: string, action: string, objectType: string, objectId: string | null, d: number, result: T.AuditLog["result"] = "success"): T.AuditLog => ({
-    id: `aud_${db.auditLogs.length + 1}`, userId, userName: db.users.find((u) => u.id === userId)?.name ?? null, action, objectType, objectId, result, meta: {}, at: at(d, int(8, 19), int(0, 59)), ip: "203.0.113.10",
+    id: `aud_${++auditSeq}`, userId, userName: db.users.find((u) => u.id === userId)?.name ?? null, action, objectType, objectId, result, meta: {}, at: at(d, int(8, 19), int(0, 59)), ip: "203.0.113.10",
   });
   db.auditLogs.push(
     audit("u_adm_1", "certificate.issued", "Certificate", "EMC-2026-MF7K2Q", -18),

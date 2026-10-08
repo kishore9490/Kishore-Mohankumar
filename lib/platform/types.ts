@@ -39,6 +39,7 @@ export type Permission =
   | "templates.manage"
   | "analytics.view"
   | "finance.view"
+  | "finance.manage"
   | "audit.view"
   | "integrations.manage"
   | "settings.manage"
