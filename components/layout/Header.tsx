@@ -80,7 +80,7 @@ export function Header() {
         <div className="flex items-center gap-2">
           <div className="hidden xl:block">
             <ButtonLink href="/login" variant="ghost" size="sm" icon={null}>
-              Student login
+              Login
             </ButtonLink>
           </div>
           <div className="hidden sm:block">
@@ -132,7 +132,7 @@ export function Header() {
               <div className="mt-8 grid gap-3">
                 <ButtonLink href="/demo" size="lg">Book a free demo</ButtonLink>
                 <ButtonLink href="/counselling" size="lg" variant="outline">Talk to a counsellor</ButtonLink>
-                <ButtonLink href="/login" size="lg" variant="ghost" icon={null}>Student login</ButtonLink>
+                <ButtonLink href="/login" size="lg" variant="ghost" icon={null}>Login</ButtonLink>
               </div>
             </nav>
           </motion.div>

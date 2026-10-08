@@ -1,7 +1,12 @@
 import { ButtonLink } from "@/components/ui/Button";
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
 
 export default function NotFound() {
   return (
+    <>
+    <Header />
+    <main id="main">
     <section className="py-28 md:py-40">
       <div className="container-x text-center">
         <p className="code-chip inline-block rounded-md bg-ink px-2.5 py-1.5 text-cyan">404 · code not found</p>
@@ -13,5 +18,8 @@ export default function NotFound() {
         </div>
       </div>
     </section>
+    </main>
+    <Footer />
+    </>
   );
 }

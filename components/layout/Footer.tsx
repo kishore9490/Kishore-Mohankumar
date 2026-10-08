@@ -30,7 +30,7 @@ const cols = [
       { label: "Book a free demo", href: "/demo" },
       { label: "Free counselling", href: "/counselling" },
       { label: "Contact", href: "/contact" },
-      { label: "Student login", href: "/login" },
+      { label: "Academy login", href: "/login" },
     ],
   },
 ];

@@ -2,10 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { site } from "@/data/site";
 import { organizationJsonLd } from "@/lib/seo";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
-import { MobileActionBar } from "@/components/layout/MobileActionBar";
-import { WhatsAppWidget } from "@/components/layout/WhatsAppWidget";
 import { JsonLd } from "@/components/ui/JsonLd";
 import "./globals.css";
 
@@ -42,11 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${geist.variable} ${geistMono.variable}`}>
       <body className="min-h-screen bg-white">
         <JsonLd data={organizationJsonLd()} />
-        <Header />
-        <main id="main">{children}</main>
-        <Footer />
-        <MobileActionBar />
-        <WhatsAppWidget />
+        {children}
       </body>
     </html>
   );

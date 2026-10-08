@@ -1,0 +1,615 @@
+// EMC Digital Academy — PostgreSQL schema (Prisma).
+//
+// Status: production data model. The app currently runs in DEMO MODE with an
+// in-memory store (server/db/store.ts) that mirrors these models. To go live:
+//   1. npm i -D prisma && npm i @prisma/client
+//   2. set DATABASE_URL, run `npx prisma migrate dev`
+//   3. implement server/repositories/* with Prisma (screens don't change).
+//
+// Large files (videos, PDFs, submissions, certificates) live in object storage;
+// only their object keys are stored here.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ───────────────────────── Identity & access ─────────────────────────
+
+enum UserStatus {
+  active
+  disabled
+  invited
+}
+
+model Role {
+  key         String           @id // student, faculty, marketing, admin, counsellor, …
+  label       String
+  permissions RolePermission[]
+  users       User[]
+}
+
+model Permission {
+  key   String           @id // e.g. "leads.edit"
+  group String
+  label String
+  roles RolePermission[]
+  users UserPermission[]
+}
+
+model RolePermission {
+  roleKey       String
+  permissionKey String
+  role          Role       @relation(fields: [roleKey], references: [key])
+  permission    Permission @relation(fields: [permissionKey], references: [key])
+
+  @@id([roleKey, permissionKey])
+}
+
+model UserPermission {
+  userId        String
+  permissionKey String
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  permission    Permission @relation(fields: [permissionKey], references: [key])
+
+  @@id([userId, permissionKey])
+}
+
+model User {
+  id           String           @id @default(cuid())
+  name         String
+  email        String           @unique
+  phone        String?          @unique
+  roleKey      String
+  role         Role             @relation(fields: [roleKey], references: [key])
+  extraPerms   UserPermission[]
+  status       UserStatus       @default(active)
+  passwordHash String
+  mfaSecretRef String? // reference to an encrypted secret, never the secret itself
+  mfaEnabled   Boolean          @default(false)
+  title        String?
+  createdAt    DateTime         @default(now())
+  lastLoginAt  DateTime?
+
+  sessions      AuthSession[]
+  student       Student?
+  faculty       Faculty?
+  marketingUser MarketingUser?
+  notifications Notification[]
+  preferences   NotificationPreference[]
+  auditLogs     AuditLog[]
+  aiRequests    AIRequest[]
+}
+
+model AuthSession {
+  id        String    @id
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  expiresAt DateTime
+  userAgent String?
+  ipHash    String?
+  revokedAt DateTime?
+
+  @@index([userId])
+}
+
+model PasswordReset {
+  tokenHash String    @id
+  userId    String
+  expiresAt DateTime
+  usedAt    DateTime?
+}
+
+model Student {
+  userId      String       @id
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  education   String?
+  enrollments Enrollment[]
+  submissions Submission[]
+  attempts    Attempt[]
+  attendance  Attendance[]
+  certificates Certificate[]
+  invoices    Invoice[]
+}
+
+model Faculty {
+  userId         String   @id
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  designation    String
+  specialization String[]
+  bio            String?
+  photoKey       String?
+  verified       Boolean  @default(false) // only verified profiles are public
+}
+
+model MarketingUser {
+  userId String @id
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  team   String?
+}
+
+// ───────────────────────── Academics ─────────────────────────
+
+enum PublishState {
+  draft
+  review
+  approved
+  published
+  archived
+}
+
+model Program {
+  id          String       @id @default(cuid())
+  slug        String       @unique
+  name        String
+  description String
+  courses     Course[]
+  batches     Batch[]
+  enrollments Enrollment[]
+  certificates Certificate[]
+}
+
+model Course {
+  id                    String       @id @default(cuid())
+  programId             String
+  program               Program      @relation(fields: [programId], references: [id])
+  code                  String       @unique
+  title                 String
+  description           String
+  status                PublishState @default(draft)
+  facultyIds            String[]
+  certMinCompletion     Int          @default(100)
+  certMinAverageScore   Int          @default(60)
+  modules               Module[]
+  assignments           Assignment[]
+  assessments           Assessment[]
+}
+
+model Module {
+  id       String   @id @default(cuid())
+  courseId String
+  course   Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  order    Int
+  title    String
+  lessons  Lesson[]
+}
+
+enum LessonType {
+  video
+  text
+  pdf
+  slides
+  interactive
+  quiz
+  practice
+  lab
+}
+
+model Lesson {
+  id          String           @id @default(cuid())
+  moduleId    String
+  module      Module           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  order       Int
+  title       String
+  type        LessonType
+  durationMin Int
+  status      PublishState     @default(draft)
+  summary     String
+  blocks      Json // structured lesson body
+  videoKey    String? // object-storage key; streamed via signed URL / CDN
+  resources   Resource[]
+  progress    LessonProgress[]
+}
+
+model Resource {
+  id         String @id @default(cuid())
+  lessonId   String
+  lesson     Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  label      String
+  kind       String
+  storageKey String
+}
+
+model LessonProgress {
+  userId      String
+  lessonId    String
+  lesson      Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  status      String // not_started | in_progress | completed
+  percent     Int      @default(0)
+  positionSec Int      @default(0) // resume playback
+  updatedAt   DateTime @updatedAt
+
+  @@id([userId, lessonId])
+}
+
+model Batch {
+  id          String         @id @default(cuid())
+  name        String
+  programId   String
+  program     Program        @relation(fields: [programId], references: [id])
+  facultyIds  String[]
+  startDate   DateTime
+  endDate     DateTime
+  capacity    Int
+  schedule    String
+  status      String // planned | active | completed
+  enrollments Enrollment[]
+  sessions    ClassSession[]
+}
+
+model Enrollment {
+  id         String   @id @default(cuid())
+  studentId  String
+  student    Student  @relation(fields: [studentId], references: [userId])
+  programId  String
+  program    Program  @relation(fields: [programId], references: [id])
+  batchId    String
+  batch      Batch    @relation(fields: [batchId], references: [id])
+  enrolledAt DateTime @default(now())
+  status     String
+
+  @@unique([studentId, batchId])
+}
+
+model ClassSession {
+  id          String       @id @default(cuid())
+  batchId     String
+  batch       Batch        @relation(fields: [batchId], references: [id])
+  courseId    String
+  title       String
+  startsAt    DateTime
+  durationMin Int
+  facultyId   String
+  mode        String
+  attendance  Attendance[]
+}
+
+model Attendance {
+  sessionId String
+  session   ClassSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  studentId String
+  student   Student      @relation(fields: [studentId], references: [userId])
+  status    String // present | absent | late | excused
+  markedBy  String
+  markedAt  DateTime     @default(now())
+
+  @@id([sessionId, studentId])
+}
+
+model Assignment {
+  id          String       @id @default(cuid())
+  courseId    String
+  course      Course       @relation(fields: [courseId], references: [id])
+  moduleId    String
+  title       String
+  description String
+  dueAt       DateTime
+  maxScore    Int
+  attachments Json
+  createdBy   String
+  submissions Submission[]
+}
+
+model Submission {
+  id           String     @id @default(cuid())
+  assignmentId String
+  assignment   Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  studentId    String
+  student      Student    @relation(fields: [studentId], references: [userId])
+  status       String
+  text         String
+  files        Json // [{ name, storageKey, sizeKb }]
+  submittedAt  DateTime?
+  score        Int?
+  feedback     String?
+  reviewedBy   String?
+  revision     Int        @default(0)
+
+  @@unique([assignmentId, studentId])
+}
+
+model Assessment {
+  id          String       @id @default(cuid())
+  courseId    String
+  course      Course       @relation(fields: [courseId], references: [id])
+  title       String
+  kind        String // quiz | module | mock | practice | final
+  durationMin Int
+  opensAt     DateTime
+  closesAt    DateTime
+  maxAttempts Int
+  passMark    Int
+  status      PublishState @default(draft)
+  createdBy   String
+  questions   Question[]
+  attempts    Attempt[]
+}
+
+model Question {
+  id              String     @id @default(cuid())
+  assessmentId    String
+  assessment      Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  type            String // single | multiple | true_false | scenario | short | coding_case
+  prompt          String
+  scenario        String?
+  options         String[]
+  correct         Int[]
+  acceptedAnswers String[]
+  points          Int
+  explanation     String
+  difficulty      String
+  tags            String[]
+}
+
+model Attempt {
+  id           String     @id @default(cuid())
+  assessmentId String
+  assessment   Assessment @relation(fields: [assessmentId], references: [id])
+  studentId    String
+  student      Student    @relation(fields: [studentId], references: [userId])
+  answers      Json
+  score        Int
+  maxScore     Int
+  startedAt    DateTime
+  submittedAt  DateTime
+}
+
+model CertificateTemplate {
+  id           String        @id @default(cuid())
+  name         String
+  description  String
+  status       String
+  certificates Certificate[]
+}
+
+model Certificate {
+  id            String              @id // public verification code
+  studentId     String
+  student       Student             @relation(fields: [studentId], references: [userId])
+  programId     String
+  program       Program             @relation(fields: [programId], references: [id])
+  templateId    String
+  template      CertificateTemplate @relation(fields: [templateId], references: [id])
+  issuedAt      DateTime            @default(now())
+  issuedBy      String
+  status        String // valid | revoked
+  revokedReason String?
+  fileKey       String? // generated PDF in object storage
+}
+
+model Announcement {
+  id        String   @id @default(cuid())
+  title     String
+  body      String
+  audience  String
+  batchId   String?
+  createdBy String
+  createdAt DateTime @default(now())
+}
+
+model ContentItem {
+  id         String       @id @default(cuid())
+  area       String // academic | marketing
+  kind       String
+  title      String
+  status     PublishState @default(draft)
+  ownerId    String
+  courseId   String?
+  bodyRef    String?
+  aiAssisted Boolean      @default(false)
+  updatedAt  DateTime     @updatedAt
+}
+
+// ───────────────────────── Growth ─────────────────────────
+
+model Campaign {
+  id          String    @id @default(cuid())
+  name        String
+  channel     String
+  status      String
+  budget      Int
+  spend       Int
+  startDate   DateTime
+  endDate     DateTime?
+  leads       Lead[]
+}
+
+model Lead {
+  id              String         @id @default(cuid())
+  name            String
+  phone           String
+  email           String?
+  programInterest String?
+  education       String?
+  source          String
+  campaignId      String?
+  campaign        Campaign?      @relation(fields: [campaignId], references: [id])
+  status          String
+  assignedTo      String?
+  lastContactAt   DateTime?
+  nextFollowUpAt  DateTime?
+  whatsappOptIn   Boolean        @default(false)
+  lostReason      String?
+  createdAt       DateTime       @default(now())
+  activities      LeadActivity[]
+  admission       Admission?
+
+  @@index([status])
+  @@index([assignedTo, nextFollowUpAt])
+}
+
+model LeadActivity {
+  id      String   @id @default(cuid())
+  leadId  String
+  lead    Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  type    String
+  summary String
+  at      DateTime @default(now())
+  by      String?
+}
+
+model Admission {
+  id                String   @id @default(cuid())
+  leadId            String?  @unique
+  lead              Lead?    @relation(fields: [leadId], references: [id])
+  name              String
+  phone             String
+  programId         String
+  stage             String
+  documentsComplete Boolean  @default(false)
+  batchId           String?
+  updatedAt         DateTime @updatedAt
+}
+
+// ───────────────────────── Finance ─────────────────────────
+
+model Invoice {
+  id           String    @id @default(cuid())
+  number       String    @unique
+  studentId    String
+  student      Student   @relation(fields: [studentId], references: [userId])
+  description  String
+  amount       Int // in paise for real data
+  paid         Int
+  currency     String    @default("INR")
+  dueDate      DateTime
+  status       String
+  installments Json
+  payments     Payment[]
+}
+
+model Payment {
+  id          String   @id @default(cuid())
+  invoiceId   String
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id])
+  amount      Int
+  paidAt      DateTime
+  method      String
+  provider    String?
+  providerRef String?  @unique
+  status      String
+}
+
+// ───────────────────────── Communication ─────────────────────────
+
+model MessageTemplate {
+  id             String          @id @default(cuid())
+  name           String
+  channel        String // email | whatsapp | sms | in_app
+  purpose        String
+  event          String?
+  category       String
+  subject        String?
+  content        String
+  variables      String[]
+  status         String
+  approval       String
+  communications Communication[]
+}
+
+model Communication {
+  id                String           @id @default(cuid())
+  userId            String?
+  leadId            String?
+  studentId         String?
+  channel           String
+  provider          String
+  templateId        String?
+  template          MessageTemplate? @relation(fields: [templateId], references: [id])
+  direction         String
+  status            String
+  providerMessageId String?          @unique
+  preview           String
+  contentReference  String?
+  event             String?
+  error             String?
+  createdAt         DateTime         @default(now())
+  deliveredAt       DateTime?
+  readAt            DateTime?
+  failedAt          DateTime?
+
+  @@index([leadId])
+  @@index([studentId])
+}
+
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category  String
+  title     String
+  body      String
+  href      String?
+  createdAt DateTime  @default(now())
+  readAt    DateTime?
+}
+
+model NotificationPreference {
+  userId   String
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category String
+  channel  String
+  enabled  Boolean
+
+  @@id([userId, category, channel])
+}
+
+// ───────────────────────── Platform ─────────────────────────
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+  action     String
+  objectType String
+  objectId   String?
+  result     String
+  meta       Json
+  ip         String?
+  at         DateTime @default(now())
+
+  @@index([at])
+  @@index([objectType, objectId])
+}
+
+model Integration {
+  key           String    @id // email, whatsapp, ai, …
+  category      String
+  provider      String
+  enabled       Boolean   @default(false)
+  configRef     String? // pointer to secrets manager — never the secret
+  lastSuccessAt DateTime?
+  lastError     String?
+}
+
+model WebhookEvent {
+  id         String   @id @default(cuid())
+  source     String
+  externalId String
+  type       String
+  status     String
+  note       String?
+  receivedAt DateTime @default(now())
+
+  @@unique([source, externalId])
+}
+
+model AIRequest {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  provider        String
+  model           String?
+  purpose         String
+  contextType     String
+  status          String
+  inputReference  String?
+  outputReference String?
+  tokens          Int?
+  createdAt       DateTime @default(now())
+}
