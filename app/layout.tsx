@@ -1,16 +1,15 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo, Inter, JetBrains_Mono } from "next/font/google";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { LeadProvider } from "@/components/leads/LeadProvider";
 import { JsonLd, dealerJsonLd } from "@/components/layout/JsonLd";
 import { site } from "@/lib/site";
+import "./fonts.css";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
-const archivo = Archivo({ subsets: ["latin"], variable: "--font-archivo", axes: ["wdth"], display: "swap" });
-const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono-face", weight: ["400", "500"], display: "swap" });
+/** Latin subsets used above the fold — preloaded so headlines render in the right face first time. */
+const preloadFonts = ["/fonts/inter-7.woff2", "/fonts/archivo-3.woff2", "/fonts/jetbrains-mono-6.woff2"];
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
@@ -39,7 +38,12 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-IN" className={`${inter.variable} ${archivo.variable} ${mono.variable}`}>
+    <html lang="en-IN">
+      <head>
+        {preloadFonts.map((href) => (
+          <link key={href} rel="preload" href={href} as="font" type="font/woff2" crossOrigin="anonymous" />
+        ))}
+      </head>
       <body className="min-h-dvh">
         <a
           href="#main"
