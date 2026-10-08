@@ -426,6 +426,7 @@ export function buildSeed(): DB {
     tpl("tpl_lead_staff", "New lead alert", "in_app", "Alert the growth team about a new lead", "lead.created", "marketing", "New enquiry from {{lead_name}} ({{lead_source}}) for {{course_name}}."),
     tpl("tpl_demo_wa", "Demo confirmation", "whatsapp", "Confirm a booked demo class", "demo.booked", "marketing", "Hi {{lead_name}}, your EMC demo class is confirmed for {{class_date}}.", null, "approved"),
     tpl("tpl_pay_due", "Payment reminder", "email", "Instalment due reminder", "payment.overdue", "payments", "Hi {{student_name}}, your instalment of {{payment_amount}} is due on {{due_date}}.", "Payment reminder from EMC"),
+    tpl("tpl_program_info", "Program information", "email", "Share program details after a counselling call", null, "marketing", "Hi {{lead_name}}, thank you for speaking with EMC. As discussed, here is how {{course_name}} works — structured modules, practical coding cases and assessments. Reply to this email or book a free demo when you’re ready.", "Your EMC program information"),
     tpl("tpl_pwd_reset", "Password reset", "email", "Account security", "auth.password_reset", "security", "Use this link to reset your EMC Academy password: {{reset_url}}. It expires in 30 minutes.", "Reset your EMC password"),
   );
 

@@ -23,6 +23,7 @@ export type AIPurpose =
   | "faculty.case_variation"
   | "marketing.lead_summary"
   | "marketing.message_draft"
+  | "marketing.content_draft"
   | "insights.learning_gaps";
 
 const PURPOSE_RULES: Record<AIPurpose, { permission: Permission; context: AIRequest["contextType"] }> = {
@@ -34,6 +35,7 @@ const PURPOSE_RULES: Record<AIPurpose, { permission: Permission; context: AIRequ
   "faculty.case_variation": { permission: "content.manage", context: "lesson" },
   "marketing.lead_summary": { permission: "leads.view", context: "lead" },
   "marketing.message_draft": { permission: "communications.send", context: "lead" },
+  "marketing.content_draft": { permission: "marketing.content", context: "marketing" },
   "insights.learning_gaps": { permission: "students.view", context: "student" },
 };
 
@@ -56,6 +58,10 @@ function buildContext(user: SessionUser, type: AIRequest["contextType"], id: str
     const acts = d.leadActivities.filter((a) => a.leadId === id).map((a) => `${a.at.slice(0, 10)} ${a.type}: ${a.summary}`);
     // Contact details are deliberately excluded.
     return `Lead first name: ${l.name.split(" ")[0]}\nInterest: ${l.programInterest}\nStatus: ${l.status}\nSource: ${l.source}\nActivity:\n${acts.join("\n")}`;
+  }
+  if (type === "marketing") {
+    // Public, non-personal facts only: program names and the brand's honesty rules.
+    return `Programs: ${d.programs.map((p) => p.name).join("; ")}\nRules: no guaranteed jobs, salaries or placements; no invented statistics, testimonials or accreditation; EMC certificates are course certificates, not external professional certifications.`;
   }
   if (type === "course") {
     const c = d.courses.find((x) => x.id === id);
