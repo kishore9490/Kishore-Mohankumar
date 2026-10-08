@@ -420,6 +420,7 @@ export function buildSeed(): DB {
     tpl("tpl_welcome_inapp", "Student welcome (in-app)", "in_app", "Welcome banner", "student.enrolled", "learning", "Welcome to {{course_name}}, {{student_name}}. Start with your first lesson."),
     tpl("tpl_class_wa", "Class reminder", "whatsapp", "Remind students before a live class", "class.scheduled", "learning", "Hi {{student_name}}, your EMC class “{{class_title}}” with {{faculty_name}} starts at {{class_date}}.", null, "approved"),
     tpl("tpl_assign_due", "Assignment reminder", "in_app", "Due-date reminder", "assignment.due", "learning", "“{{assignment_title}}” is due on {{due_date}}."),
+    tpl("tpl_assess_done", "Assessment submitted", "in_app", "Confirm an assessment attempt and point to the result", "assessment.completed", "learning", "Your attempt at “{{assessment_title}}” is submitted. Your score: {{score}}."),
     tpl("tpl_cert_email", "Certificate issued", "email", "Notify a student that a certificate was issued", "certificate.issued", "learning", "Congratulations {{student_name}}! Your certificate {{certificate_id}} for {{course_name}} is ready. Verify it at {{verify_url}}.", "Your EMC certificate"),
     tpl("tpl_cert_inapp", "Certificate issued (in-app)", "in_app", "Certificate notice", "certificate.issued", "learning", "Your certificate {{certificate_id}} is ready."),
     tpl("tpl_lead_wa", "Enquiry acknowledgement", "whatsapp", "Reply to a new enquiry", "lead.created", "marketing", "Hi {{lead_name}}, thanks for your interest in EMC. A counsellor will call you shortly.", null, "pending"),
@@ -431,8 +432,9 @@ export function buildSeed(): DB {
   );
 
   /* communication history (simulated provider) */
+  let commSeq = 0;
   const comm = (o: Partial<T.Communication> & Pick<T.Communication, "channel" | "preview" | "createdAt">): T.Communication => ({
-    id: `com_${db.communications.length + 1}`, userId: null, leadId: null, studentId: null, provider: o.channel === "in_app" ? "in_app" : "simulated", templateId: null,
+    id: `com_${++commSeq}`, userId: null, leadId: null, studentId: null, provider: o.channel === "in_app" ? "in_app" : "simulated", templateId: null,
     direction: "outbound", status: "delivered", providerMessageId: o.channel === "in_app" ? null : `sim_${int(100000, 999999)}`, contentReference: null, event: null,
     deliveredAt: o.createdAt, readAt: null, failedAt: null, error: null, ...o,
   });

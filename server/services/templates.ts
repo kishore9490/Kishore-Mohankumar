@@ -8,5 +8,5 @@ export function renderTemplate(content: string, vars: Record<string, string | un
 export const TEMPLATE_VARIABLES = [
   "student_name", "course_name", "batch_name", "class_title", "class_date", "faculty_name",
   "assignment_title", "due_date", "payment_amount", "certificate_id", "verify_url",
-  "lead_name", "lead_source", "reset_url",
+  "lead_name", "lead_source", "reset_url", "assessment_title", "score",
 ];
