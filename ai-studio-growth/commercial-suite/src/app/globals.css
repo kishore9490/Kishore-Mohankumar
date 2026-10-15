@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+/* Design tokens — deep navy, rich purple, white and soft neutrals */
+@theme {
+  --font-sans: "Inter Variable", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Plus Jakarta Sans Variable", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+
+  --color-navy-950: #070a1f;
+  --color-navy-900: #0d1235;
+  --color-navy-800: #161b4a;
+  --color-navy-700: #232a6b;
+  --color-brand-50: #f4f3ff;
+  --color-brand-100: #ebe9fe;
+  --color-brand-200: #d9d6fe;
+  --color-brand-300: #bdb4fe;
+  --color-brand-400: #9b8afb;
+  --color-brand-500: #7a5af8;
+  --color-brand-600: #5b4ce6;
+  --color-brand-700: #4b3bc9;
+  --color-brand-800: #3e31a3;
+  --color-canvas: #f6f7fb;
+  --color-line: #e6e8f0;
+  --color-ink: #121733;
+  --color-muted: #5f6684;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+}
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+}
+::selection {
+  background: var(--color-brand-200);
+}
+.font-display {
+  font-family: var(--font-display);
+}
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Grid children may shrink below their content width (prevents wide tables from overflowing on phones) */
+.grid > * {
+  min-width: 0;
+}

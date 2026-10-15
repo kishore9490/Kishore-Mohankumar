@@ -1,0 +1,496 @@
+// AI Studio Craft Commercial Suite — data model
+// Production target: PostgreSQL. Monetary values use DECIMAL columns (never float).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ───────────────────────── Auth ─────────────────────────
+
+enum Role {
+  ADMIN
+  STAFF
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String
+  passwordHash String
+  role         Role      @default(STAFF)
+  active       Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  sessions       Session[]
+  auditEvents    AuditEvent[]
+  payments       Payment[]
+  communications CommunicationLog[]
+  documents      Document[]         @relation("DocumentCreatedBy")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  expiresAt DateTime
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+// ───────────────────────── Company ─────────────────────────
+
+enum RoundingMode {
+  NONE // grand total kept to the paisa
+  NEAREST_RUPEE // grand total rounded half-up to the nearest rupee; difference shown as "Round off"
+}
+
+model CompanyProfile {
+  id                  String       @id @default(cuid())
+  // Branding (presentation) — kept separate from legal/tax identity
+  brandName           String
+  coBrandName         String?
+  tagline             String?
+  logoPrimary         Bytes?
+  logoPrimaryMime     String?
+  logoSecondary       Bytes?
+  logoSecondaryMime   String?
+  logoPrimaryTile     String       @default("light") // tile behind the logo: "light" | "dark"
+  logoSecondaryTile   String       @default("dark")
+  primaryColor        String       @default("#0F1B3D")
+  accentColor         String       @default("#6D28D9")
+  // Legal / tax identity
+  legalName           String?
+  address             String?
+  phone               String?
+  email               String?
+  website             String?
+  gstin               String?
+  pan                 String?
+  state               String?
+  stateCode           String?
+  // Banking & payments
+  bankName            String?
+  bankAccountName     String?
+  bankAccountNumber   String?
+  bankIfsc            String?
+  bankBranch          String?
+  upiId               String?
+  paymentInstructions String?
+  authorisedSignatory String?
+  // Defaults
+  documentFooter      String?
+  termsQuotation      String?
+  termsInvoice        String?
+  termsProposal       String?
+  currency            String       @default("INR")
+  defaultTaxRate      Decimal      @default(18) @db.Decimal(5, 2)
+  roundingMode        RoundingMode @default(NEAREST_RUPEE)
+  isDefault           Boolean      @default(false)
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+
+  documents Document[]
+  sequences DocumentSequence[]
+}
+
+enum DocumentType {
+  PROPOSAL
+  QUOTATION
+  INVOICE
+  PROFORMA
+}
+
+model DocumentSequence {
+  id                  String       @id @default(cuid())
+  companyId           String
+  type                DocumentType
+  prefix              String
+  nextNumber          Int          @default(1)
+  padding             Int          @default(4)
+  includeFinancialYear Boolean     @default(true)
+  updatedAt           DateTime     @updatedAt
+
+  company CompanyProfile @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, type])
+}
+
+// ───────────────────────── Customers & catalogue ─────────────────────────
+
+enum CommunicationChannel {
+  EMAIL
+  WHATSAPP
+  PHONE
+}
+
+model Customer {
+  id               String               @id @default(cuid())
+  name             String
+  contactPerson    String?
+  email            String?
+  phone            String?
+  billingAddress   String?
+  shippingAddress  String?
+  gstin            String?
+  state            String?
+  stateCode        String?
+  notes            String?
+  preferredChannel CommunicationChannel @default(EMAIL)
+  whatsappConsent  Boolean              @default(false)
+  archived         Boolean              @default(false)
+  isSample         Boolean              @default(false)
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+
+  documents      Document[]
+  communications CommunicationLog[]
+
+  @@index([name])
+  @@index([archived])
+}
+
+enum BillingFrequency {
+  ONE_TIME
+  MONTHLY
+  QUARTERLY
+  HALF_YEARLY
+  ANNUAL
+}
+
+model ProductService {
+  id                  String           @id @default(cuid())
+  name                String
+  shortDescription    String?
+  detailedDescription String?
+  category            String
+  sku                 String?          @unique
+  hsnSac              String?
+  unit                String           @default("Nos")
+  defaultQuantity     Decimal          @default(1) @db.Decimal(14, 3)
+  defaultPrice        Decimal          @default(0) @db.Decimal(14, 2)
+  taxRate             Decimal          @default(18) @db.Decimal(5, 2)
+  billingFrequency    BillingFrequency @default(ONE_TIME)
+  inclusions          String[]
+  exclusions          String[]
+  active              Boolean          @default(true)
+  isSample            Boolean          @default(false)
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+
+  lineItems DocumentLineItem[]
+
+  @@index([category])
+  @@index([active])
+}
+
+// ───────────────────────── Documents ─────────────────────────
+
+enum DocumentStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  REJECTED
+  EXPIRED
+  ISSUED
+  PARTIALLY_PAID
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+enum DocumentTemplate {
+  PREMIUM_COMMERCIAL
+  PROFESSIONAL_QUOTATION
+  PROFESSIONAL_INVOICE
+  DETAILED_PROPOSAL
+}
+
+enum TaxMode {
+  INTRA_STATE // CGST + SGST
+  INTER_STATE // IGST
+  NO_TAX // e.g. exempt / export without tax — explicit, never implied
+}
+
+model Document {
+  id                String           @id @default(cuid())
+  type              DocumentType
+  // Number is assigned from the DocumentSequence inside a transaction.
+  // Tax invoices receive their number when issued (keeps the series gap-free for drafts).
+  number            String?
+  companyId         String
+  customerId        String
+  template          DocumentTemplate
+  status            DocumentStatus   @default(DRAFT)
+  title             String?
+  reference         String?
+  issueDate         DateTime         @db.Date
+  validUntil        DateTime?        @db.Date
+  dueDate           DateTime?        @db.Date
+  placeOfSupply     String?
+  placeOfSupplyCode String?
+  taxMode           TaxMode          @default(INTRA_STATE)
+  customerSnapshot  Json             // billing details frozen when saved
+  notes             String?
+  terms             String?
+  paymentTerms      String?
+  // Server-computed totals (never trusted from the client)
+  subtotal          Decimal          @default(0) @db.Decimal(14, 2)
+  discountTotal     Decimal          @default(0) @db.Decimal(14, 2)
+  taxableTotal      Decimal          @default(0) @db.Decimal(14, 2)
+  cgstTotal         Decimal          @default(0) @db.Decimal(14, 2)
+  sgstTotal         Decimal          @default(0) @db.Decimal(14, 2)
+  igstTotal         Decimal          @default(0) @db.Decimal(14, 2)
+  taxTotal          Decimal          @default(0) @db.Decimal(14, 2)
+  roundOff          Decimal          @default(0) @db.Decimal(14, 2)
+  grandTotal        Decimal          @default(0) @db.Decimal(14, 2)
+  amountPaid        Decimal          @default(0) @db.Decimal(14, 2)
+  roundingMode      RoundingMode     @default(NEAREST_RUPEE)
+  convertedFromId   String?
+  isSample          Boolean          @default(false)
+  issuedAt          DateTime?
+  sentAt            DateTime?
+  createdById       String?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  company        CompanyProfile     @relation(fields: [companyId], references: [id])
+  customer       Customer           @relation(fields: [customerId], references: [id])
+  createdBy      User?              @relation("DocumentCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  convertedFrom  Document?          @relation("Conversion", fields: [convertedFromId], references: [id], onDelete: SetNull)
+  conversions    Document[]         @relation("Conversion")
+  lineItems      DocumentLineItem[]
+  sections       ProposalSection[]
+  payments       Payment[]
+  communications CommunicationLog[]
+  auditEvents    AuditEvent[]
+  shareLinks     DocumentShareLink[]
+
+  // Duplicate numbers are impossible within a company + series
+  @@unique([companyId, type, number])
+  // A source document can be converted into each target type at most once
+  @@unique([convertedFromId, type])
+  @@index([type, status])
+  @@index([customerId])
+  @@index([issueDate])
+}
+
+enum DiscountType {
+  PERCENT
+  AMOUNT
+}
+
+model DocumentLineItem {
+  id               String            @id @default(cuid())
+  documentId       String
+  position         Int
+  productServiceId String?
+  name             String
+  description      String?
+  details          Json?             // { detailedDescription, inclusions[], exclusions[] } snapshot
+  hsnSac           String?
+  quantity         Decimal           @db.Decimal(14, 3)
+  unit             String            @default("Nos")
+  unitPrice        Decimal           @db.Decimal(14, 2)
+  discountType     DiscountType      @default(PERCENT)
+  discountValue    Decimal           @default(0) @db.Decimal(14, 2)
+  taxRate          Decimal           @db.Decimal(5, 2)
+  billingFrequency BillingFrequency?
+  grossAmount      Decimal           @db.Decimal(14, 2)
+  discountAmount   Decimal           @db.Decimal(14, 2)
+  taxableAmount    Decimal           @db.Decimal(14, 2)
+  taxAmount        Decimal           @db.Decimal(14, 2)
+  totalAmount      Decimal           @db.Decimal(14, 2)
+
+  document       Document        @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  productService ProductService? @relation(fields: [productServiceId], references: [id], onDelete: SetNull)
+
+  @@index([documentId])
+}
+
+enum ProposalSectionType {
+  COVER
+  EXECUTIVE_SUMMARY
+  CUSTOMER_REQUIREMENTS
+  PROPOSED_SOLUTION
+  SERVICE_OVERVIEW
+  FEATURE_BREAKDOWN
+  SCOPE_OF_WORK
+  DELIVERABLES
+  IMPLEMENTATION_PLAN
+  TIMELINE
+  PRICING_SUMMARY
+  COMMERCIAL_TERMS
+  BUSINESS_VALUE
+  ASSUMPTIONS
+  EXCLUSIONS
+  ACCEPTANCE
+  CLOSING_PAGE
+}
+
+model ProposalSection {
+  id         String              @id @default(cuid())
+  documentId String
+  position   Int
+  type       ProposalSectionType
+  title      String
+  enabled    Boolean             @default(true)
+  content    Json                // { body, items: [{ title, detail }], highlight }
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId])
+}
+
+// ───────────────────────── Payments ─────────────────────────
+
+enum PaymentMethod {
+  BANK_TRANSFER
+  UPI
+  CHEQUE
+  CASH
+  CARD
+  OTHER
+}
+
+model Payment {
+  id           String        @id @default(cuid())
+  documentId   String
+  paymentDate  DateTime      @db.Date
+  amount       Decimal       @db.Decimal(14, 2)
+  method       PaymentMethod
+  reference    String?
+  notes        String?
+  recordedById String?
+  createdAt    DateTime      @default(now())
+
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  recordedBy User?    @relation(fields: [recordedById], references: [id], onDelete: SetNull)
+
+  @@index([documentId])
+}
+
+// ───────────────────────── Communications & integrations ─────────────────────────
+
+enum MessageChannel {
+  EMAIL
+  WHATSAPP
+  WHATSAPP_MANUAL
+}
+
+enum MessageType {
+  DOCUMENT
+  PAYMENT_REMINDER
+  TEST
+}
+
+enum DeliveryStatus {
+  PREPARED // created locally (manual fallback opened, or explicit dev-mock mode); nothing sent by the app
+  QUEUED
+  SENT_TO_PROVIDER // provider accepted the request — not proof of delivery
+  DELIVERED // provider reported delivery (webhook evidence)
+  READ // provider reported read (WhatsApp webhook evidence)
+  FAILED
+}
+
+enum DeliveryMode {
+  LIVE
+  DEV_MOCK
+  MANUAL
+}
+
+model CommunicationLog {
+  id                String         @id @default(cuid())
+  customerId        String?
+  documentId        String?
+  channel           MessageChannel
+  messageType       MessageType
+  mode              DeliveryMode
+  recipient         String
+  subject           String?
+  status            DeliveryStatus
+  providerMessageId String?        @unique
+  errorMessage      String?
+  attachmentName    String?
+  createdById       String?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  statusUpdatedAt   DateTime?
+
+  customer  Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  document  Document? @relation(fields: [documentId], references: [id], onDelete: SetNull)
+  createdBy User?     @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([documentId])
+  @@index([customerId])
+  @@index([createdAt])
+}
+
+model WebhookEvent {
+  id         String   @id @default(cuid())
+  provider   String
+  eventKey   String   @unique
+  receivedAt DateTime @default(now())
+}
+
+// Non-secret integration preferences. Secrets live only in server environment variables.
+model IntegrationConfiguration {
+  id        String   @id @default(cuid())
+  provider  String   @unique // "brevo" | "whatsapp"
+  enabled   Boolean  @default(true)
+  settings  Json
+  updatedAt DateTime @updatedAt
+}
+
+model MessageTemplate {
+  id        String         @id @default(cuid())
+  channel   MessageChannel
+  key       String // e.g. QUOTATION, INVOICE, PROPOSAL, PROFORMA, PAYMENT_REMINDER
+  name      String
+  subject   String?
+  body      String
+  updatedAt DateTime       @updatedAt
+
+  @@unique([channel, key])
+}
+
+model DocumentShareLink {
+  id          String    @id @default(cuid())
+  tokenHash   String    @unique
+  documentId  String
+  expiresAt   DateTime
+  accessCount Int       @default(0)
+  maxAccess   Int       @default(20)
+  revokedAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId])
+}
+
+model AuditEvent {
+  id         String   @id @default(cuid())
+  documentId String?
+  userId     String?
+  action     String
+  summary    String
+  createdAt  DateTime @default(now())
+
+  document Document? @relation(fields: [documentId], references: [id], onDelete: SetNull)
+  user     User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([documentId])
+  @@index([createdAt])
+}
