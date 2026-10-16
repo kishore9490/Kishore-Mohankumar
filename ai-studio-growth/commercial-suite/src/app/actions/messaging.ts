@@ -1,5 +1,4 @@
 "use server";
-import { revalidatePath } from "next/cache";
 import { randomBytes } from "node:crypto";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
@@ -41,7 +40,6 @@ async function failLog(logId: string | null, e: unknown) {
   if (!logId) return;
   const msg = e instanceof IntegrationError || e instanceof ServiceError ? e.message : "Sending failed due to an unexpected error.";
   await prisma.communicationLog.update({ where: { id: logId }, data: { status: "FAILED", errorMessage: msg.slice(0, 500), statusUpdatedAt: new Date() } }).catch(() => {});
-  revalidatePath("/", "layout");
 }
 
 export async function sendDocumentEmailAction(input: z.input<typeof sendEmailSchema>): Promise<ActionResult> {
@@ -68,7 +66,6 @@ export async function sendDocumentEmailAction(input: z.input<typeof sendEmailSch
     if (mock) {
       await prisma.communicationLog.update({ where: { id: log.id }, data: { errorMessage: "Development mock mode — no email was sent.", statusUpdatedAt: new Date() } });
       await audit(prisma, { documentId: raw.id, userId: user.id, action: "email.mock", summary: `Email to ${data.to} prepared in development mock mode (not sent)` });
-      revalidatePath("/", "layout");
       return { ok: true, message: "Development mock mode: the email was prepared and logged but NOT sent." };
     }
     const result = await brevoSendEmail({
@@ -82,7 +79,6 @@ export async function sendDocumentEmailAction(input: z.input<typeof sendEmailSch
     await prisma.communicationLog.update({ where: { id: log.id }, data: { status: "SENT_TO_PROVIDER", providerMessageId: result.messageId, statusUpdatedAt: new Date() } });
     await audit(prisma, { documentId: raw.id, userId: user.id, action: "email.sent", summary: `${data.messageType === "PAYMENT_REMINDER" ? "Payment reminder" : DOCUMENT_TYPE_META[raw.type as DocumentType].label} emailed to ${data.to} (accepted by Brevo)` });
     await markSentIfDraft(raw.id, raw.type, raw.status, user.id);
-    revalidatePath("/", "layout");
     return { ok: true, message: "Email accepted by Brevo for delivery. Delivery and opens update automatically when the Brevo webhook is configured." };
   } catch (e) {
     await failLog(logId, e);
@@ -104,7 +100,6 @@ export async function saveGeneralSettingsAction(input: z.input<typeof generalSch
     await assertUser("ADMIN");
     const d = generalSchema.parse(input);
     await saveApp({ publicUrl: d.publicUrl ? d.publicUrl.replace(/\/$/, "") : undefined });
-    revalidatePath("/settings", "layout");
     return { ok: true, message: "General settings saved" };
   } catch (e) {
     if (e instanceof z.ZodError) return { ok: false, error: e.issues[0].message };
@@ -131,7 +126,6 @@ export async function saveBrevoSettingsAction(input: z.input<typeof brevoSchema>
       { apiKey: d.clearApiKey ? null as unknown as string : d.apiKey || undefined },
     );
     await audit(prisma, { userId: user.id, action: "integration.brevo", summary: `Brevo settings updated${d.apiKey ? " (API key replaced)" : ""}${d.clearApiKey ? " (API key removed)" : ""}` });
-    revalidatePath("/settings", "layout");
     return { ok: true, message: "Email settings saved" };
   } catch (e) {
     if (e instanceof z.ZodError) return { ok: false, error: e.issues[0].message };
@@ -143,7 +137,6 @@ export async function regenerateBrevoWebhookTokenAction(): Promise<ActionResult>
   try {
     await assertUser("ADMIN");
     await saveBrevo({}, { webhookToken: randomBytes(24).toString("base64url") });
-    revalidatePath("/settings", "layout");
     return { ok: true, message: "New webhook URL generated — update it in Brevo." };
   } catch (e) {
     return toActionError(e);
@@ -156,12 +149,10 @@ export async function testBrevoAction(): Promise<ActionResult> {
     const r = await brevoTestConnection();
     const message = `Connected to Brevo${r.companyName ? ` (${r.companyName})` : ""}. ${r.senderMessage}`;
     await saveBrevo({ lastTest: { at: new Date().toISOString(), ok: r.senderVerified !== false, message } });
-    revalidatePath("/settings", "layout");
     return r.senderVerified === false ? { ok: false, error: message } : { ok: true, message };
   } catch (e) {
     const message = e instanceof IntegrationError ? e.message : "Connection test failed.";
     await saveBrevo({ lastTest: { at: new Date().toISOString(), ok: false, message } }).catch(() => {});
-    revalidatePath("/settings", "layout");
     if (e instanceof IntegrationError) return { ok: false, error: e.message };
     return toActionError(e);
   }
@@ -181,7 +172,6 @@ export async function sendTestEmailAction(to: string): Promise<ActionResult> {
       await prisma.communicationLog.update({ where: { id: log.id }, data: { status: "FAILED", errorMessage: (e as Error).message.slice(0, 500), statusUpdatedAt: new Date() } });
       throw e;
     }
-    revalidatePath("/communications");
     return { ok: true, message: `Test email accepted by Brevo for ${email}.` };
   } catch (e) {
     if (e instanceof z.ZodError) return { ok: false, error: e.issues[0].message };
@@ -197,7 +187,6 @@ export async function saveMessageTemplateAction(input: z.input<typeof templateSc
     await assertUser("ADMIN");
     const d = templateSchema.parse(input);
     await prisma.messageTemplate.update({ where: { id: d.id }, data: { subject: d.subject ?? null, body: d.body } });
-    revalidatePath("/settings", "layout");
     return { ok: true, message: "Template saved" };
   } catch (e) {
     if (e instanceof z.ZodError) return { ok: false, error: e.issues[0].message };

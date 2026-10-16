@@ -291,6 +291,8 @@ async function main() {
     await waitText(page, "₹33,690.00");
   });
 
+  await db.integrationConfiguration.deleteMany({ where: { provider: "brevo" } }); // start from "not configured"
+
   await step("validates the Brevo key in Settings → Integrations (no WhatsApp in the app)", async () => {
     await page.goto(`${BASE}/settings/integrations`, { waitUntil: "networkidle0" });
     assert(!(await page.content()).includes("WhatsApp"), "WhatsApp should not appear in Integrations");
@@ -320,7 +322,7 @@ async function main() {
         if (req.headers["api-key"] !== "xkeysib-0123456789abcdef0123456789abcdef-e2eFakeKey123") return json(401, { message: "Key not found" });
         if (req.url === "/v3/account") return json(200, { email: "owner@example.com", companyName: "E2E Brevo" });
         if (req.url === "/v3/senders") return json(200, { senders: [{ email: "quotes@example.com", active: true }] });
-        if (req.url === "/v3/smtp/email") { sent.push(JSON.parse(raw)); return json(201, { messageId: `<e2e-${sent.length}@brevo>` }); }
+        if (req.url === "/v3/smtp/email") { sent.push(JSON.parse(raw)); return json(201, { messageId: `<e2e-${RUN}-${sent.length}@brevo>` }); }
         json(404, {});
       });
     });

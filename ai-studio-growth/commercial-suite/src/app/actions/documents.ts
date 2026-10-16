@@ -1,5 +1,4 @@
 "use server";
-import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { assertUser } from "@/lib/auth/session";
 import { documentSchema, paymentSchema, type DocumentInput, type PaymentInput } from "@/lib/validation/schemas";
@@ -10,7 +9,6 @@ import {
 import { DOCUMENT_TYPE_META, type DocumentStatus, type DocumentType } from "@/lib/documents/meta";
 
 function revalidateDocs() {
-  revalidatePath("/", "layout");
 }
 
 export async function saveDocumentAction(id: string | null, input: DocumentInput): Promise<ActionResult<{ id: string; path: string }>> {

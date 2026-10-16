@@ -1,5 +1,4 @@
 "use server";
-import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { assertUser } from "@/lib/auth/session";
@@ -31,7 +30,6 @@ export async function saveCompanyAction(id: string | null, input: CompanyInput):
       return row;
     });
     await audit(prisma, { userId: user.id, action: "company.saved", summary: `Company profile ${saved.brandName} ${id ? "updated" : "created"}` });
-    revalidatePath("/", "layout");
     return { ok: true, data: { id: saved.id }, message: "Company settings saved" };
   } catch (e) {
     return toActionError(e);
@@ -60,7 +58,6 @@ export async function uploadLogoAction(formData: FormData): Promise<ActionResult
       where: { id: companyId },
       data: slot === "primary" ? { logoPrimary: bytes, logoPrimaryMime: mime } : { logoSecondary: bytes, logoSecondaryMime: mime },
     });
-    revalidatePath("/settings/company");
     return { ok: true, message: "Logo uploaded" };
   } catch (e) {
     return toActionError(e);
@@ -74,7 +71,6 @@ export async function removeLogoAction(companyId: string, slot: "primary" | "sec
       where: { id: companyId },
       data: slot === "primary" ? { logoPrimary: null, logoPrimaryMime: null } : { logoSecondary: null, logoSecondaryMime: null },
     });
-    revalidatePath("/settings/company");
     return { ok: true, message: "Logo removed — a typographic brand treatment will be used." };
   } catch (e) {
     return toActionError(e);
@@ -87,7 +83,6 @@ export async function saveSequenceAction(id: string, input: z.input<typeof seque
     const d = sequenceSchema.parse(input);
     const seq = await prisma.documentSequence.update({ where: { id }, data: d });
     await audit(prisma, { userId: user.id, action: "numbering.updated", summary: `${seq.type} numbering set to prefix ${d.prefix}, next ${d.nextNumber}` });
-    revalidatePath("/settings/company");
     return { ok: true, message: "Numbering updated. Existing numbers are never reused — clashes are skipped automatically." };
   } catch (e) {
     if (e instanceof z.ZodError) return { ok: false, error: e.issues[0].message };
@@ -100,7 +95,6 @@ export async function resetSampleDataAction(): Promise<ActionResult> {
     const user = await assertUser("ADMIN");
     await seedSampleData(prisma, user.id);
     await audit(prisma, { userId: user.id, action: "samples.reset", summary: "Sample data reset" });
-    revalidatePath("/", "layout");
     return { ok: true, message: "Sample data has been reset." };
   } catch (e) {
     return toActionError(e);
@@ -112,7 +106,6 @@ export async function clearSampleDataAction(): Promise<ActionResult> {
     const user = await assertUser("ADMIN");
     await clearSampleData(prisma);
     await audit(prisma, { userId: user.id, action: "samples.cleared", summary: "Sample data removed" });
-    revalidatePath("/", "layout");
     return { ok: true, message: "All sample records removed." };
   } catch (e) {
     return toActionError(e);
@@ -132,7 +125,6 @@ export async function inviteUserAction(input: z.input<typeof inviteSchema>): Pro
     const url = `${await appBaseUrl()}/invite/${token}`;
     const mail = await sendInviteEmail(d.email, d.name, url, "invite", admin.name);
     await audit(prisma, { userId: admin.id, action: "user.invited", summary: `${d.email} invited as ${d.role.toLowerCase()}${mail.sent ? " (email sent)" : ""}` });
-    revalidatePath("/settings/users");
     return { ok: true, data: { url, emailed: mail.sent, emailNote: mail.reason }, message: mail.sent ? `Invitation emailed to ${d.email}` : "Invitation created" };
   } catch (e) {
     if (e instanceof z.ZodError) return { ok: false, error: e.issues[0].message };
@@ -150,7 +142,6 @@ export async function reissueInviteAction(userId: string): Promise<InviteResult>
     const url = `${await appBaseUrl()}/invite/${token}`;
     const mail = await sendInviteEmail(user.email, user.name, url, "invite", admin.name);
     await audit(prisma, { userId: admin.id, action: "user.invited", summary: `Invitation re-issued to ${user.email}` });
-    revalidatePath("/settings/users");
     return { ok: true, data: { url, emailed: mail.sent, emailNote: mail.reason }, message: "New invitation link created" };
   } catch (e) {
     return toActionError(e);
@@ -167,7 +158,6 @@ export async function resetAccessAction(userId: string): Promise<InviteResult> {
     const url = `${await appBaseUrl()}/invite/${token}`;
     const mail = await sendInviteEmail(user.email, user.name, url, "reset", admin.name);
     await audit(prisma, { userId: admin.id, action: "user.access_reset", summary: `Access reset for ${user.email} (password, MFA and sessions revoked)` });
-    revalidatePath("/settings/users");
     return { ok: true, data: { url, emailed: mail.sent, emailNote: mail.reason }, message: "Access reset — the user must use the new link" };
   } catch (e) {
     return toActionError(e);
@@ -179,7 +169,6 @@ export async function revokeInviteAction(userId: string): Promise<ActionResult> 
     const admin = await assertUser("ADMIN");
     await revokeInvitations(prisma, userId);
     await audit(prisma, { userId: admin.id, action: "user.invite_revoked", summary: "Invitation revoked" });
-    revalidatePath("/settings/users");
     return { ok: true, message: "Invitation revoked" };
   } catch (e) {
     return toActionError(e);
@@ -199,7 +188,6 @@ export async function setUserActiveAction(id: string, active: boolean): Promise<
       await prisma.session.deleteMany({ where: { userId: id } });
       await revokeInvitations(prisma, id);
     }
-    revalidatePath("/settings/users");
     return { ok: true, message: active ? "User reactivated" : "User deactivated and signed out" };
   } catch (e) {
     return toActionError(e);
@@ -228,7 +216,6 @@ export async function regenerateRecoveryCodesAction(code: string): Promise<Actio
     if (!(await verifyCurrentUserCode(prisma, me.id, code))) throw new ServiceError("The authenticator code is not valid.");
     const codes = await regenerateRecoveryCodes(prisma, me.id);
     await audit(prisma, { userId: me.id, action: "auth.recovery_regenerated", summary: "Recovery codes regenerated" });
-    revalidatePath("/settings/security");
     return { ok: true, data: { codes }, message: "New recovery codes generated — the old ones no longer work." };
   } catch (e) {
     return toActionError(e);

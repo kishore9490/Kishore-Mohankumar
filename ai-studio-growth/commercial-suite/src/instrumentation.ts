@@ -8,9 +8,10 @@ import type { Instrumentation } from "next";
  */
 export const onRequestError: Instrumentation.onRequestError = async (error, request, context) => {
   if (process.env.NEXT_RUNTIME !== "nodejs") return;
-  const err = error as Error & { digest?: string };
-  const frame = (err.stack ?? "").split("\n").find((l) => l.includes("/src/") || l.includes(".next/server")) ?? "";
-  const summary = `[${err.digest ?? "no-digest"}] ${request.method} ${request.path} (${context.routeType} ${context.routePath}) — ${err.name}: ${err.message}${frame ? ` @ ${frame.trim()}` : ""}`;
+  const err = error as Error & { digest?: string; code?: string; syscall?: string; path?: string };
+  const fsInfo = [err.code, err.syscall, err.path].filter(Boolean).join(" ");
+  const frames = (err.stack ?? "").split("\n").slice(1).map((l) => l.trim().replace(/^at /, "").replace(/\/home\/[^ )]*?\/(node_modules|\.next)\//, "$1/")).slice(0, 4).join(" < ");
+  const summary = `[${err.digest ?? "no-digest"}] ${request.method} ${request.path} (${context.routeType} ${context.routePath}) — ${err.name}: ${err.message}${fsInfo ? ` [${fsInfo}]` : ""}${frames ? ` @ ${frames}` : ""}`;
   console.error("[server-error]", summary);
   try {
     const { prisma } = await import("./lib/prisma");

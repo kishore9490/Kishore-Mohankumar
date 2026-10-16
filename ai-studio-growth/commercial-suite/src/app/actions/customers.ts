@@ -1,5 +1,4 @@
 "use server";
-import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { assertUser } from "@/lib/auth/session";
 import { customerSchema, type CustomerInput } from "@/lib/validation/schemas";
@@ -24,7 +23,6 @@ export async function saveCustomerAction(id: string | null, input: CustomerInput
     };
     if (data.preferredChannel === "WHATSAPP" && !data.phone) return { ok: false, error: "A phone number is required when WhatsApp is the preferred channel.", fieldErrors: { phone: ["Required for WhatsApp"] } };
     const saved = id ? await prisma.customer.update({ where: { id }, data }) : await prisma.customer.create({ data });
-    revalidatePath("/customers");
     return { ok: true, data: { id: saved.id }, message: id ? "Customer updated" : "Customer created" };
   } catch (e) {
     return toActionError(e);
@@ -35,8 +33,6 @@ export async function setCustomerArchivedAction(id: string, archived: boolean): 
   try {
     await assertUser();
     await prisma.customer.update({ where: { id }, data: { archived } });
-    revalidatePath("/customers");
-    revalidatePath(`/customers/${id}`);
     return { ok: true, message: archived ? "Customer archived" : "Customer restored" };
   } catch (e) {
     return toActionError(e);
@@ -50,7 +46,6 @@ export async function deleteCustomerAction(id: string): Promise<ActionResult> {
     const count = await prisma.document.count({ where: { customerId: id } });
     if (count > 0) throw new ServiceError(`This customer has ${count} document(s). Archive the customer instead to keep the history intact.`);
     await prisma.customer.delete({ where: { id } });
-    revalidatePath("/customers");
     return { ok: true, message: "Customer deleted" };
   } catch (e) {
     return toActionError(e);

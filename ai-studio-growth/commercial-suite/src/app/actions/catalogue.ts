@@ -1,5 +1,4 @@
 "use server";
-import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { assertUser } from "@/lib/auth/session";
 import { productSchema, type ProductInput } from "@/lib/validation/schemas";
@@ -17,7 +16,6 @@ export async function saveProductAction(id: string | null, input: ProductInput):
     }
     const data = { ...d, sku: d.sku ?? null, hsnSac: d.hsnSac ?? null, shortDescription: d.shortDescription ?? null, detailedDescription: d.detailedDescription ?? null };
     const saved = id ? await prisma.productService.update({ where: { id }, data }) : await prisma.productService.create({ data });
-    revalidatePath("/catalogue");
     return { ok: true, data: { id: saved.id }, message: id ? "Item updated" : "Item created" };
   } catch (e) {
     return toActionError(e);
@@ -28,7 +26,6 @@ export async function setProductActiveAction(id: string, active: boolean): Promi
   try {
     await assertUser();
     await prisma.productService.update({ where: { id }, data: { active } });
-    revalidatePath("/catalogue");
     return { ok: true, message: active ? "Item activated" : "Item deactivated" };
   } catch (e) {
     return toActionError(e);
@@ -41,7 +38,6 @@ export async function deleteProductAction(id: string): Promise<ActionResult> {
     const used = await prisma.documentLineItem.count({ where: { productServiceId: id } });
     if (used > 0) return { ok: false, error: `This item is used on ${used} document line(s). Deactivate it instead.` };
     await prisma.productService.delete({ where: { id } });
-    revalidatePath("/catalogue");
     return { ok: true, message: "Item deleted" };
   } catch (e) {
     return toActionError(e);
