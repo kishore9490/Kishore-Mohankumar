@@ -6,6 +6,7 @@
 import puppeteer, { type Page } from "puppeteer-core";
 import { PDFDocument } from "pdf-lib";
 import { mkdirSync, writeFileSync } from "node:fs";
+import http from "node:http";
 import path from "node:path";
 import { PrismaClient } from "@prisma/client";
 import { inviteUser } from "../../src/lib/auth/accounts";
@@ -18,6 +19,7 @@ const OUT = process.env.E2E_OUT || path.join(process.cwd(), "test-results");
 const RUN = Date.now().toString(36);
 let passed = 0;
 const failures: string[] = [];
+let failPage: Page | null = null;
 
 async function step(name: string, fn: () => Promise<void>) {
   const t0 = Date.now();
@@ -26,6 +28,7 @@ async function step(name: string, fn: () => Promise<void>) {
     passed++;
     console.log(`  ✓ ${name} (${Date.now() - t0}ms)`);
   } catch (e) {
+    await failPage?.screenshot({ path: path.join(OUT, `fail-${failures.length + 1}.png`), fullPage: true }).catch(() => {});
     failures.push(`${name}: ${(e as Error).message}`);
     console.log(`  ✗ ${name}\n      ${(e as Error).message.split("\n")[0]}`);
   }
@@ -71,6 +74,7 @@ async function main() {
   mkdirSync(OUT, { recursive: true });
   const browser = await puppeteer.launch({ executablePath: process.env.CHROMIUM_PATH, args: ["--no-sandbox"] });
   const page = await browser.newPage();
+  failPage = page;
   await page.setViewport({ width: 1440, height: 900 });
   const pageErrors: string[] = [];
   page.on("pageerror", (e) => pageErrors.push(`${new URL(page.url()).pathname}: ${String(e).slice(0, 160)}`));
@@ -303,6 +307,58 @@ async function main() {
     assert(disabled === true, "send button should be disabled without credentials");
     await page.keyboard.press("Escape");
   });
+
+  // Full email flow against a local fake Brevo API — run with the app started with
+  // BREVO_API_BASE=http://127.0.0.1:$E2E_FAKE_BREVO_PORT/v3 and the same E2E_FAKE_BREVO_PORT here.
+  if (process.env.E2E_FAKE_BREVO_PORT) {
+    const sent: Record<string, unknown>[] = [];
+    const fake = http.createServer((req, res) => {
+      let raw = "";
+      req.on("data", (c) => (raw += c));
+      req.on("end", () => {
+        const json = (code: number, b: unknown) => { res.writeHead(code, { "content-type": "application/json" }); res.end(JSON.stringify(b)); };
+        if (req.headers["api-key"] !== "xkeysib-0123456789abcdef0123456789abcdef-e2eFakeKey123") return json(401, { message: "Key not found" });
+        if (req.url === "/v3/account") return json(200, { email: "owner@example.com", companyName: "E2E Brevo" });
+        if (req.url === "/v3/senders") return json(200, { senders: [{ email: "quotes@example.com", active: true }] });
+        if (req.url === "/v3/smtp/email") { sent.push(JSON.parse(raw)); return json(201, { messageId: `<e2e-${sent.length}@brevo>` }); }
+        json(404, {});
+      });
+    });
+    await new Promise<void>((r) => fake.listen(Number(process.env.E2E_FAKE_BREVO_PORT), "127.0.0.1", r));
+
+    await step("configures Brevo in Settings, tests the connection and sends a test email", async () => {
+      await page.goto(`${BASE}/settings/integrations`, { waitUntil: "networkidle0" });
+      await setInput(page, "#brevo-key", "xkeysib-0123456789abcdef0123456789abcdef-e2eFakeKey123");
+      await setInput(page, "#brevo-sender", "quotes@example.com");
+      await setInput(page, "#brevo-name", "E2E Sender");
+      await clickText(page, "button", "Save email settings");
+      await waitText(page, "Email settings saved");
+      await clickText(page, "button", "Test connection");
+      await waitText(page, "Sender quotes@example.com is verified and active");
+      await setInput(page, "#test-to", "owner@example.com");
+      await clickText(page, "button", "Send test");
+      await waitText(page, "Test email accepted by Brevo");
+      assert(sent.length === 1 && (sent[0].to as { email: string }[])[0].email === "owner@example.com", "test email not received by fake Brevo");
+    });
+
+    await step("emails the invoice with its PDF attached and logs it", async () => {
+      await page.goto(invoiceUrl, { waitUntil: "networkidle0" });
+      await clickText(page, "button", "Email tax invoice");
+      await setInput(page, "#em-to", "accounts@example.com");
+      await clickText(page, "[role=dialog] button", "Send email");
+      await waitText(page, "Email accepted by Brevo");
+      const mail = sent.at(-1)! as { to: { email: string }[]; attachment?: { name: string; content: string }[]; htmlContent: string };
+      assert(mail.to[0].email === "accounts@example.com", "wrong recipient");
+      const att = mail.attachment?.[0];
+      assert(!!att && att.name.endsWith(".pdf") && Buffer.from(att.content, "base64").subarray(0, 5).toString() === "%PDF-", "PDF attachment missing or invalid");
+      await page.goto(`${BASE}/communications`, { waitUntil: "networkidle0" });
+      await waitText(page, "accounts@example.com");
+      await waitText(page, "Sent to provider");
+    });
+
+    await db.integrationConfiguration.deleteMany({ where: { provider: "brevo" } });
+    fake.close();
+  }
 
   await step("invites a staff member from Settings and shows the link", async () => {
     await page.goto(`${BASE}/settings/users`, { waitUntil: "networkidle0" });

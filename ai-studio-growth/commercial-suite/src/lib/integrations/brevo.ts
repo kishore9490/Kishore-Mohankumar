@@ -1,4 +1,5 @@
 import "server-only";
+import { prisma } from "../prisma";
 import { brevoStatus, loadBrevo } from "./config";
 
 /**
@@ -6,7 +7,7 @@ import { brevoStatus, loadBrevo } from "./config";
  *   POST /v3/smtp/email  (send)     GET /v3/account (connection)     GET /v3/senders (sender verification)
  * Credentials come from Settings → Integrations (encrypted in the database) and never reach the browser.
  */
-const BREVO_API = "https://api.brevo.com/v3";
+const BREVO_API = (process.env.BREVO_API_BASE || "https://api.brevo.com/v3").replace(/\/$/, ""); // override only for tests
 
 export class IntegrationError extends Error {
   constructor(message: string, public readonly status?: number) {
@@ -89,9 +90,57 @@ function escapeHtml(s: string) {
   return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 }
 
-export function textToHtml(text: string): string {
-  const paras = text.split(/\n{2,}/).map((p) => `<p style="margin:0 0 14px">${escapeHtml(p).replace(/\n/g, "<br/>").replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" style="color:#5B4CE6">$1</a>')}</p>`);
+export function textToHtml(text: string, linkColor = "#5B4CE6"): string {
+  const paras = text.split(/\n{2,}/).map((p) => `<p style="margin:0 0 14px">${escapeHtml(p).replace(/\n/g, "<br/>").replace(/(https?:\/\/[^\s<]+)/g, `<a href="$1" style="color:${linkColor};word-break:break-all">$1</a>`)}</p>`);
   return `<div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.55;color:#121733">${paras.join("")}</div>`;
+}
+
+export interface EmailBranding {
+  brandName: string;
+  coBrandName?: string | null;
+  legalName?: string | null;
+  address?: string | null;
+  phone?: string | null;
+  email?: string | null;
+  website?: string | null;
+  gstin?: string | null;
+  primaryColor?: string | null;
+  accentColor?: string | null;
+}
+
+const safeColor = (c: string | null | undefined, fallback: string) => (c && /^#[0-9a-f]{6}$/i.test(c) ? c : fallback);
+
+/** Email-client-safe branded layout (tables + inline styles): company header, message, company footer. */
+export function renderEmailHtml(text: string, brand: EmailBranding | null): string {
+  if (!brand) return textToHtml(text);
+  const primary = safeColor(brand.primaryColor, "#0F1B3D");
+  const accent = safeColor(brand.accentColor, "#6D28D9");
+  const title = [brand.brandName, brand.coBrandName].filter(Boolean).map((t) => escapeHtml(t!)).join(" &times; ");
+  const footer = [
+    brand.legalName && `<strong>${escapeHtml(brand.legalName)}</strong>`,
+    brand.address && escapeHtml(brand.address).replace(/\n/g, ", "),
+    [brand.phone, brand.email, brand.website].filter(Boolean).map((v) => escapeHtml(v!)).join(" &middot; "),
+    brand.gstin && `GSTIN ${escapeHtml(brand.gstin)}`,
+  ].filter(Boolean).join("<br/>");
+  return `<!doctype html><html><body style="margin:0;padding:0;background:#f4f5fa">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f5fa;padding:24px 12px"><tr><td align="center">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:10px;overflow:hidden;border:1px solid #e3e6f0">
+<tr><td style="background:${primary};padding:18px 28px;font-family:Arial,Helvetica,sans-serif;font-size:17px;font-weight:bold;color:#ffffff;letter-spacing:.3px">${title}</td></tr>
+<tr><td style="height:3px;background:${accent};font-size:0;line-height:0">&nbsp;</td></tr>
+<tr><td style="padding:28px">${textToHtml(text, accent)}</td></tr>
+${footer ? `<tr><td style="padding:16px 28px 22px;border-top:1px solid #eceef5;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.6;color:#6b7190">${footer}</td></tr>` : ""}
+</table></td></tr></table></body></html>`;
+}
+
+async function loadBranding(): Promise<EmailBranding | null> {
+  try {
+    return await prisma.companyProfile.findFirst({
+      orderBy: { createdAt: "asc" },
+      select: { brandName: true, coBrandName: true, legalName: true, address: true, phone: true, email: true, website: true, gstin: true, primaryColor: true, accentColor: true },
+    });
+  } catch {
+    return null; // branding is optional — never block an email on it
+  }
 }
 
 export async function brevoSendEmail(msg: EmailMessage): Promise<{ messageId: string | null }> {
@@ -105,7 +154,7 @@ export async function brevoSendEmail(msg: EmailMessage): Promise<{ messageId: st
       ...(status.replyTo ? { replyTo: { email: status.replyTo } } : {}),
       subject: msg.subject,
       textContent: msg.text,
-      htmlContent: textToHtml(msg.text),
+      htmlContent: renderEmailHtml(msg.text, await loadBranding()),
       ...(msg.tags?.length ? { tags: msg.tags } : {}),
       ...(msg.attachments?.length ? { attachment: msg.attachments.map((a) => ({ name: a.name, content: a.contentBase64 })) } : {}),
     }),
