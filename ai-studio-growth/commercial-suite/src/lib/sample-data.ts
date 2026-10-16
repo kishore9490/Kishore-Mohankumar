@@ -6,9 +6,8 @@
  */
 import { readFileSync, existsSync } from "node:fs";
 import path from "node:path";
-import { randomBytes } from "node:crypto";
 import type { PrismaClient } from "@prisma/client";
-import { hashPassword } from "./auth/password";
+import { inviteUser } from "./auth/accounts";
 import { addDaysISO, todayISO } from "./dates";
 import { documentSchema, type DocumentInput } from "./validation/schemas";
 import { issueInvoice, recordPayment, saveDocument, setDocumentStatus } from "./services/documents";
@@ -78,17 +77,12 @@ export async function seedBase(db: PrismaClient, opts: { log?: (m: string) => vo
     });
   }
 
-  const adminEmail = (process.env.SEED_ADMIN_EMAIL || "admin@aistudiocraft.local").toLowerCase();
-  const existingAdmin = await db.user.findUnique({ where: { email: adminEmail } });
-  if (!existingAdmin) {
-    let password = process.env.SEED_ADMIN_PASSWORD;
-    let generated = false;
-    if (!password) {
-      password = randomBytes(12).toString("base64url");
-      generated = true;
-    }
-    await db.user.create({ data: { email: adminEmail, name: "Administrator", role: "ADMIN", passwordHash: await hashPassword(password) } });
-    log(`Created administrator ${adminEmail}${generated ? ` with generated password: ${password}  (shown once — change it after signing in)` : " (password from SEED_ADMIN_PASSWORD)"}.`);
+  // Invite-only: the first administrator is created without a password and receives a one-time link.
+  if ((await db.user.count()) === 0) {
+    const adminEmail = (process.env.SEED_ADMIN_EMAIL || "admin@aistudiocraft.local").toLowerCase();
+    const { token } = await inviteUser(db, { name: process.env.SEED_ADMIN_NAME || "Administrator", email: adminEmail, role: "ADMIN" }, null);
+    const base = (process.env.PUBLIC_APP_URL || process.env.APP_URL || "http://localhost:3000").replace(/\/$/, "");
+    log(`Created administrator ${adminEmail}. Open this one-time link to set the password and MFA (valid 72 hours):\n    ${base}/invite/${token}`);
   }
 
   for (const t of DEFAULT_MESSAGE_TEMPLATES) {

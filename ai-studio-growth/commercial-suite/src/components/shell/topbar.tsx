@@ -68,7 +68,7 @@ export function Topbar({ user }: { user: { name: string; email: string; role: st
         </D.Portal>
       </D.Root>
       <div className="lg:hidden">
-        <Link href="/" className="font-display text-sm font-bold text-ink">Commercial Suite</Link>
+        <Link href="/" className="font-display text-sm font-bold text-ink">Quote Studio</Link>
       </div>
       <div className="ml-auto flex items-center gap-2">
         <CreateMenu size="sm" />

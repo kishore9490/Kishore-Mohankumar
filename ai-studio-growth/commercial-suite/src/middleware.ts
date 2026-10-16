@@ -7,7 +7,8 @@ import { NextResponse, type NextRequest } from "next/server";
  */
 const PUBLIC_PREFIXES = [
   "/login",
-  "/api/webhooks/", // provider webhooks — verified by signature / verify token
+  "/invite/", // single-use invitation links — verified by token
+  "/api/webhooks/", // provider webhooks — verified by signature / secret token
   "/share/", // short-lived signed document links — verified by token
   "/print/", // server-side PDF rendering — verified by signed render token
   "/_next/",

@@ -6,6 +6,7 @@ import { prisma } from "../prisma";
 import { randomToken, sha256 } from "./tokens";
 
 export const SESSION_COOKIE = "cs_session";
+export const CHALLENGE_COOKIE = "cs_challenge";
 const SESSION_DAYS = 7;
 
 export interface SessionUser {
@@ -73,3 +74,19 @@ export async function assertUser(role?: "ADMIN"): Promise<SessionUser> {
 }
 
 export class AuthError extends Error {}
+
+const cookieSecure = () => process.env.NODE_ENV === "production" && process.env.INSECURE_COOKIES !== "true";
+
+/** Holds the short-lived MFA challenge token between the password step and the code step. */
+export async function setChallengeCookie(token: string) {
+  const jar = await cookies();
+  jar.set(CHALLENGE_COOKIE, token, { httpOnly: true, sameSite: "lax", secure: cookieSecure(), path: "/", maxAge: 10 * 60 });
+}
+
+export async function readChallengeCookie(): Promise<string | undefined> {
+  return (await cookies()).get(CHALLENGE_COOKIE)?.value;
+}
+
+export async function clearChallengeCookie() {
+  (await cookies()).delete(CHALLENGE_COOKIE);
+}

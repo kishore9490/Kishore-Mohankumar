@@ -1,12 +1,17 @@
 /**
  * End-to-end browser test (headless Chromium via puppeteer-core) against a running server.
  * Usage: APP_URL=http://127.0.0.1:3000 npm run test:e2e
- * Requires SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD and CHROMIUM_PATH (see .env).
+ * Requires DATABASE_URL (creates its own invited e2e admin), SESSION_SECRET and CHROMIUM_PATH (see .env).
  */
 import puppeteer, { type Page } from "puppeteer-core";
 import { PDFDocument } from "pdf-lib";
 import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
+import { PrismaClient } from "@prisma/client";
+import { inviteUser } from "../../src/lib/auth/accounts";
+import { currentStep, totpAt } from "../../src/lib/auth/totp";
+
+const db = new PrismaClient();
 
 const BASE = (process.env.APP_URL || "http://127.0.0.1:3000").replace(/\/$/, "");
 const OUT = process.env.E2E_OUT || path.join(process.cwd(), "test-results");
@@ -68,7 +73,7 @@ async function main() {
   const page = await browser.newPage();
   await page.setViewport({ width: 1440, height: 900 });
   const pageErrors: string[] = [];
-  page.on("pageerror", (e) => pageErrors.push(String(e)));
+  page.on("pageerror", (e) => pageErrors.push(`${new URL(page.url()).pathname}: ${String(e).slice(0, 160)}`));
   page.on("dialog", (d) => d.accept());
   page.setDefaultTimeout(45000);
   console.log(`E2E against ${BASE}`);
@@ -82,14 +87,76 @@ async function main() {
     assert(print.status === 404, `print page without token should 404, got ${print.status}`);
   });
 
-  await step("rejects a wrong password, then signs in", async () => {
-    await page.goto(`${BASE}/login`, { waitUntil: "networkidle0" });
-    await page.type("#email", process.env.SEED_ADMIN_EMAIL!);
+  const adminEmail = `e2e-admin-${RUN}@example.com`;
+  const adminPassword = "E2eStrongPass123";
+  let totpSecret = "";
+  let lastStep = -1;
+  const nextCode = async () => {
+    // Codes are single-use per 30s step; wait for a fresh step if needed.
+    while (currentStep() <= lastStep) await new Promise((r) => setTimeout(r, 1000));
+    lastStep = currentStep();
+    return totpAt(totpSecret);
+  };
+
+  await step("invalid invitation links are rejected", async () => {
+    await page.goto(`${BASE}/invite/not-a-real-token-aaaaaaaaaaaaaaaaaaaaaaaa`, { waitUntil: "networkidle0" });
+    await waitText(page, "no longer valid");
+  });
+
+  await step("accepts an invitation, sets a password and enrols MFA (invalid then valid OTP)", async () => {
+    const { token } = await inviteUser(db, { name: `E2E Admin ${RUN}`, email: adminEmail, role: "ADMIN" }, null);
+    await page.goto(`${BASE}/invite/${token}`, { waitUntil: "networkidle0" });
+    await waitText(page, "You're invited".replace("'", "’")).catch(() => waitText(page, "invited"));
+    await page.type("#new-password", adminPassword);
+    await page.type("#confirm-password", adminPassword);
+    await Promise.all([page.waitForNavigation({ waitUntil: "networkidle0" }), clickText(page, "button[type=submit]", "Set password")]);
+    assert(page.url().includes("/login/setup"), `expected MFA setup, got ${page.url()}`);
+    totpSecret = (await page.$eval("[data-testid=totp-secret]", (el) => el.textContent ?? "")).replace(/\s/g, "");
+    assert(/^[A-Z2-7]{32}$/.test(totpSecret), `unexpected secret ${totpSecret}`);
+    // wrong code → shake + red state + message
+    await page.click("input[aria-label='Digit 1']");
+    await page.keyboard.type("000000");
+    await page.waitForSelector("[data-otp-state=error]");
+    await waitText(page, "does not match");
+    await page.screenshot({ path: path.join(OUT, "otp-invalid.png") });
+    await page.waitForSelector("[data-otp-state=idle]");
+    await page.waitForFunction(() => (document.querySelector("input[aria-label='Digit 1']") as HTMLInputElement)?.value === "");
+    await page.click("input[aria-label='Digit 1']");
+    await page.keyboard.type(await nextCode());
+    await waitText(page, "Authenticator connected");
+    await page.screenshot({ path: path.join(OUT, "otp-valid.png") });
+    await page.waitForSelector("[data-testid=recovery-codes]");
+    const codes = await page.$$eval("[data-testid=recovery-codes] li", (els) => els.map((e) => e.textContent ?? ""));
+    assert(codes.length === 8, `expected 8 recovery codes, got ${codes.length}`);
+    await page.click("input[type=checkbox]");
+    await Promise.all([page.waitForNavigation({ waitUntil: "networkidle0" }), clickText(page, "button", "Continue to dashboard")]);
+    await waitText(page, "Outstanding receivables");
+  });
+
+  await step("signs out, rejects a wrong password, and signs in with password + OTP", async () => {
+    await page.click("button[aria-label='Account menu']");
+    await Promise.all([page.waitForNavigation({ waitUntil: "networkidle0" }), clickText(page, "[role=menuitem]", "Sign out")]);
+    await page.type("#email", adminEmail);
     await page.type("#password", "definitely-wrong-password");
     await page.click("button[type=submit]");
     await waitText(page, "Incorrect email or password");
-    await setInput(page, "#password", process.env.SEED_ADMIN_PASSWORD!);
+    await setInput(page, "#password", adminPassword);
     await Promise.all([page.waitForNavigation({ waitUntil: "networkidle0" }), page.click("button[type=submit]")]);
+    assert(page.url().includes("/login/verify"), `expected OTP step, got ${page.url()}`);
+    // protected pages are still blocked before the OTP step
+    const res = await page.goto(`${BASE}/customers`, { waitUntil: "networkidle0" });
+    assert(page.url().includes("/login"), `customers should require full sign-in (status ${res?.status()})`);
+    await page.goto(`${BASE}/login/verify`, { waitUntil: "networkidle0" });
+    await page.click("input[aria-label='Digit 1']");
+    await page.keyboard.type("123456");
+    await page.waitForSelector("[data-otp-state=error]");
+    await waitText(page, "attempts left");
+    await page.waitForSelector("[data-otp-state=idle]");
+    await page.waitForFunction(() => (document.querySelector("input[aria-label='Digit 1']") as HTMLInputElement)?.value === "");
+    await page.click("input[aria-label='Digit 1']");
+    await page.keyboard.type(await nextCode());
+    await waitText(page, "Verified");
+    await page.waitForFunction(() => location.pathname === "/", { timeout: 15000 });
     await waitText(page, "Outstanding receivables");
   });
 
@@ -220,7 +287,18 @@ async function main() {
     await waitText(page, "₹33,690.00");
   });
 
-  await step("shows email as not configured and logs a manual WhatsApp fallback honestly", async () => {
+  await step("configures integrations in Settings (WhatsApp Business mode, Brevo key validation)", async () => {
+    await page.goto(`${BASE}/settings/integrations`, { waitUntil: "networkidle0" });
+    await waitText(page, "WhatsApp Business app");
+    await page.select("#wa-open", "phone");
+    await clickText(page, "button", "Save WhatsApp settings");
+    await waitText(page, "WhatsApp settings saved");
+    await page.type("#brevo-key", "not-a-brevo-key");
+    await clickText(page, "button", "Save email settings");
+    await waitText(page, "does not look like a Brevo API v3 key");
+  });
+
+  await step("shows email as not configured; sends via WhatsApp Business with confirmation", async () => {
     await page.goto(invoiceUrl, { waitUntil: "networkidle0" });
     await clickText(page, "button", "Email tax invoice");
     await waitText(page, "Email is not configured");
@@ -232,14 +310,45 @@ async function main() {
       window.open = ((u: string) => { (window as unknown as { __opened: string[] }).__opened.push(u); return null; }) as typeof window.open;
     });
     await clickText(page, "button", "WhatsApp reminder");
-    await waitText(page, "not configured");
-    await clickText(page, "[role=dialog] button", "Open WhatsApp manually");
+    await clickText(page, "[role=dialog] button", "Open in WhatsApp Business");
     await page.waitForFunction(() => (window as unknown as { __opened: string[] }).__opened.length > 0);
     const opened = await page.evaluate(() => (window as unknown as { __opened: string[] }).__opened[0]);
-    assert(opened.startsWith("https://wa.me/919876543210?text="), `unexpected wa.me url ${opened}`);
+    assert(opened.startsWith("https://wa.me/919876543210?text="), `unexpected chat url ${opened}`);
+    await waitText(page, "Did you send it");
+    await clickText(page, "[role=dialog] button", "Yes, I sent it");
+    await waitText(page, "Marked as sent");
     await page.goto(`${BASE}/communications`, { waitUntil: "networkidle0" });
-    await waitText(page, "WhatsApp (manual)");
-    await waitText(page, "Prepared");
+    await waitText(page, "WhatsApp Business app");
+    await waitText(page, "Sent (confirmed)");
+  });
+
+  await step("runs a WhatsApp promotion for opted-in customers", async () => {
+    await page.goto(`${BASE}/promotions/new`, { waitUntil: "networkidle0" });
+    await page.type("#pname", `E2E Offer ${RUN}`);
+    await waitText(page, customerName);
+    await Promise.all([page.waitForNavigation({ waitUntil: "networkidle0" }), clickText(page, "button", "Create promotion queue")]);
+    await page.evaluate(() => {
+      (window as unknown as { __opened: string[] }).__opened = [];
+      window.open = ((u: string) => { (window as unknown as { __opened: string[] }).__opened.push(u); return null; }) as typeof window.open;
+    });
+    await clickText(page, "button", "Open next");
+    await page.waitForFunction(() => (window as unknown as { __opened: string[] }).__opened.length > 0);
+    const opened = await page.evaluate(() => (window as unknown as { __opened: string[] }).__opened[0]);
+    assert(decodeURIComponent(opened).includes("Hello R. Kumar"), `message not personalised: ${opened.slice(0, 120)}`);
+    await clickText(page, "button", "I sent it");
+    await waitText(page, "All customers handled");
+  });
+
+  await step("invites a staff member from Settings and shows the link", async () => {
+    await page.goto(`${BASE}/settings/users`, { waitUntil: "networkidle0" });
+    await clickText(page, "button", "Invite user");
+    await page.type("#u-name", "E2E Staff");
+    await page.type("#u-email", `e2e-staff-${RUN}@example.com`);
+    await clickText(page, "[role=dialog] button", "Create invitation");
+    await waitText(page, "/invite/");
+    await page.keyboard.press("Escape");
+    await page.goto(`${BASE}/settings/security`, { waitUntil: "networkidle0" });
+    await waitText(page, "8 of 8");
   });
 
   let proposalId = "";
@@ -294,7 +403,7 @@ async function main() {
   });
 
   await step("every main route renders without errors", async () => {
-    for (const r of ["/", "/customers", "/catalogue", "/documents/proposals", "/documents/quotations", "/documents/invoices", "/documents/proforma", "/communications", "/history", "/settings/company", "/settings/integrations", "/settings/users"]) {
+    for (const r of ["/", "/customers", "/catalogue", "/documents/proposals", "/documents/quotations", "/documents/invoices", "/documents/proforma", "/promotions", "/communications", "/history", "/settings/company", "/settings/integrations", "/settings/templates", "/settings/users", "/settings/security"]) {
       const res = await page.goto(`${BASE}${r}`, { waitUntil: "networkidle0" });
       assert(res?.status() === 200, `${r} returned ${res?.status()}`);
     }
@@ -324,6 +433,7 @@ async function main() {
   });
 
   await browser.close();
+  await db.$disconnect();
   if (pageErrors.length) console.log(`\n  Browser errors:\n    ${pageErrors.slice(0, 5).join("\n    ")}`);
   console.log(`\n${passed} passed, ${failures.length} failed`);
   if (failures.length) {

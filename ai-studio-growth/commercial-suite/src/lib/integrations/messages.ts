@@ -27,7 +27,7 @@ export function templateVars(doc: RenderableDocument, senderName: string): Recor
 export const TEMPLATE_PLACEHOLDERS = ["customerName", "customerCompany", "documentNumber", "documentTitle", "documentType", "amount", "balance", "dueDate", "validUntil", "companyName", "senderName"];
 
 /** Delivery status ranking — webhook updates never move a message backwards. */
-export const STATUS_RANK: Record<string, number> = { PREPARED: 0, QUEUED: 1, SENT_TO_PROVIDER: 2, DELIVERED: 3, READ: 4, FAILED: 5 };
+export const STATUS_RANK: Record<string, number> = { PREPARED: 0, QUEUED: 1, SENT_TO_PROVIDER: 2, SENT_MANUAL: 2, DELIVERED: 3, READ: 4, FAILED: 5 };
 
 export function mapWhatsAppStatus(s: string): "SENT_TO_PROVIDER" | "DELIVERED" | "READ" | "FAILED" | null {
   switch (s) {
@@ -45,10 +45,11 @@ export function mapWhatsAppStatus(s: string): "SENT_TO_PROVIDER" | "DELIVERED" |
 }
 
 export const DELIVERY_STATUS_META: Record<string, { label: string; tone: "neutral" | "info" | "success" | "warning" | "danger" | "purple"; help: string }> = {
-  PREPARED: { label: "Prepared", tone: "neutral", help: "Prepared locally — not sent by the application (manual WhatsApp or development mock)." },
+  PREPARED: { label: "Prepared", tone: "neutral", help: "Chat opened in WhatsApp Business (or development mock) — not yet confirmed as sent." },
+  SENT_MANUAL: { label: "Sent (confirmed)", tone: "success", help: "Sent from the WhatsApp Business app and confirmed by a team member." },
   QUEUED: { label: "Queued", tone: "info", help: "Being submitted to the provider." },
   SENT_TO_PROVIDER: { label: "Sent to provider", tone: "purple", help: "The provider accepted the message. This does not prove the customer received it." },
   DELIVERED: { label: "Delivered", tone: "success", help: "The provider reported delivery to the recipient's device." },
-  READ: { label: "Read", tone: "success", help: "WhatsApp reported the message as read." },
+  READ: { label: "Read / opened", tone: "success", help: "WhatsApp reported the message as read, or Brevo reported the email as opened." },
   FAILED: { label: "Failed", tone: "danger", help: "The provider rejected or failed to deliver the message." },
 };

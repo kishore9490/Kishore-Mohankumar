@@ -1,26 +1,16 @@
 import "server-only";
 import { prisma } from "../prisma";
 import { randomToken, sha256 } from "../auth/tokens";
+import { publicAppUrl } from "./config";
 
-/** Public base URL (must be HTTPS and reachable from the internet for WhatsApp/customers). */
-export function publicAppUrl(): string | null {
-  const url = process.env.PUBLIC_APP_URL?.replace(/\/$/, "");
-  if (!url) return null;
-  try {
-    const u = new URL(url);
-    if (["localhost", "127.0.0.1", "0.0.0.0"].includes(u.hostname)) return null;
-    return url;
-  } catch {
-    return null;
-  }
-}
+export { publicAppUrl };
 
 /**
  * Creates a short-lived, single-document link. Only the SHA-256 hash of the token is stored;
  * links expire, have an access cap and can be revoked. There is no public directory of documents.
  */
 export async function createShareLink(documentId: string, hours = 72, maxAccess = 20): Promise<string | null> {
-  const base = publicAppUrl();
+  const base = await publicAppUrl();
   if (!base) return null;
   const token = randomToken(24);
   await prisma.documentShareLink.create({

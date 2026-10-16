@@ -9,8 +9,7 @@ import {
 } from "@/lib/documents/meta";
 import { dec, formatMoney } from "@/lib/money";
 import { formatDate, formatDateTime, todayISO } from "@/lib/dates";
-import { brevoStatus, emailMockMode } from "@/lib/integrations/brevo";
-import { whatsappStatus } from "@/lib/integrations/whatsapp";
+import { brevoStatus, whatsappStatus, publicAppUrl } from "@/lib/integrations/config";
 import { composeDefaults } from "@/lib/integrations/compose";
 import { DELIVERY_STATUS_META } from "@/lib/integrations/messages";
 import { PageHeader } from "@/components/ui/page-header";
@@ -56,10 +55,10 @@ export default async function DocumentPage({ params }: { params: Promise<{ kind:
   const balance = dec(doc.totals.balance);
   const sendable = stored !== "CANCELLED" && !(type === "INVOICE" && stored === "DRAFT") && doc.lines.length > 0;
   const compose = sendable ? await composeDefaults(id, user.name) : null;
-  const brevo = brevoStatus();
-  const wa = whatsappStatus();
-  const waCfg = await prisma.integrationConfiguration.findUnique({ where: { provider: "whatsapp" } });
-  const waSettings = (waCfg?.settings ?? {}) as { documentTemplateName?: string; reminderTemplateName?: string };
+  const [brevo, wa, publicUrl] = await Promise.all([brevoStatus(), whatsappStatus(), publicAppUrl()]);
+  const waSettings = wa.settings;
+  const inWindow = !!raw.customer.whatsappLastInboundAt && Date.now() - raw.customer.whatsappLastInboundAt.getTime() < 24 * 3_600_000;
+  const waProps = { mode: wa.mode, apiActive: wa.apiActive, consent: raw.customer.whatsappConsent, inWindow, linksEnabled: !!publicUrl };
   const reminderAllowed = type === "INVOICE" && ["ISSUED", "PARTIALLY_PAID"].includes(stored) && balance.gt(0);
   const dateRows: [string, string][] = [
     ["Issue date", formatDate(doc.issueDate)],
@@ -115,12 +114,12 @@ export default async function DocumentPage({ params }: { params: Promise<{ kind:
           {sendable && compose && (
             <Card className="flex flex-wrap items-center gap-2 p-3">
               <span className="mr-1 text-[13px] font-medium text-muted">Send to customer:</span>
-              <EmailDialog documentId={id} defaultTo={doc.customer.email ?? ""} compose={compose.email.DOCUMENT} kind="DOCUMENT" configured={brevo.configured} mockMode={emailMockMode()} missing={brevo.missing} label={`Email ${meta.label.toLowerCase()}`} />
-              <WhatsAppDialog documentId={id} defaultTo={doc.customer.phone ?? ""} compose={compose.whatsapp.DOCUMENT} kind="DOCUMENT" configured={wa.configured} consent={raw.customer.whatsappConsent} label="WhatsApp" hasTemplate={!!waSettings.documentTemplateName} />
+              <EmailDialog documentId={id} defaultTo={doc.customer.email ?? ""} compose={compose.email.DOCUMENT} kind="DOCUMENT" configured={brevo.configured} mockMode={brevo.mode === "mock"} missing={brevo.missing} label={`Email ${meta.label.toLowerCase()}`} />
+              <WhatsAppDialog documentId={id} defaultTo={doc.customer.phone ?? ""} compose={compose.whatsapp.DOCUMENT} kind="DOCUMENT" label="WhatsApp" hasTemplate={!!waSettings.documentTemplateName} {...waProps} />
               {reminderAllowed && (
                 <>
-                  <EmailDialog documentId={id} defaultTo={doc.customer.email ?? ""} compose={compose.email.PAYMENT_REMINDER} kind="PAYMENT_REMINDER" configured={brevo.configured} mockMode={emailMockMode()} missing={brevo.missing} label="Email payment reminder" />
-                  <WhatsAppDialog documentId={id} defaultTo={doc.customer.phone ?? ""} compose={compose.whatsapp.PAYMENT_REMINDER} kind="PAYMENT_REMINDER" configured={wa.configured} consent={raw.customer.whatsappConsent} label="WhatsApp reminder" hasTemplate={!!(waSettings.reminderTemplateName || waSettings.documentTemplateName)} />
+                  <EmailDialog documentId={id} defaultTo={doc.customer.email ?? ""} compose={compose.email.PAYMENT_REMINDER} kind="PAYMENT_REMINDER" configured={brevo.configured} mockMode={brevo.mode === "mock"} missing={brevo.missing} label="Email payment reminder" />
+                  <WhatsAppDialog documentId={id} defaultTo={doc.customer.phone ?? ""} compose={compose.whatsapp.PAYMENT_REMINDER} kind="PAYMENT_REMINDER" label="WhatsApp reminder" hasTemplate={!!(waSettings.reminderTemplateName || waSettings.documentTemplateName)} {...waProps} />
                 </>
               )}
             </Card>
@@ -205,7 +204,7 @@ export default async function DocumentPage({ params }: { params: Promise<{ kind:
                 {raw.communications.map((m) => (
                   <li key={m.id} className="px-5 py-3">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="truncate">{m.channel === "WHATSAPP_MANUAL" ? "WhatsApp (manual)" : m.channel === "EMAIL" ? "Email" : "WhatsApp API"} → {m.recipient}</span>
+                      <span className="truncate">{m.channel === "WHATSAPP_MANUAL" ? "WhatsApp Business" : m.channel === "EMAIL" ? "Email" : "WhatsApp API"} → {m.recipient}</span>
                       <Badge tone={DELIVERY_STATUS_META[m.status].tone}>{DELIVERY_STATUS_META[m.status].label}</Badge>
                     </div>
                     <div className="text-xs text-muted">{m.messageType === "PAYMENT_REMINDER" ? "Payment reminder · " : ""}{formatDateTime(m.createdAt)}{m.mode === "DEV_MOCK" ? " · dev mock" : ""}</div>

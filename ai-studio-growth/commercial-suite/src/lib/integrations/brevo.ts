@@ -1,36 +1,12 @@
 import "server-only";
+import { brevoStatus, loadBrevo } from "./config";
 
 /**
- * Brevo transactional email (REST API v3: POST https://api.brevo.com/v3/smtp/email).
- * Secrets are read from server environment variables only and are never logged or sent to the browser.
+ * Brevo transactional email — REST API v3.
+ *   POST /v3/smtp/email  (send)     GET /v3/account (connection)     GET /v3/senders (sender verification)
+ * Credentials come from Settings → Integrations (encrypted in the database) and never reach the browser.
  */
 const BREVO_API = "https://api.brevo.com/v3";
-
-export interface BrevoStatus {
-  configured: boolean;
-  mode: "live" | "mock";
-  senderEmail: string | null;
-  senderName: string | null;
-  missing: string[];
-}
-
-export function brevoStatus(): BrevoStatus {
-  const missing: string[] = [];
-  if (!process.env.BREVO_API_KEY) missing.push("BREVO_API_KEY");
-  if (!process.env.BREVO_SENDER_EMAIL) missing.push("BREVO_SENDER_EMAIL");
-  return {
-    configured: missing.length === 0,
-    mode: emailMockMode() ? "mock" : "live",
-    senderEmail: process.env.BREVO_SENDER_EMAIL ?? null,
-    senderName: process.env.BREVO_SENDER_NAME ?? null,
-    missing,
-  };
-}
-
-/** Mock delivery only when explicitly requested and never in production. */
-export function emailMockMode(): boolean {
-  return process.env.EMAIL_DELIVERY_MODE === "mock" && process.env.NODE_ENV !== "production";
-}
 
 export class IntegrationError extends Error {
   constructor(message: string, public readonly status?: number) {
@@ -38,19 +14,27 @@ export class IntegrationError extends Error {
   }
 }
 
+export { brevoStatus };
+
+/** Mock delivery only when explicitly selected in Settings and never in production. */
+export async function emailMockMode(): Promise<boolean> {
+  return (await brevoStatus()).mode === "mock";
+}
+
 function safeProviderMessage(status: number, body: unknown): string {
   const b = body as { code?: string; message?: string } | null;
   const msg = b?.message ? String(b.message).slice(0, 200) : "";
-  if (status === 401) return "Brevo rejected the API key (401 Unauthorized). Check BREVO_API_KEY.";
+  if (status === 401) return "Brevo rejected the API key (401 Unauthorized). Check the key in Settings → Integrations.";
   if (status === 400) return `Brevo rejected the request: ${msg || "bad request"}.`;
   if (status === 402) return "Brevo account has insufficient credits or the plan does not allow this send (402).";
+  if (status === 403) return `Brevo refused the request (403)${msg ? `: ${msg}` : ""}. Check that the sender is verified and the IP is authorised.`;
   if (status === 429) return "Brevo rate limit reached (429). Try again shortly.";
   return `Brevo returned HTTP ${status}${msg ? `: ${msg}` : ""}.`;
 }
 
-async function brevoFetch(path: string, init: RequestInit): Promise<unknown> {
-  const key = process.env.BREVO_API_KEY;
-  if (!key) throw new IntegrationError("Brevo is not configured (BREVO_API_KEY is missing).");
+async function brevoFetch(path: string, init: RequestInit, apiKeyOverride?: string): Promise<unknown> {
+  const key = apiKeyOverride ?? (await loadBrevo()).secrets.apiKey;
+  if (!key) throw new IntegrationError("Brevo is not configured — add the API key in Settings → Integrations.");
   let res: Response;
   try {
     res = await fetch(`${BREVO_API}${path}`, {
@@ -73,9 +57,23 @@ async function brevoFetch(path: string, init: RequestInit): Promise<unknown> {
   return body;
 }
 
-export async function brevoTestConnection(): Promise<{ email?: string; companyName?: string }> {
-  const body = (await brevoFetch("/account", { method: "GET" })) as { email?: string; companyName?: string };
-  return { email: body?.email, companyName: body?.companyName };
+/** Checks the API key and whether the configured sender is a verified, active Brevo sender. */
+export async function brevoTestConnection(): Promise<{ email?: string; companyName?: string; senderVerified: boolean | null; senderMessage: string }> {
+  const { settings } = await loadBrevo();
+  const account = (await brevoFetch("/account", { method: "GET" })) as { email?: string; companyName?: string };
+  let senderVerified: boolean | null = null;
+  let senderMessage = "No sender email configured.";
+  if (settings.senderEmail) {
+    try {
+      const senders = (await brevoFetch("/senders", { method: "GET" })) as { senders?: { email: string; active: boolean }[] };
+      const match = senders.senders?.find((s) => s.email.toLowerCase() === settings.senderEmail!.toLowerCase());
+      senderVerified = !!match?.active;
+      senderMessage = match ? (match.active ? `Sender ${match.email} is verified and active.` : `Sender ${match.email} exists but is not active/verified in Brevo.`) : `Sender ${settings.senderEmail} is not registered in Brevo — add and verify it under Senders, Domains & Dedicated IPs.`;
+    } catch (e) {
+      senderMessage = `Could not check senders: ${(e as Error).message}`;
+    }
+  }
+  return { email: account?.email, companyName: account?.companyName, senderVerified, senderMessage };
 }
 
 export interface EmailMessage {
@@ -84,6 +82,7 @@ export interface EmailMessage {
   subject: string;
   text: string;
   attachments?: { name: string; contentBase64: string }[];
+  tags?: string[];
 }
 
 function escapeHtml(s: string) {
@@ -91,25 +90,45 @@ function escapeHtml(s: string) {
 }
 
 export function textToHtml(text: string): string {
-  const paras = text.split(/\n{2,}/).map((p) => `<p style="margin:0 0 14px">${escapeHtml(p).replace(/\n/g, "<br/>")}</p>`);
+  const paras = text.split(/\n{2,}/).map((p) => `<p style="margin:0 0 14px">${escapeHtml(p).replace(/\n/g, "<br/>").replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" style="color:#5B4CE6">$1</a>')}</p>`);
   return `<div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.55;color:#121733">${paras.join("")}</div>`;
 }
 
 export async function brevoSendEmail(msg: EmailMessage): Promise<{ messageId: string | null }> {
-  const status = brevoStatus();
+  const status = await brevoStatus();
   if (!status.configured) throw new IntegrationError(`Brevo is not configured. Missing: ${status.missing.join(", ")}.`);
-  const replyTo = process.env.BREVO_REPLY_TO;
   const body = (await brevoFetch("/smtp/email", {
     method: "POST",
     body: JSON.stringify({
       sender: { email: status.senderEmail, name: status.senderName ?? undefined },
       to: [{ email: msg.to, name: msg.toName || undefined }],
-      ...(replyTo ? { replyTo: { email: replyTo } } : {}),
+      ...(status.replyTo ? { replyTo: { email: status.replyTo } } : {}),
       subject: msg.subject,
       textContent: msg.text,
       htmlContent: textToHtml(msg.text),
+      ...(msg.tags?.length ? { tags: msg.tags } : {}),
       ...(msg.attachments?.length ? { attachment: msg.attachments.map((a) => ({ name: a.name, content: a.contentBase64 })) } : {}),
     }),
   })) as { messageId?: string };
   return { messageId: body?.messageId ?? null };
+}
+
+/** Maps Brevo transactional webhook events to delivery statuses (null = informational only). */
+export function mapBrevoEvent(event: string): "DELIVERED" | "READ" | "FAILED" | null {
+  switch (event) {
+    case "delivered":
+      return "DELIVERED";
+    case "opened":
+    case "unique_opened":
+    case "click":
+      return "READ";
+    case "hard_bounce":
+    case "blocked":
+    case "invalid_email":
+    case "error":
+    case "spam":
+      return "FAILED";
+    default:
+      return null; // request, deferred, soft_bounce, unsubscribed …
+  }
 }

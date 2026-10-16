@@ -16,6 +16,11 @@ const CANDIDATE_BROWSERS = [
   "/usr/bin/chromium",
   "/usr/bin/chromium-browser",
   "/usr/bin/google-chrome",
+  "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+  "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+  "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+  "C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe",
+  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
 ].filter(Boolean) as string[];
 
 export function findBrowserExecutable(): string | null {
@@ -168,8 +173,8 @@ async function assemble(doc: RenderableDocument, chunks: { bytes: Uint8Array; ki
   out.setTitle(`${typeLabel} ${doc.number ?? "(draft)"} — ${doc.customer.name}`);
   out.setAuthor(brandLine(doc.company));
   out.setSubject(doc.title ?? typeLabel);
-  out.setCreator("AI Studio Craft Commercial Suite");
-  out.setProducer("AI Studio Craft Commercial Suite (Chromium + pdf-lib)");
+  out.setCreator("AI Studio Quote Studio");
+  out.setProducer("AI Studio Quote Studio (Chromium + pdf-lib)");
   return Buffer.from(await out.save());
 }
 

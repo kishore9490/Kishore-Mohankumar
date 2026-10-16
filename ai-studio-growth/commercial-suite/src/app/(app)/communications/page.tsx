@@ -17,7 +17,7 @@ import { docHref } from "@/components/documents/doc-link";
 export const metadata = { title: "Communications" };
 export const dynamic = "force-dynamic";
 
-const CHANNEL_LABEL: Record<string, string> = { EMAIL: "Email (Brevo)", WHATSAPP: "WhatsApp API", WHATSAPP_MANUAL: "WhatsApp (manual)" };
+const CHANNEL_LABEL: Record<string, string> = { EMAIL: "Email (Brevo)", WHATSAPP: "WhatsApp API", WHATSAPP_MANUAL: "WhatsApp Business app" };
 
 export default async function CommunicationsPage({ searchParams }: { searchParams: Promise<{ channel?: string; status?: string; document?: string }> }) {
   await requireUser();
@@ -31,7 +31,7 @@ export default async function CommunicationsPage({ searchParams }: { searchParam
   return (
     <>
       <PageHeader title="Communications" description="Every email and WhatsApp attempt with evidence-based delivery status. Message bodies and credentials are not stored." />
-      <div className="mb-4 grid gap-2 text-xs text-muted sm:grid-cols-3 lg:grid-cols-6">
+      <div className="mb-4 grid gap-2 text-xs text-muted sm:grid-cols-3 lg:grid-cols-7">
         {Object.entries(DELIVERY_STATUS_META).map(([k, m]) => (
           <div key={k} className="rounded-lg border border-line bg-white p-2.5"><Badge tone={m.tone}>{m.label}</Badge><p className="mt-1.5">{m.help}</p></div>
         ))}

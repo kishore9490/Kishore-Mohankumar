@@ -4,7 +4,10 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { assertUser } from "@/lib/auth/session";
 import { hashPassword, verifyPassword } from "@/lib/auth/password";
-import { companySchema, passwordField, sequenceSchema, userSchema, type CompanyInput } from "@/lib/validation/schemas";
+import { createInvitation, inviteUser, regenerateRecoveryCodes, resetAccess, revokeInvitations, verifyCurrentUserCode } from "@/lib/auth/accounts";
+import { sendInviteEmail } from "@/lib/auth/invite-email";
+import { appBaseUrl } from "@/lib/integrations/config";
+import { companySchema, passwordField, sequenceSchema, type CompanyInput } from "@/lib/validation/schemas";
 import { ServiceError, toActionError, type ActionResult } from "@/lib/services/errors";
 import { clearSampleData, seedSampleData } from "@/lib/sample-data";
 import { audit } from "@/lib/services/audit";
@@ -116,17 +119,68 @@ export async function clearSampleDataAction(): Promise<ActionResult> {
   }
 }
 
-export async function createUserAction(input: z.input<typeof userSchema>): Promise<ActionResult> {
+const inviteSchema = z.object({ name: z.string().trim().min(2, "Enter the person’s name").max(120), email: z.string().trim().toLowerCase().email("Enter a valid email address"), role: z.enum(["ADMIN", "STAFF"]) });
+
+export type InviteResult = ActionResult<{ url: string; emailed: boolean; emailNote?: string }>;
+
+/** Invite-only onboarding: creates the account without a password and returns a single-use link. */
+export async function inviteUserAction(input: z.input<typeof inviteSchema>): Promise<InviteResult> {
   try {
     const admin = await assertUser("ADMIN");
-    const parsed = userSchema.safeParse(input);
-    if (!parsed.success) return { ok: false, error: parsed.error.issues[0].message, fieldErrors: parsed.error.flatten().fieldErrors as Record<string, string[]> };
-    const exists = await prisma.user.findUnique({ where: { email: parsed.data.email } });
-    if (exists) return { ok: false, error: "A user with this email already exists." };
-    await prisma.user.create({ data: { name: parsed.data.name, email: parsed.data.email, role: parsed.data.role, passwordHash: await hashPassword(parsed.data.password) } });
-    await audit(prisma, { userId: admin.id, action: "user.created", summary: `User ${parsed.data.email} created (${parsed.data.role.toLowerCase()})` });
+    const d = inviteSchema.parse(input);
+    const { token } = await inviteUser(prisma, d, admin.id);
+    const url = `${await appBaseUrl()}/invite/${token}`;
+    const mail = await sendInviteEmail(d.email, d.name, url, "invite", admin.name);
+    await audit(prisma, { userId: admin.id, action: "user.invited", summary: `${d.email} invited as ${d.role.toLowerCase()}${mail.sent ? " (email sent)" : ""}` });
     revalidatePath("/settings/users");
-    return { ok: true, message: "User created. Share the temporary password securely." };
+    return { ok: true, data: { url, emailed: mail.sent, emailNote: mail.reason }, message: mail.sent ? `Invitation emailed to ${d.email}` : "Invitation created" };
+  } catch (e) {
+    if (e instanceof z.ZodError) return { ok: false, error: e.issues[0].message };
+    return toActionError(e);
+  }
+}
+
+/** New link for someone who has not accepted yet (previous links stop working). */
+export async function reissueInviteAction(userId: string): Promise<InviteResult> {
+  try {
+    const admin = await assertUser("ADMIN");
+    const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    if (user.passwordHash) throw new ServiceError("This user has already accepted. Use “Reset access” instead.");
+    const token = await createInvitation(prisma, userId, admin.id);
+    const url = `${await appBaseUrl()}/invite/${token}`;
+    const mail = await sendInviteEmail(user.email, user.name, url, "invite", admin.name);
+    await audit(prisma, { userId: admin.id, action: "user.invited", summary: `Invitation re-issued to ${user.email}` });
+    revalidatePath("/settings/users");
+    return { ok: true, data: { url, emailed: mail.sent, emailNote: mail.reason }, message: "New invitation link created" };
+  } catch (e) {
+    return toActionError(e);
+  }
+}
+
+/** Revokes password, MFA and sessions; the user regains access only via the new link. */
+export async function resetAccessAction(userId: string): Promise<InviteResult> {
+  try {
+    const admin = await assertUser("ADMIN");
+    if (userId === admin.id) throw new ServiceError("You cannot reset your own access. Ask another administrator.");
+    const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    const token = await resetAccess(prisma, userId, admin.id);
+    const url = `${await appBaseUrl()}/invite/${token}`;
+    const mail = await sendInviteEmail(user.email, user.name, url, "reset", admin.name);
+    await audit(prisma, { userId: admin.id, action: "user.access_reset", summary: `Access reset for ${user.email} (password, MFA and sessions revoked)` });
+    revalidatePath("/settings/users");
+    return { ok: true, data: { url, emailed: mail.sent, emailNote: mail.reason }, message: "Access reset — the user must use the new link" };
+  } catch (e) {
+    return toActionError(e);
+  }
+}
+
+export async function revokeInviteAction(userId: string): Promise<ActionResult> {
+  try {
+    const admin = await assertUser("ADMIN");
+    await revokeInvitations(prisma, userId);
+    await audit(prisma, { userId: admin.id, action: "user.invite_revoked", summary: "Invitation revoked" });
+    revalidatePath("/settings/users");
+    return { ok: true, message: "Invitation revoked" };
   } catch (e) {
     return toActionError(e);
   }
@@ -138,10 +192,13 @@ export async function setUserActiveAction(id: string, active: boolean): Promise<
     if (id === admin.id) throw new ServiceError("You cannot deactivate your own account.");
     if (!active) {
       const target = await prisma.user.findUniqueOrThrow({ where: { id } });
-      if (target.role === "ADMIN" && (await prisma.user.count({ where: { role: "ADMIN", active: true } })) <= 1) throw new ServiceError("At least one active administrator is required.");
+      if (target.role === "ADMIN" && (await prisma.user.count({ where: { role: "ADMIN", active: true, passwordHash: { not: null } } })) <= 1) throw new ServiceError("At least one active administrator is required.");
     }
     await prisma.user.update({ where: { id }, data: { active } });
-    if (!active) await prisma.session.deleteMany({ where: { userId: id } });
+    if (!active) {
+      await prisma.session.deleteMany({ where: { userId: id } });
+      await revokeInvitations(prisma, id);
+    }
     revalidatePath("/settings/users");
     return { ok: true, message: active ? "User reactivated" : "User deactivated and signed out" };
   } catch (e) {
@@ -149,30 +206,31 @@ export async function setUserActiveAction(id: string, active: boolean): Promise<
   }
 }
 
-export async function adminResetPasswordAction(id: string, password: string): Promise<ActionResult> {
+export async function changeOwnPasswordAction(current: string, next: string, code: string): Promise<ActionResult> {
   try {
-    const admin = await assertUser("ADMIN");
-    const pw = passwordField.parse(password);
-    await prisma.user.update({ where: { id }, data: { passwordHash: await hashPassword(pw) } });
-    await prisma.session.deleteMany({ where: { userId: id } });
-    await audit(prisma, { userId: admin.id, action: "user.password_reset", summary: "Password reset by administrator" });
-    return { ok: true, message: "Password reset. The user has been signed out of all sessions." };
+    const me = await assertUser();
+    const pw = passwordField.parse(next);
+    const user = await prisma.user.findUniqueOrThrow({ where: { id: me.id } });
+    if (!user.passwordHash || !(await verifyPassword(current, user.passwordHash))) throw new ServiceError("Your current password is incorrect.");
+    if (!(await verifyCurrentUserCode(prisma, me.id, code))) throw new ServiceError("The authenticator code is not valid.");
+    await prisma.user.update({ where: { id: me.id }, data: { passwordHash: await hashPassword(pw) } });
+    await audit(prisma, { userId: me.id, action: "auth.password_changed", summary: "Password changed" });
+    return { ok: true, message: "Password changed" };
   } catch (e) {
     if (e instanceof z.ZodError) return { ok: false, error: e.issues[0].message };
     return toActionError(e);
   }
 }
 
-export async function changeOwnPasswordAction(current: string, next: string): Promise<ActionResult> {
+export async function regenerateRecoveryCodesAction(code: string): Promise<ActionResult<{ codes: string[] }>> {
   try {
     const me = await assertUser();
-    const pw = passwordField.parse(next);
-    const user = await prisma.user.findUniqueOrThrow({ where: { id: me.id } });
-    if (!(await verifyPassword(current, user.passwordHash))) throw new ServiceError("Your current password is incorrect.");
-    await prisma.user.update({ where: { id: me.id }, data: { passwordHash: await hashPassword(pw) } });
-    return { ok: true, message: "Password changed" };
+    if (!(await verifyCurrentUserCode(prisma, me.id, code))) throw new ServiceError("The authenticator code is not valid.");
+    const codes = await regenerateRecoveryCodes(prisma, me.id);
+    await audit(prisma, { userId: me.id, action: "auth.recovery_regenerated", summary: "Recovery codes regenerated" });
+    revalidatePath("/settings/security");
+    return { ok: true, data: { codes }, message: "New recovery codes generated — the old ones no longer work." };
   } catch (e) {
-    if (e instanceof z.ZodError) return { ok: false, error: e.issues[0].message };
     return toActionError(e);
   }
 }

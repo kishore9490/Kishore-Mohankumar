@@ -45,3 +45,44 @@ body {
 .grid > * {
   min-width: 0;
 }
+
+/* ───────── OTP animations ───────── */
+@keyframes otp-shake {
+  0%, 100% { transform: translateX(0); }
+  15% { transform: translateX(-10px); }
+  30% { transform: translateX(9px); }
+  45% { transform: translateX(-7px); }
+  60% { transform: translateX(5px); }
+  75% { transform: translateX(-3px); }
+}
+@keyframes otp-pop {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+@keyframes otp-ring {
+  0% { transform: scale(0.6); opacity: 0; }
+  60% { transform: scale(1.06); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes otp-draw {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes otp-fade-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes otp-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+.otp-shake { animation: otp-shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
+.otp-cell-success { animation: otp-pop 0.42s ease-out both; }
+.otp-verifying { animation: otp-pulse 1s ease-in-out infinite; }
+.otp-ring { animation: otp-ring 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+.otp-check { stroke-dasharray: 48; stroke-dashoffset: 48; animation: otp-draw 0.45s 0.25s ease-out forwards; }
+.otp-fade-up { animation: otp-fade-up 0.35s ease-out both; }
+@media (prefers-reduced-motion: reduce) {
+  .otp-shake, .otp-cell-success, .otp-verifying, .otp-ring, .otp-fade-up { animation: none; }
+  .otp-check { animation: none; stroke-dashoffset: 0; }
+}

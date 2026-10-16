@@ -6,7 +6,6 @@ import { toRenderCompany } from "@/lib/documents/load";
 import { brandLine } from "@/lib/documents/render-model";
 import { DOCUMENT_TYPE_META, type DocumentType } from "@/lib/documents/meta";
 import type { CompanyInput } from "@/lib/validation/schemas";
-import { PageHeader } from "@/components/ui/page-header";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { buttonClass } from "@/components/ui/button";
@@ -43,7 +42,7 @@ export default async function CompanySettingsPage({ searchParams }: { searchPara
 
   return (
     <>
-      <PageHeader title="Company Settings" description="Company profiles, branding, legal details, numbering and defaults." actions={isAdmin && <Link href="/settings/company?new=1" className={buttonClass({ variant: "outline", size: "sm" })}><Plus /> New company profile</Link>} />
+      {isAdmin && <div className="mb-4 flex justify-end"><Link href="/settings/company?new=1" className={buttonClass({ variant: "outline", size: "sm" })}><Plus /> New company profile</Link></div>}
       {!isAdmin && <div className="mb-4 rounded-lg bg-canvas px-4 py-3 text-sm text-muted ring-1 ring-line">Only administrators can change company settings. You are viewing them read-only.</div>}
       {companies.length > 1 && (
         <div className="mb-6 flex flex-wrap gap-2">

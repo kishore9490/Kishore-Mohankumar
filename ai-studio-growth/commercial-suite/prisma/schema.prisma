@@ -21,14 +21,25 @@ model User {
   id           String    @id @default(cuid())
   email        String    @unique
   name         String
-  passwordHash String
+  // Null until the invited user accepts their invitation and sets a password
+  passwordHash String?
   role         Role      @default(STAFF)
   active       Boolean   @default(true)
+  // TOTP multi-factor authentication (secret encrypted at rest)
+  mfaSecretEnc String?
+  mfaEnabled   Boolean   @default(false)
+  mfaLastStep  Int?      // last accepted TOTP time-step — prevents code replay
+  invitedAt    DateTime?
+  activatedAt  DateTime?
   lastLoginAt  DateTime?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
   sessions       Session[]
+  invitations    Invitation[]   @relation("InvitationUser")
+  invitesSent    Invitation[]   @relation("InvitationCreatedBy")
+  challenges     AuthChallenge[]
+  recoveryCodes  RecoveryCode[]
   auditEvents    AuditEvent[]
   payments       Payment[]
   communications CommunicationLog[]
@@ -47,6 +58,56 @@ model Session {
 
   @@index([userId])
   @@index([expiresAt])
+}
+
+/// Single-use invitation link: the only way to set a password and join.
+model Invitation {
+  id          String    @id @default(cuid())
+  userId      String
+  tokenHash   String    @unique
+  expiresAt   DateTime
+  usedAt      DateTime?
+  revokedAt   DateTime?
+  createdById String?
+  createdAt   DateTime  @default(now())
+
+  user      User  @relation("InvitationUser", fields: [userId], references: [id], onDelete: Cascade)
+  createdBy User? @relation("InvitationCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+}
+
+enum ChallengePurpose {
+  LOGIN // password verified, waiting for the TOTP code
+  ENROLL // password verified (or invitation accepted), setting up TOTP
+}
+
+/// Short-lived state between the password step and the MFA step.
+model AuthChallenge {
+  id               String           @id @default(cuid())
+  tokenHash        String           @unique
+  userId           String
+  purpose          ChallengePurpose
+  pendingSecretEnc String?          // TOTP secret being enrolled (encrypted)
+  attempts         Int              @default(0)
+  expiresAt        DateTime
+  createdAt        DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model RecoveryCode {
+  id        String    @id @default(cuid())
+  userId    String
+  codeHash  String
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 // ───────────────────────── Company ─────────────────────────
@@ -149,6 +210,8 @@ model Customer {
   notes            String?
   preferredChannel CommunicationChannel @default(EMAIL)
   whatsappConsent  Boolean              @default(false)
+  // Last inbound WhatsApp message (from webhook) — free-form replies are allowed for 24h after it
+  whatsappLastInboundAt DateTime?
   archived         Boolean              @default(false)
   isSample         Boolean              @default(false)
   createdAt        DateTime             @default(now())
@@ -156,6 +219,7 @@ model Customer {
 
   documents      Document[]
   communications CommunicationLog[]
+  campaignRecipients CampaignRecipient[]
 
   @@index([name])
   @@index([archived])
@@ -392,6 +456,7 @@ enum MessageChannel {
 enum MessageType {
   DOCUMENT
   PAYMENT_REMINDER
+  PROMOTION
   TEST
 }
 
@@ -401,6 +466,7 @@ enum DeliveryStatus {
   SENT_TO_PROVIDER // provider accepted the request — not proof of delivery
   DELIVERED // provider reported delivery (webhook evidence)
   READ // provider reported read (WhatsApp webhook evidence)
+  SENT_MANUAL // sent by a team member from the WhatsApp Business app and confirmed by them
   FAILED
 }
 
@@ -427,7 +493,9 @@ model CommunicationLog {
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
   statusUpdatedAt   DateTime?
+  campaignId        String?
 
+  campaign  Campaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
   customer  Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
   document  Document? @relation(fields: [documentId], references: [id], onDelete: SetNull)
   createdBy User?     @relation(fields: [createdById], references: [id], onDelete: SetNull)
@@ -450,6 +518,8 @@ model IntegrationConfiguration {
   provider  String   @unique // "brevo" | "whatsapp"
   enabled   Boolean  @default(true)
   settings  Json
+  // Credentials entered in Settings, AES-256-GCM encrypted. Never sent to the browser.
+  secretsEnc String?
   updatedAt DateTime @updatedAt
 }
 
@@ -493,4 +563,43 @@ model AuditEvent {
 
   @@index([documentId])
   @@index([createdAt])
+}
+
+// ───────────────────────── Promotions (WhatsApp Business app, click-to-send) ─────────────────────────
+
+/// A promotional message sent one-by-one from the WhatsApp Business app to opted-in customers.
+model Campaign {
+  id          String   @id @default(cuid())
+  name        String
+  message     String
+  createdById String?
+  archived    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  recipients     CampaignRecipient[]
+  communications CommunicationLog[]
+}
+
+enum RecipientStatus {
+  PENDING
+  OPENED // chat opened in WhatsApp Business with the message prefilled
+  SENT // team member confirmed they pressed send
+  SKIPPED
+}
+
+model CampaignRecipient {
+  id         String          @id @default(cuid())
+  campaignId String
+  customerId String
+  phone      String
+  status     RecipientStatus @default(PENDING)
+  openedAt   DateTime?
+  sentAt     DateTime?
+
+  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@unique([campaignId, customerId])
+  @@index([campaignId, status])
 }

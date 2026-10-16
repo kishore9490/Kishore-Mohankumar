@@ -7,11 +7,11 @@ import { NAV_GROUPS } from "./nav";
 export function BrandMark({ compact = false }: { compact?: boolean }) {
   return (
     <Link href="/" className="flex items-center gap-2.5">
-      <span className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 font-display text-sm font-extrabold text-white shadow-inner">CS</span>
+      <span className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 font-display text-sm font-extrabold text-white shadow-inner">QS</span>
       {!compact && (
         <span className="leading-tight">
-          <span className="block font-display text-[13px] font-bold text-white">Commercial Suite</span>
-          <span className="block text-[11px] text-indigo-200/70">Infinitia Hub × AI Studio Craft</span>
+          <span className="block font-display text-[13px] font-bold text-white">Quote Studio</span>
+          <span className="block text-[11px] text-indigo-200/70">AI Studio · Infinitia Hub</span>
         </span>
       )}
     </Link>

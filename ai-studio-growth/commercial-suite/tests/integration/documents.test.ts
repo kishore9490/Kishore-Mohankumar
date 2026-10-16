@@ -37,7 +37,6 @@ async function issuedInvoice(total = "20000") {
 
 d("document services (PostgreSQL)", () => {
   beforeAll(async () => {
-    process.env.SEED_ADMIN_PASSWORD = "integration-test-pass-123";
     const company = await seedBase(db);
     companyId = company.id;
     userId = (await db.user.findFirstOrThrow()).id;

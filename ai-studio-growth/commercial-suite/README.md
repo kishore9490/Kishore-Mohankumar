@@ -1,11 +1,31 @@
-# AI Studio Craft Commercial Suite
+# AI Studio Quote Studio
 
 **Infinitia Hub × AI Studio Craft** — an internal commercial document platform for creating premium
 commercial proposals, quotations, GST tax invoices and proforma invoices, recording payments, and
 sending documents by email (Brevo) and WhatsApp (Business Cloud API).
 
 This is an **internal company application**. It has no public sign-up, no subscriptions and no multi-tenancy.
-Administrators create user accounts.
+Access is **invite-only** with **authenticator-app MFA** for every user.
+
+## Quick start (Windows / macOS / Linux)
+
+Prerequisites: Node.js 20+, PostgreSQL running with an empty database, Chrome or Edge.
+
+```bash
+git clone -b ccr-c1686265-rhp1vi https://github.com/kishore9490/Kishore-Mohankumar.git
+cd Kishore-Mohankumar/ai-studio-growth/commercial-suite
+npm install
+npm run setup -- "postgresql://postgres:YOUR_PASSWORD@localhost:5432/commercial_suite?schema=public" you@company.com "Your Name"
+npm run dev
+```
+
+On Windows PowerShell use `npm.cmd` instead of `npm` (or run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` once).
+`npm run setup` writes `.env` (with a permanent `SESSION_SECRET`), applies migrations, seeds sample data and prints a
+**one-time invitation link** for the first administrator. Open it, set a password, scan the QR code with an
+authenticator app, save the recovery codes — done. Then configure email and WhatsApp in **Settings → Integrations**.
+
+> Keep `SESSION_SECRET` unchanged forever — it encrypts MFA secrets and the integration credentials stored in the database.
+
 
 ---
 
@@ -24,12 +44,15 @@ Administrators create user accounts.
 | **GST engine** | Decimal-safe (`decimal.js`), CGST+SGST / IGST / No-tax chosen per document (suggested from supplier state vs place of supply), per-line half-up paise rounding, optional nearest-rupee grand total with explicit round-off, per-rate tax summary, amount in words (lakh/crore). |
 | **Templates** | Premium Commercial (16:9 slide proposals modelled on the Anant Motors reference; navy A4 variant for other documents), Professional Quotation, Professional Invoice, Detailed Project Proposal (A4, numbered sections with contents). |
 | **PDF** | Real PDFs with selectable, embedded fonts via headless Chromium + `pdf-lib`: page breaks, repeating table headers, running footers, "Page n of N", continuation headers, full-bleed cover/closing pages, watermarks for Draft/Sample/Cancelled. |
-| **Brevo email** | Send quotation/proposal/invoice/payment reminder with PDF attached, test connection, test email, editable templates, logged attempts and safe error messages. |
-| **WhatsApp** | Cloud API: PDF uploaded as media (no public URLs needed), approved-template or 24-hour-window sending, consent enforcement, signature-verified webhook with de-duplication and non-regressing statuses. Manual `wa.me` fallback (logged as *Prepared*, never as delivered), with optional short-lived secure link. |
+| **Brevo email** | Configured in Settings (API key encrypted). Send quotation/proposal/invoice/payment reminder with PDF attached, sender-verification check, test email, editable templates, delivery & open tracking via a token-protected webhook, invitation emails. |
+| **WhatsApp Business app (default)** | Click-to-send: messages open in your WhatsApp Business desktop app, WhatsApp Web or phone with the text and a secure expiring PDF link prefilled — no Meta approval, templates or 24-hour rule. Staff confirm “I sent it”, which is logged. |
+| **Promotions** | Personalised promotional messages to customers who opted in, worked through as a one-tap-per-customer queue in WhatsApp Business, with progress and logging. |
+| **WhatsApp Cloud API (optional)** | Automated sending for teams with a Meta-verified number: PDF uploaded as media, approved templates loaded from Meta, 24-hour-window tracking from inbound messages, signature-verified webhook with de-duplicated, non-regressing statuses, test messages. |
 | **Communications** | Evidence-based statuses: Prepared, Queued, Sent to provider, Delivered, Read, Failed. Message bodies and secrets are not stored. |
 | **Document history** | Audit trail of document, payment, communication and settings events. |
 | **Company settings** | Multiple company profiles; branding (two configurable logos with light/dark tiles, colours) kept separate from legal/tax/bank details; numbering per series; default terms; rounding; sample-data reset. |
-| **Security** | Real authentication (scrypt hashes, DB sessions with hashed tokens, httpOnly cookies), role-based access (Admin/Staff), login rate limiting, edge gate + server-side checks on every page/action/API, Zod validation on the server, signed render tokens, upload magic-byte checks, no secrets in client code. |
+| **Security** | Invite-only accounts (single-use, 72-hour links; admins never set passwords), mandatory TOTP MFA (RFC 6238, replay-protected, 5-attempt lockout, 8 one-time recovery codes) with animated valid/invalid OTP feedback, scrypt password hashes, DB sessions with hashed tokens, “Reset access” that revokes password/MFA/sessions, role-based access (Admin/Staff), rate limiting, AES-256-GCM encryption for stored secrets, server-side checks on every page/action/API. |
+| **Settings** | One Settings area: Company · Integrations (public URL, Brevo, WhatsApp) · Message templates · Users & invitations · Security (recovery codes, password change). |
 
 ---
 
@@ -95,7 +118,9 @@ During development use `npm run db:migrate:dev` to create new migrations.
 npm run dev                      # http://localhost:3000 (bound to 0.0.0.0)
 ```
 
-Sign in with `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`. Change the password under **Settings → Users** and create staff accounts there.
+Accept the invitation link printed by the seed/setup (or create one with `npm run invite -- email "Name" ADMIN`).
+Invite team members under **Settings → Users & invitations**. If someone loses their phone and recovery codes, an
+administrator uses **Reset access** (or the CLI) to issue a new link.
 
 ## Build & run in production mode
 
@@ -122,26 +147,26 @@ See `.env.example` for the full list. Summary:
 | Variable | Purpose |
 |---|---|
 | `DATABASE_URL` | PostgreSQL connection |
-| `SESSION_SECRET` | 32+ char secret (signs PDF render tokens) |
-| `SEED_ADMIN_EMAIL`, `SEED_ADMIN_PASSWORD` | First administrator (password generated & printed once if empty) |
-| `CHROMIUM_PATH` | Chromium/Chrome executable for PDFs |
-| `INTERNAL_APP_URL` | How the server reaches itself for rendering (default `http://127.0.0.1:$PORT`) |
-| `PUBLIC_APP_URL` | Public HTTPS URL (WhatsApp webhooks, secure document links) |
-| `BREVO_API_KEY`, `BREVO_SENDER_EMAIL`, `BREVO_SENDER_NAME`, `BREVO_REPLY_TO` | Brevo transactional email |
-| `EMAIL_DELIVERY_MODE` | `live` (default) or `mock` (development only; logs, does not send) |
-| `WHATSAPP_ACCESS_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_BUSINESS_ACCOUNT_ID`, `WHATSAPP_API_VERSION`, `WHATSAPP_WEBHOOK_VERIFY_TOKEN`, `WHATSAPP_APP_SECRET` | WhatsApp Cloud API |
+| `SESSION_SECRET` | 32+ chars; signs render tokens and encrypts stored secrets — never change it |
+| `ENCRYPTION_KEY` | Optional dedicated encryption key (defaults to `SESSION_SECRET`) |
+| `SEED_ADMIN_EMAIL`, `SEED_ADMIN_NAME` | First administrator (created as an invitation) |
+| `CHROMIUM_PATH` | Chrome/Chromium/Edge executable for PDFs (common paths auto-detected) |
+| `APP_URL` | Base URL used in CLI-printed invitation links |
 
-All secrets are read on the server only. Missing integration credentials never block document creation;
-the Integrations page shows exactly what is configured.
+Email (Brevo), WhatsApp and the public URL are configured **in the app** (Settings → Integrations) and stored
+encrypted in the database — no environment variables needed.
 
 ### WhatsApp notes
 
-- Business-initiated messages require an **approved template**. Configure the template name in
-  Integrations: a template with a **DOCUMENT header** and three body variables (customer name, document number, amount).
-  Without a template, document messages are only delivered within 24 hours of the customer's last message.
-- API sending requires a recorded customer **opt-in** (customer record → WhatsApp opt-in).
-- Webhook: point Meta to `https://YOUR_DOMAIN/api/webhooks/whatsapp`, use `WHATSAPP_WEBHOOK_VERIFY_TOKEN`,
-  and set `WHATSAPP_APP_SECRET` so signatures (`X-Hub-Signature-256`) can be verified.
+- **WhatsApp Business app mode (default):** nothing to set up. Choose where chats open (desktop app, WhatsApp Web or
+  phone) in Settings. Set the *Public app URL* to include a secure, expiring PDF link in messages; otherwise the PDF
+  downloads for you to attach. Fully automatic sending from the WhatsApp Business app is intentionally not offered —
+  WhatsApp provides no permitted API for it and unofficial automation risks a permanent ban of the number.
+- **Promotions:** only customers with WhatsApp opt-in recorded are included; keep an opt-out line in the message.
+- **Cloud API mode (optional):** enter the token, phone number ID and business account ID in Settings, load your
+  approved templates, then set the webhook in the Meta console to `https://YOUR_DOMAIN/api/webhooks/whatsapp` with the
+  generated verify token and your app secret.
+- **Brevo tracking:** add the webhook URL shown in Settings to Brevo → Transactional → Settings → Webhooks.
 
 ## Sandbox vs production persistence
 

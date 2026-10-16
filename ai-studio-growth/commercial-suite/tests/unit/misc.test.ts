@@ -68,12 +68,12 @@ describe("messaging", () => {
     expect(normalizeWhatsAppNumber("123")).toBeNull();
   });
   it("verifies webhook signatures", () => {
-    process.env.WHATSAPP_APP_SECRET = "app-secret";
     const body = JSON.stringify({ entry: [{ changes: [{ value: { statuses: [{ id: "wamid.1", status: "delivered", timestamp: "1700000000" }] } }] }] });
     const sig = "sha256=" + createHmac("sha256", "app-secret").update(body).digest("hex");
-    expect(verifyWebhookSignature(body, sig)).toBe(true);
-    expect(verifyWebhookSignature(body + " ", sig)).toBe(false);
-    expect(verifyWebhookSignature(body, null)).toBe(false);
+    expect(verifyWebhookSignature(body, sig, "app-secret")).toBe(true);
+    expect(verifyWebhookSignature(body + " ", sig, "app-secret")).toBe(false);
+    expect(verifyWebhookSignature(body, null, "app-secret")).toBe(false);
+    expect(verifyWebhookSignature(body, sig, null)).toBe(false);
     expect(extractStatusUpdates(JSON.parse(body))).toEqual([{ messageId: "wamid.1", status: "delivered", timestamp: "1700000000", errorTitle: undefined }]);
   });
 });

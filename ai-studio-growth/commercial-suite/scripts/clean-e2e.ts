@@ -1,4 +1,4 @@
-// Removes records created by the e2e test (customers/products whose names start with "E2E ").
+// Removes records created by the e2e test (E2E customers/products/promotions and e2e-*@example.com users).
 import { PrismaClient } from "@prisma/client";
 const db = new PrismaClient();
 (async () => {
@@ -10,6 +10,9 @@ const db = new PrismaClient();
   await db.document.deleteMany({ where: { id: { in: dids } } });
   await db.customer.deleteMany({ where: { id: { in: ids } } });
   const p = await db.productService.deleteMany({ where: { name: { startsWith: "E2E " } } });
+  await db.campaign.deleteMany({ where: { name: { startsWith: "E2E " } } });
+  const u = await db.user.deleteMany({ where: { email: { startsWith: "e2e-" }, AND: { email: { endsWith: "@example.com" } } } });
+  console.log(`Removed ${u.count} e2e users`);
   console.log(`Removed ${ids.length} customers, ${dids.length} documents, ${p.count} products`);
   await db.$disconnect();
 })();

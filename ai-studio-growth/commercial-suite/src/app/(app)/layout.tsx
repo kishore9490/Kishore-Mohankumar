@@ -9,8 +9,8 @@ import { BrandMark, SidebarNav } from "@/components/shell/sidebar";
 import { Topbar } from "@/components/shell/topbar";
 
 export const metadata: Metadata = {
-  title: { default: "Commercial Suite", template: "%s · Commercial Suite" },
-  description: "AI Studio Craft Commercial Suite — internal commercial document management",
+  title: { default: "AI Studio Quote Studio", template: "%s · Quote Studio" },
+  description: "AI Studio Quote Studio — internal quotation, proposal and invoice platform",
   robots: { index: false, follow: false },
 };
 
