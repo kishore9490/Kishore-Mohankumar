@@ -44,7 +44,7 @@ export function InviteUserDialog() {
             <div className="grid gap-3">
               <Field label="Name" htmlFor="u-name"><Input id="u-name" value={v.name} onChange={(e) => setV({ ...v, name: e.target.value })} /></Field>
               <Field label="Email" htmlFor="u-email"><Input id="u-email" type="email" value={v.email} onChange={(e) => setV({ ...v, email: e.target.value })} /></Field>
-              <Field label="Role" htmlFor="u-role"><Select id="u-role" value={v.role} onChange={(e) => setV({ ...v, role: e.target.value as "STAFF" | "ADMIN" })}><option value="STAFF">Staff — documents, customers, payments, promotions</option><option value="ADMIN">Administrator — plus settings, integrations and users</option></Select></Field>
+              <Field label="Role" htmlFor="u-role"><Select id="u-role" value={v.role} onChange={(e) => setV({ ...v, role: e.target.value as "STAFF" | "ADMIN" })}><option value="STAFF">Staff — documents, customers, payments</option><option value="ADMIN">Administrator — plus settings, integrations and users</option></Select></Field>
             </div>
             <div className="mt-5 flex justify-end gap-2">
               <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>

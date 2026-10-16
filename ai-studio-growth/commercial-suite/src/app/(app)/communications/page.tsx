@@ -30,7 +30,7 @@ export default async function CommunicationsPage({ searchParams }: { searchParam
   const logs = await prisma.communicationLog.findMany({ where, orderBy: { createdAt: "desc" }, take: 300, include: { customer: { select: { id: true, name: true } }, document: { select: { id: true, type: true, number: true } }, createdBy: { select: { name: true } } } });
   return (
     <>
-      <PageHeader title="Communications" description="Every email and WhatsApp attempt with evidence-based delivery status. Message bodies and credentials are not stored." />
+      <PageHeader title="Communications" description="Every email attempt with evidence-based delivery status. Message bodies and credentials are not stored." />
       <div className="mb-4 grid gap-2 text-xs text-muted sm:grid-cols-3 lg:grid-cols-7">
         {Object.entries(DELIVERY_STATUS_META).map(([k, m]) => (
           <div key={k} className="rounded-lg border border-line bg-white p-2.5"><Badge tone={m.tone}>{m.label}</Badge><p className="mt-1.5">{m.help}</p></div>
@@ -51,7 +51,7 @@ export default async function CommunicationsPage({ searchParams }: { searchParam
           {document && <Link href="/communications" className="text-sm text-brand-700">Clear document filter</Link>}
         </form>
         {logs.length === 0 ? (
-          <EmptyState icon={Send} title="No communication yet" description="Send a document by email or WhatsApp from its detail page. Attempts are recorded here." />
+          <EmptyState icon={Send} title="No communication yet" description="Send a document by email from its detail page. Attempts are recorded here." />
         ) : (
           <Table>
             <thead><tr><Th>When</Th><Th>Channel</Th><Th>Recipient</Th><Th className="hidden md:table-cell">Document</Th><Th className="hidden lg:table-cell">Type</Th><Th>Status</Th></tr></thead>

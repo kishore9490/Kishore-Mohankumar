@@ -1,12 +1,12 @@
-import { CheckCircle2, CircleAlert, Globe, Mail, MessageCircle } from "lucide-react";
+import { CheckCircle2, CircleAlert, Globe, Mail } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth/session";
-import { brevoStatus, loadApp, loadBrevo, publicAppUrl, whatsappStatus } from "@/lib/integrations/config";
+import { brevoStatus, loadApp, loadBrevo, publicAppUrl } from "@/lib/integrations/config";
 import { DELIVERY_STATUS_META } from "@/lib/integrations/messages";
 import { formatDateTime } from "@/lib/dates";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { BrevoForm, CloudApiForm, GeneralForm, WhatsAppModeForm } from "@/components/settings/integration-controls";
+import { BrevoForm, GeneralForm } from "@/components/settings/integration-controls";
 
 export const metadata = { title: "Integrations" };
 export const dynamic = "force-dynamic";
@@ -22,15 +22,13 @@ function LastTest({ test }: { test?: { at: string; ok: boolean; message: string 
 
 export default async function IntegrationsPage() {
   await requireAdmin();
-  const [app, brevo, brevoRaw, wa, publicUrl, recent] = await Promise.all([
+  const [app, brevo, brevoRaw, publicUrl, recent] = await Promise.all([
     loadApp(),
     brevoStatus(),
     loadBrevo(),
-    whatsappStatus(),
     publicAppUrl(),
-    prisma.communicationLog.findMany({ orderBy: { createdAt: "desc" }, take: 8 }),
+    prisma.communicationLog.findMany({ where: { channel: "EMAIL" }, orderBy: { createdAt: "desc" }, take: 8 }),
   ]);
-  const s = wa.settings;
   const brevoWebhook = publicUrl && brevoRaw.secrets.webhookToken ? `${publicUrl}/api/webhooks/brevo?token=${brevoRaw.secrets.webhookToken}` : null;
 
   return (
@@ -58,39 +56,12 @@ export default async function IntegrationsPage() {
       </Card>
 
       <Card>
-        <CardHeader
-          title={<span className="flex items-center gap-2"><MessageCircle className="size-4 text-emerald-600" /> WhatsApp</span>}
-          description="Send quotes, invoices, reminders and promotions over WhatsApp."
-          actions={<StatusPill ok={wa.mode === "BUSINESS_APP" || wa.apiActive} label={wa.mode === "BUSINESS_APP" ? "WhatsApp Business app" : wa.apiActive ? "Cloud API connected" : "Cloud API not configured"} />}
-        />
-        <CardBody>
-          <WhatsAppModeForm initial={{ mode: wa.mode, openWith: s.openWith ?? "desktop", businessNumber: s.businessNumber ?? "", defaultCountryCode: s.defaultCountryCode ?? "91", shareLinkHours: String(s.shareLinkHours ?? 72) }} />
-        </CardBody>
-      </Card>
-
-      {wa.mode === "CLOUD_API" && (
-        <Card>
-          <CardHeader title="WhatsApp Cloud API credentials" description="From the Meta developer console (WhatsApp → API Setup) using a permanent system-user token." actions={<StatusPill ok={wa.configured} label={wa.configured ? "Credentials set" : `Missing ${wa.missing.join(", ")}`} />} />
-          <CardBody className="space-y-3">
-            <LastTest test={s.lastTest} />
-            <CloudApiForm
-              initial={{ phoneNumberId: s.phoneNumberId ?? "", businessAccountId: s.businessAccountId ?? "", apiVersion: wa.apiVersion, documentTemplateName: s.documentTemplateName ?? "", reminderTemplateName: s.reminderTemplateName ?? "", templateLanguage: s.templateLanguage ?? "en", testTemplateName: s.testTemplateName ?? "hello_world", testTemplateLanguage: s.testTemplateLanguage ?? "en_US" }}
-              masked={{ accessToken: wa.accessTokenMasked, appSecret: wa.appSecretSet, verifyToken: wa.verifyTokenSet }}
-              configured={wa.configured}
-              templates={s.templates ?? []}
-              webhookUrl={publicUrl ? `${publicUrl}/api/webhooks/whatsapp` : null}
-            />
-          </CardBody>
-        </Card>
-      )}
-
-      <Card>
         <CardHeader title="Recent messages" />
         {recent.length === 0 ? <CardBody><p className="text-sm text-muted">No messages yet.</p></CardBody> : (
           <ul className="divide-y divide-line text-sm">
             {recent.map((m) => (
               <li key={m.id} className="flex flex-wrap items-center justify-between gap-2 px-5 py-3">
-                <span>{m.channel === "EMAIL" ? "Email" : m.channel === "WHATSAPP" ? "WhatsApp API" : "WhatsApp Business"} → {m.recipient} <span className="text-muted">· {formatDateTime(m.createdAt)}</span></span>
+                <span>Email → {m.recipient} <span className="text-muted">· {formatDateTime(m.createdAt)}</span></span>
                 <span className="flex items-center gap-2">{m.errorMessage && <span className="max-w-md truncate text-xs text-red-600">{m.errorMessage}</span>}<Badge tone={DELIVERY_STATUS_META[m.status].tone}>{DELIVERY_STATUS_META[m.status].label}</Badge></span>
               </li>
             ))}

@@ -171,7 +171,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         <Card>
           <CardHeader title="Recent customer communications" actions={<Link href="/communications" className="text-[13px] font-medium text-brand-700 hover:underline">View all</Link>} />
           {comms.length === 0 ? (
-            <EmptyState icon={Send} title="No messages sent yet" description="Emails and WhatsApp messages sent from documents will appear here with their delivery status." />
+            <EmptyState icon={Send} title="No messages sent yet" description="Emails sent from documents will appear here with their delivery status." />
           ) : (
             <ul className="divide-y divide-line">
               {comms.map((c) => (

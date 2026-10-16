@@ -287,56 +287,21 @@ async function main() {
     await waitText(page, "₹33,690.00");
   });
 
-  await step("configures integrations in Settings (WhatsApp Business mode, Brevo key validation)", async () => {
+  await step("validates the Brevo key in Settings → Integrations (no WhatsApp in the app)", async () => {
     await page.goto(`${BASE}/settings/integrations`, { waitUntil: "networkidle0" });
-    await waitText(page, "WhatsApp Business app");
-    await page.select("#wa-open", "phone");
-    await clickText(page, "button", "Save WhatsApp settings");
-    await waitText(page, "WhatsApp settings saved");
+    assert(!(await page.content()).includes("WhatsApp"), "WhatsApp should not appear in Integrations");
     await page.type("#brevo-key", "not-a-brevo-key");
     await clickText(page, "button", "Save email settings");
     await waitText(page, "does not look like a Brevo API v3 key");
   });
 
-  await step("shows email as not configured; sends via WhatsApp Business with confirmation", async () => {
+  await step("shows email as not configured on a document", async () => {
     await page.goto(invoiceUrl, { waitUntil: "networkidle0" });
     await clickText(page, "button", "Email tax invoice");
     await waitText(page, "Email is not configured");
     const disabled = await page.$$eval("[role=dialog] button", (bs) => (bs as HTMLButtonElement[]).find((b) => b.textContent?.includes("Send email"))?.disabled);
     assert(disabled === true, "send button should be disabled without credentials");
     await page.keyboard.press("Escape");
-    await page.evaluate(() => {
-      (window as unknown as { __opened: string[] }).__opened = [];
-      window.open = ((u: string) => { (window as unknown as { __opened: string[] }).__opened.push(u); return null; }) as typeof window.open;
-    });
-    await clickText(page, "button", "WhatsApp reminder");
-    await clickText(page, "[role=dialog] button", "Open in WhatsApp Business");
-    await page.waitForFunction(() => (window as unknown as { __opened: string[] }).__opened.length > 0);
-    const opened = await page.evaluate(() => (window as unknown as { __opened: string[] }).__opened[0]);
-    assert(opened.startsWith("https://wa.me/919876543210?text="), `unexpected chat url ${opened}`);
-    await waitText(page, "Did you send it");
-    await clickText(page, "[role=dialog] button", "Yes, I sent it");
-    await waitText(page, "Marked as sent");
-    await page.goto(`${BASE}/communications`, { waitUntil: "networkidle0" });
-    await waitText(page, "WhatsApp Business app");
-    await waitText(page, "Sent (confirmed)");
-  });
-
-  await step("runs a WhatsApp promotion for opted-in customers", async () => {
-    await page.goto(`${BASE}/promotions/new`, { waitUntil: "networkidle0" });
-    await page.type("#pname", `E2E Offer ${RUN}`);
-    await waitText(page, customerName);
-    await Promise.all([page.waitForNavigation({ waitUntil: "networkidle0" }), clickText(page, "button", "Create promotion queue")]);
-    await page.evaluate(() => {
-      (window as unknown as { __opened: string[] }).__opened = [];
-      window.open = ((u: string) => { (window as unknown as { __opened: string[] }).__opened.push(u); return null; }) as typeof window.open;
-    });
-    await clickText(page, "button", "Open next");
-    await page.waitForFunction(() => (window as unknown as { __opened: string[] }).__opened.length > 0);
-    const opened = await page.evaluate(() => (window as unknown as { __opened: string[] }).__opened[0]);
-    assert(decodeURIComponent(opened).includes("Hello R. Kumar"), `message not personalised: ${opened.slice(0, 120)}`);
-    await clickText(page, "button", "I sent it");
-    await waitText(page, "All customers handled");
   });
 
   await step("invites a staff member from Settings and shows the link", async () => {
@@ -403,7 +368,7 @@ async function main() {
   });
 
   await step("every main route renders without errors", async () => {
-    for (const r of ["/", "/customers", "/catalogue", "/documents/proposals", "/documents/quotations", "/documents/invoices", "/documents/proforma", "/promotions", "/communications", "/history", "/settings/company", "/settings/integrations", "/settings/templates", "/settings/users", "/settings/security"]) {
+    for (const r of ["/", "/customers", "/catalogue", "/documents/proposals", "/documents/quotations", "/documents/invoices", "/documents/proforma", "/communications", "/history", "/settings/company", "/settings/integrations", "/settings/templates", "/settings/users", "/settings/security"]) {
       const res = await page.goto(`${BASE}${r}`, { waitUntil: "networkidle0" });
       assert(res?.status() === 200, `${r} returned ${res?.status()}`);
     }

@@ -11,7 +11,7 @@ export function AuthShell({ children }: { children: ReactNode }) {
         <div className="relative">
           <div className="text-[11px] font-semibold tracking-[0.26em] text-indigo-200 uppercase">Infinitia Hub × AI Studio Craft</div>
           <h1 className="mt-6 max-w-lg font-display text-4xl leading-tight font-bold">AI Studio Quote Studio</h1>
-          <p className="mt-4 max-w-md text-indigo-100/80">Premium proposals, quotations, GST invoices and proforma invoices — sent by email and WhatsApp, with every payment tracked.</p>
+          <p className="mt-4 max-w-md text-indigo-100/80">Premium proposals, quotations, GST invoices and proforma invoices — sent by email, with every payment tracked.</p>
         </div>
         <ul className="relative mt-auto grid max-w-md gap-3 text-sm text-indigo-100/80">
           <li className="flex items-center gap-2"><ShieldCheck className="size-4 text-brand-300" /> Invite-only access with authenticator-app MFA</li>

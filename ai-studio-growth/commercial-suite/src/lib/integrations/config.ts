@@ -27,43 +27,7 @@ export interface BrevoSecrets {
   webhookToken?: string;
 }
 
-export interface WhatsAppTemplateInfo {
-  name: string;
-  language: string;
-  status: string;
-  category?: string;
-  hasDocumentHeader: boolean;
-  bodyParams: number;
-}
-
-export type WhatsAppMode = "BUSINESS_APP" | "CLOUD_API";
-
-export interface WhatsAppSettings {
-  /** BUSINESS_APP (default): click-to-send from the WhatsApp Business app. CLOUD_API: automated sending via Meta. */
-  mode?: WhatsAppMode;
-  openWith?: "desktop" | "web" | "phone";
-  businessNumber?: string;
-  defaultCountryCode?: string;
-  phoneNumberId?: string;
-  businessAccountId?: string;
-  apiVersion?: string;
-  documentTemplateName?: string;
-  reminderTemplateName?: string;
-  templateLanguage?: string;
-  testTemplateName?: string;
-  testTemplateLanguage?: string;
-  shareLinkHours?: number;
-  templates?: WhatsAppTemplateInfo[];
-  templatesLoadedAt?: string;
-  lastTest?: { at: string; ok: boolean; message: string; displayPhoneNumber?: string; verifiedName?: string; qualityRating?: string };
-}
-export interface WhatsAppSecrets {
-  accessToken?: string;
-  appSecret?: string;
-  verifyToken?: string;
-}
-
-type Provider = "app" | "brevo" | "whatsapp";
+type Provider = "app" | "brevo";
 
 async function load<S, K>(provider: Provider): Promise<{ settings: S; secrets: K }> {
   const row = await prisma.integrationConfiguration.findUnique({ where: { provider } });
@@ -101,10 +65,8 @@ async function save<S extends object, K extends object>(provider: Provider, sett
 
 export const loadApp = () => load<AppSettings, Record<string, never>>("app");
 export const loadBrevo = () => load<BrevoSettings, BrevoSecrets>("brevo");
-export const loadWhatsApp = () => load<WhatsAppSettings, WhatsAppSecrets>("whatsapp");
 export const saveApp = (s: Partial<AppSettings>) => save<AppSettings, Record<string, never>>("app", s);
 export const saveBrevo = (s: Partial<BrevoSettings>, k?: Partial<BrevoSecrets>) => save<BrevoSettings, BrevoSecrets>("brevo", s, k);
-export const saveWhatsApp = (s: Partial<WhatsAppSettings>, k?: Partial<WhatsAppSecrets>) => save<WhatsAppSettings, WhatsAppSecrets>("whatsapp", s, k);
 
 function validPublicUrl(url: string | undefined | null): string | null {
   if (!url) return null;
@@ -171,45 +133,5 @@ export async function brevoStatus(): Promise<BrevoStatus> {
     missing,
     webhookTokenSet: !!secrets.webhookToken,
     lastTest: settings.lastTest,
-  };
-}
-
-export interface WhatsAppStatus {
-  mode: WhatsAppMode;
-  /** Cloud API mode selected AND credentials present — documents are sent automatically. */
-  apiActive: boolean;
-  configured: boolean;
-  missing: string[];
-  apiVersion: string;
-  phoneNumberId: string | null;
-  businessAccountId: string | null;
-  accessTokenMasked: string | null;
-  appSecretSet: boolean;
-  verifyTokenSet: boolean;
-  webhookConfigured: boolean;
-  settings: Omit<WhatsAppSettings, never>;
-}
-
-export const DEFAULT_WA_API_VERSION = "v21.0";
-
-export async function whatsappStatus(): Promise<WhatsAppStatus> {
-  const { settings, secrets } = await loadWhatsApp();
-  const missing: string[] = [];
-  if (!secrets.accessToken) missing.push("access token");
-  if (!settings.phoneNumberId) missing.push("phone number ID");
-  const mode: WhatsAppMode = settings.mode === "CLOUD_API" ? "CLOUD_API" : "BUSINESS_APP";
-  return {
-    mode,
-    apiActive: mode === "CLOUD_API" && missing.length === 0,
-    configured: missing.length === 0,
-    missing,
-    apiVersion: settings.apiVersion || DEFAULT_WA_API_VERSION,
-    phoneNumberId: settings.phoneNumberId ?? null,
-    businessAccountId: settings.businessAccountId ?? null,
-    accessTokenMasked: maskSecret(secrets.accessToken),
-    appSecretSet: !!secrets.appSecret,
-    verifyTokenSet: !!secrets.verifyToken,
-    webhookConfigured: !!secrets.appSecret && !!secrets.verifyToken,
-    settings,
   };
 }

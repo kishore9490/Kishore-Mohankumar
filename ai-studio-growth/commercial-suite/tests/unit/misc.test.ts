@@ -1,12 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { createHmac } from "node:crypto";
 import { formatDocumentNumber } from "@/lib/documents/numbering";
 import { financialYearLabel } from "@/lib/dates";
 import { effectiveStatus } from "@/lib/documents/meta";
 import { parseRichText } from "@/lib/proposal/sections";
 import { renderParts, buildLinesAndTotals } from "@/lib/documents/render-model";
-import { renderTemplate, mapWhatsAppStatus } from "@/lib/integrations/messages";
-import { verifyWebhookSignature, normalizeWhatsAppNumber, extractStatusUpdates } from "@/lib/integrations/whatsapp";
+import { renderTemplate } from "@/lib/integrations/messages";
 import { signRenderToken, verifyRenderToken } from "@/lib/auth/tokens";
 import { hashPassword, verifyPassword } from "@/lib/auth/password";
 import { customerSchema } from "@/lib/validation/schemas";
@@ -56,25 +54,6 @@ describe("proposal rendering helpers", () => {
 describe("messaging", () => {
   it("renders templates", () => {
     expect(renderTemplate("Hi {{customerName}}, {{ amount }} {{unknown}}", { customerName: "Asha", amount: "₹10" })).toBe("Hi Asha, ₹10 {{unknown}}");
-  });
-  it("maps WhatsApp statuses", () => {
-    expect(mapWhatsAppStatus("delivered")).toBe("DELIVERED");
-    expect(mapWhatsAppStatus("sent")).toBe("SENT_TO_PROVIDER");
-    expect(mapWhatsAppStatus("unknown")).toBeNull();
-  });
-  it("normalises WhatsApp numbers", () => {
-    expect(normalizeWhatsAppNumber("98765 43210")).toBe("919876543210");
-    expect(normalizeWhatsAppNumber("+91 98765-43210")).toBe("919876543210");
-    expect(normalizeWhatsAppNumber("123")).toBeNull();
-  });
-  it("verifies webhook signatures", () => {
-    const body = JSON.stringify({ entry: [{ changes: [{ value: { statuses: [{ id: "wamid.1", status: "delivered", timestamp: "1700000000" }] } }] }] });
-    const sig = "sha256=" + createHmac("sha256", "app-secret").update(body).digest("hex");
-    expect(verifyWebhookSignature(body, sig, "app-secret")).toBe(true);
-    expect(verifyWebhookSignature(body + " ", sig, "app-secret")).toBe(false);
-    expect(verifyWebhookSignature(body, null, "app-secret")).toBe(false);
-    expect(verifyWebhookSignature(body, sig, null)).toBe(false);
-    expect(extractStatusUpdates(JSON.parse(body))).toEqual([{ messageId: "wamid.1", status: "delivered", timestamp: "1700000000", errorTitle: undefined }]);
   });
 });
 

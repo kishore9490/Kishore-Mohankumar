@@ -1,0 +1,4 @@
+wa-profile/
+sent-log.csv
+*.pdf
+__pycache__/

@@ -9,7 +9,7 @@ import {
 } from "@/lib/documents/meta";
 import { dec, formatMoney } from "@/lib/money";
 import { formatDate, formatDateTime, todayISO } from "@/lib/dates";
-import { brevoStatus, whatsappStatus, publicAppUrl } from "@/lib/integrations/config";
+import { brevoStatus } from "@/lib/integrations/config";
 import { composeDefaults } from "@/lib/integrations/compose";
 import { DELIVERY_STATUS_META } from "@/lib/integrations/messages";
 import { PageHeader } from "@/components/ui/page-header";
@@ -20,7 +20,7 @@ import { ActionButton } from "@/components/forms/action-button";
 import { PreviewFrame } from "@/components/editor/preview-frame";
 import { DocumentMoreMenu } from "@/components/documents/document-actions";
 import { PaymentDialog } from "@/components/documents/payment-dialog";
-import { EmailDialog, WhatsAppDialog } from "@/components/documents/send-dialogs";
+import { EmailDialog } from "@/components/documents/send-dialogs";
 import { docHref } from "@/components/documents/doc-link";
 import { deletePaymentAction, issueInvoiceAction } from "@/app/actions/documents";
 
@@ -55,10 +55,7 @@ export default async function DocumentPage({ params }: { params: Promise<{ kind:
   const balance = dec(doc.totals.balance);
   const sendable = stored !== "CANCELLED" && !(type === "INVOICE" && stored === "DRAFT") && doc.lines.length > 0;
   const compose = sendable ? await composeDefaults(id, user.name) : null;
-  const [brevo, wa, publicUrl] = await Promise.all([brevoStatus(), whatsappStatus(), publicAppUrl()]);
-  const waSettings = wa.settings;
-  const inWindow = !!raw.customer.whatsappLastInboundAt && Date.now() - raw.customer.whatsappLastInboundAt.getTime() < 24 * 3_600_000;
-  const waProps = { mode: wa.mode, apiActive: wa.apiActive, consent: raw.customer.whatsappConsent, inWindow, linksEnabled: !!publicUrl };
+  const brevo = await brevoStatus();
   const reminderAllowed = type === "INVOICE" && ["ISSUED", "PARTIALLY_PAID"].includes(stored) && balance.gt(0);
   const dateRows: [string, string][] = [
     ["Issue date", formatDate(doc.issueDate)],
@@ -115,17 +112,13 @@ export default async function DocumentPage({ params }: { params: Promise<{ kind:
             <Card className="flex flex-wrap items-center gap-2 p-3">
               <span className="mr-1 text-[13px] font-medium text-muted">Send to customer:</span>
               <EmailDialog documentId={id} defaultTo={doc.customer.email ?? ""} compose={compose.email.DOCUMENT} kind="DOCUMENT" configured={brevo.configured} mockMode={brevo.mode === "mock"} missing={brevo.missing} label={`Email ${meta.label.toLowerCase()}`} />
-              <WhatsAppDialog documentId={id} defaultTo={doc.customer.phone ?? ""} compose={compose.whatsapp.DOCUMENT} kind="DOCUMENT" label="WhatsApp" hasTemplate={!!waSettings.documentTemplateName} {...waProps} />
               {reminderAllowed && (
-                <>
-                  <EmailDialog documentId={id} defaultTo={doc.customer.email ?? ""} compose={compose.email.PAYMENT_REMINDER} kind="PAYMENT_REMINDER" configured={brevo.configured} mockMode={brevo.mode === "mock"} missing={brevo.missing} label="Email payment reminder" />
-                  <WhatsAppDialog documentId={id} defaultTo={doc.customer.phone ?? ""} compose={compose.whatsapp.PAYMENT_REMINDER} kind="PAYMENT_REMINDER" label="WhatsApp reminder" hasTemplate={!!(waSettings.reminderTemplateName || waSettings.documentTemplateName)} {...waProps} />
-                </>
+                <EmailDialog documentId={id} defaultTo={doc.customer.email ?? ""} compose={compose.email.PAYMENT_REMINDER} kind="PAYMENT_REMINDER" configured={brevo.configured} mockMode={brevo.mode === "mock"} missing={brevo.missing} label="Email payment reminder" />
               )}
             </Card>
           )}
           {!sendable && stored !== "CANCELLED" && (
-            <p className="text-[13px] text-muted">{type === "INVOICE" && stored === "DRAFT" ? "Issue the invoice to enable sending by email or WhatsApp." : "Add at least one line item to enable sending."}</p>
+            <p className="text-[13px] text-muted">{type === "INVOICE" && stored === "DRAFT" ? "Issue the invoice to enable sending by email." : "Add at least one line item to enable sending."}</p>
           )}
           <PreviewFrame doc={doc} maxHeight="calc(100vh - 180px)" />
         </div>

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus, Search, Users } from "lucide-react";
+import { Download, Plus, Search, Users } from "lucide-react";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth/session";
@@ -27,7 +27,7 @@ export default async function CustomersPage({ searchParams }: { searchParams: Pr
   const customers = await prisma.customer.findMany({ where, orderBy: { name: "asc" }, include: { _count: { select: { documents: true } } }, take: 500 });
   return (
     <>
-      <PageHeader title="Customers" description="Companies and contacts you prepare documents for." actions={<Link href="/customers/new" className={buttonClass()}><Plus /> New customer</Link>} />
+      <PageHeader title="Customers" description="Companies and contacts you prepare documents for." actions={<><a href="/api/customers/export" className={buttonClass({ variant: "outline" })}><Download /> Export CSV</a><Link href="/customers/new" className={buttonClass()}><Plus /> New customer</Link></>} />
       <Card>
         <form className="flex flex-wrap items-center gap-2 border-b border-line p-4" role="search">
           <div className="relative min-w-56 flex-1">

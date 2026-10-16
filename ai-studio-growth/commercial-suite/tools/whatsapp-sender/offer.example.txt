@@ -1,0 +1,5 @@
+Hi {first_name},
+
+Greetings from AI Studio Craft! This Diwali we're offering 15% off AI chatbots and WhatsApp automation for {name}.
+
+Reply YES and we'll share the details. Reply STOP to opt out.

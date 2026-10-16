@@ -2,7 +2,7 @@
 
 **Infinitia Hub × AI Studio Craft** — an internal commercial document platform for creating premium
 commercial proposals, quotations, GST tax invoices and proforma invoices, recording payments, and
-sending documents by email (Brevo) and WhatsApp (Business Cloud API).
+sending documents by email (Brevo). WhatsApp sending is a separate Python script (`tools/whatsapp-sender`).
 
 This is an **internal company application**. It has no public sign-up, no subscriptions and no multi-tenancy.
 Access is **invite-only** with **authenticator-app MFA** for every user.
@@ -22,7 +22,7 @@ npm run dev
 On Windows PowerShell use `npm.cmd` instead of `npm` (or run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` once).
 `npm run setup` writes `.env` (with a permanent `SESSION_SECRET`), applies migrations, seeds sample data and prints a
 **one-time invitation link** for the first administrator. Open it, set a password, scan the QR code with an
-authenticator app, save the recovery codes — done. Then configure email and WhatsApp in **Settings → Integrations**.
+authenticator app, save the recovery codes — done. Then configure email in **Settings → Integrations**.
 
 > Keep `SESSION_SECRET` unchanged forever — it encrypts MFA secrets and the integration credentials stored in the database.
 
@@ -34,7 +34,7 @@ authenticator app, save the recovery codes — done. Then configure email and Wh
 | Area | What it does |
 |---|---|
 | **Dashboard** | Quotation/invoice counts, outstanding receivables, paid invoices, drafts, payment-status bar (real amounts only), recent documents, activity and communications. Sample data is flagged. |
-| **Customers** | Create, edit, view, search, filter (status/channel), archive/restore, delete (only without documents). GSTIN optional and validated; state/state code; WhatsApp opt-in. |
+| **Customers** | Create, edit, view, search, filter (status/channel), archive/restore, delete (only without documents). GSTIN optional and validated; state/state code; WhatsApp opt-in; **Export CSV** (for the WhatsApp sender script). |
 | **Products & Services** | Reusable catalogue: descriptions, category, SKU, HSN/SAC, unit, default qty/price, GST rate, billing frequency, inclusions/exclusions, active flag. Custom one-off lines are supported on documents. |
 | **Document builder** | Guided steps: Customer → Details → Services & pricing → (Proposal sections) → Terms → Design & preview. Inline validation, live totals, live preview using the PDF renderer, save draft, unsaved-changes warning. |
 | **Commercial proposals** | Assembled from 17 reusable section types (cover, executive summary, service detail pages, features, scope, deliverables, implementation plan, timeline, commercial summary, terms, business value, assumptions, exclusions, acceptance, closing…). Add/remove/hide, drag-and-drop or move up/down, edit content, duplicate, reopen. |
@@ -45,14 +45,12 @@ authenticator app, save the recovery codes — done. Then configure email and Wh
 | **Templates** | Premium Commercial (16:9 slide proposals modelled on the Anant Motors reference; navy A4 variant for other documents), Professional Quotation, Professional Invoice, Detailed Project Proposal (A4, numbered sections with contents). |
 | **PDF** | Real PDFs with selectable, embedded fonts via headless Chromium + `pdf-lib`: page breaks, repeating table headers, running footers, "Page n of N", continuation headers, full-bleed cover/closing pages, watermarks for Draft/Sample/Cancelled. |
 | **Brevo email** | Configured in Settings (API key encrypted). Send quotation/proposal/invoice/payment reminder with PDF attached, sender-verification check, test email, editable templates, delivery & open tracking via a token-protected webhook, invitation emails. |
-| **WhatsApp Business app (default)** | Click-to-send: messages open in your WhatsApp Business desktop app, WhatsApp Web or phone with the text and a secure expiring PDF link prefilled — no Meta approval, templates or 24-hour rule. Staff confirm “I sent it”, which is logged. |
-| **Promotions** | Personalised promotional messages to customers who opted in, worked through as a one-tap-per-customer queue in WhatsApp Business, with progress and logging. |
-| **WhatsApp Cloud API (optional)** | Automated sending for teams with a Meta-verified number: PDF uploaded as media, approved templates loaded from Meta, 24-hour-window tracking from inbound messages, signature-verified webhook with de-duplicated, non-regressing statuses, test messages. |
+| **WhatsApp (Python script)** | `tools/whatsapp-sender/send_whatsapp.py` sends personalised messages and PDFs from your own WhatsApp / WhatsApp Business account via WhatsApp Web, using a CSV exported from Customers. Opted-in contacts only by default, dry run, per-run limit, pacing between messages, resumable log. See its README. |
 | **Communications** | Evidence-based statuses: Prepared, Queued, Sent to provider, Delivered, Read, Failed. Message bodies and secrets are not stored. |
 | **Document history** | Audit trail of document, payment, communication and settings events. |
 | **Company settings** | Multiple company profiles; branding (two configurable logos with light/dark tiles, colours) kept separate from legal/tax/bank details; numbering per series; default terms; rounding; sample-data reset. |
 | **Security** | Invite-only accounts (single-use, 72-hour links; admins never set passwords), mandatory TOTP MFA (RFC 6238, replay-protected, 5-attempt lockout, 8 one-time recovery codes) with animated valid/invalid OTP feedback, scrypt password hashes, DB sessions with hashed tokens, “Reset access” that revokes password/MFA/sessions, role-based access (Admin/Staff), rate limiting, AES-256-GCM encryption for stored secrets, server-side checks on every page/action/API. |
-| **Settings** | One Settings area: Company · Integrations (public URL, Brevo, WhatsApp) · Message templates · Users & invitations · Security (recovery codes, password change). |
+| **Settings** | One Settings area: Company · Integrations (public URL, Brevo) · Message templates · Users & invitations · Security (recovery codes, password change). |
 
 ---
 
@@ -74,7 +72,7 @@ prisma/              schema, migrations, seed, seed assets (logos from the refer
 src/app/(app)/       authenticated application pages
 src/app/(auth)/      login
 src/app/print/       print view used by the PDF renderer (signed-token access)
-src/app/api/         PDF endpoint, WhatsApp webhook
+src/app/api/         PDF endpoint, customer CSV export, Brevo webhook
 src/app/share/       short-lived secure document links
 src/app/actions/     server actions (validated, authorised)
 src/lib/             money & GST engine, services, auth, integrations, PDF, validation
@@ -152,19 +150,16 @@ See `.env.example` for the full list. Summary:
 | `CHROMIUM_PATH` | Chrome/Chromium/Edge executable for PDFs (common paths auto-detected) |
 | `APP_URL` | Base URL used in CLI-printed invitation links |
 
-Email (Brevo), WhatsApp and the public URL are configured **in the app** (Settings → Integrations) and stored
+Email (Brevo) and the public URL are configured **in the app** (Settings → Integrations) and stored
 encrypted in the database — no environment variables needed.
 
-### WhatsApp notes
+### WhatsApp
 
-- **WhatsApp Business app mode (default):** nothing to set up. Choose where chats open (desktop app, WhatsApp Web or
-  phone) in Settings. Set the *Public app URL* to include a secure, expiring PDF link in messages; otherwise the PDF
-  downloads for you to attach. Fully automatic sending from the WhatsApp Business app is intentionally not offered —
-  WhatsApp provides no permitted API for it and unofficial automation risks a permanent ban of the number.
-- **Promotions:** only customers with WhatsApp opt-in recorded are included; keep an opt-out line in the message.
-- **Cloud API mode (optional):** enter the token, phone number ID and business account ID in Settings, load your
-  approved templates, then set the webhook in the Meta console to `https://YOUR_DOMAIN/api/webhooks/whatsapp` with the
-  generated verify token and your app secret.
+WhatsApp is not part of the web app. Use the Python script in `tools/whatsapp-sender/` (see its README): export
+customers from **Customers → Export CSV**, download quotation PDFs from the app, and run the script on your computer.
+
+### Email notes
+
 - **Brevo tracking:** add the webhook URL shown in Settings to Brevo → Transactional → Settings → Webhooks.
 
 ## Sandbox vs production persistence
@@ -199,7 +194,7 @@ web hosting cannot run this app). Recommended setup on Ubuntu:
 1. `apt install -y nodejs npm mariadb-server chromium nginx` (Node 20+ via NodeSource if needed); install fonts
    (`fonts-crosextra-carlito fonts-dejavu`) for consistent PDF glyph fallback.
 2. Create the MySQL database and user; set `.env` with production values, `PUBLIC_APP_URL=https://your-domain`,
-   `CHROMIUM_PATH=/usr/bin/chromium` and real Brevo/WhatsApp credentials.
+   `CHROMIUM_PATH=/usr/bin/chromium` and real Brevo credentials.
 3. `npm ci && npm run build && npm run db:migrate && SEED_SAMPLE_DATA=false npm run db:seed`.
 4. Run with a process manager: `pm2 start npm --name commercial-suite -- start` and `pm2 save`.
 5. Nginx reverse proxy to `127.0.0.1:3000` with HTTPS (Let's Encrypt / Certbot). Session cookies are `Secure`

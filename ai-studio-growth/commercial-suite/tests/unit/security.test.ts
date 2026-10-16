@@ -1,9 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { base32Decode, base32Encode, generateRecoveryCodes, generateTotpSecret, hotp, normalizeRecoveryCode, otpauthUrl, totpAt, verifyTotp } from "@/lib/auth/totp";
 import { decryptSecret, encryptSecret, maskSecret, tryDecryptSecret } from "@/lib/crypto/secret-box";
-import { buildChatUrl, normalizeWhatsAppNumber } from "@/lib/integrations/phone";
 import { mapBrevoEvent } from "@/lib/integrations/brevo";
-import { extractInboundMessages } from "@/lib/integrations/whatsapp";
 
 process.env.SESSION_SECRET = process.env.SESSION_SECRET || "x".repeat(40);
 
@@ -52,22 +50,6 @@ describe("secret box (AES-256-GCM)", () => {
     const tampered = box.slice(0, -2) + (box.endsWith("A") ? "BB" : "AA");
     expect(tryDecryptSecret(tampered)).toBeNull();
     expect(maskSecret("abcdefgh1234")).toBe("••••••••1234");
-  });
-});
-
-describe("WhatsApp Business click-to-send", () => {
-  it("normalises numbers with a default country code", () => {
-    expect(normalizeWhatsAppNumber("98765 43210")).toBe("919876543210");
-    expect(normalizeWhatsAppNumber("98765 43210", "971")).toBe("9719876543210");
-    expect(normalizeWhatsAppNumber("+1 (415) 555-0100")).toBe("14155550100");
-  });
-  it("builds links for desktop app, web and phone", () => {
-    expect(buildChatUrl("919876543210", "Hi & bye", "desktop")).toBe("whatsapp://send?phone=919876543210&text=Hi%20%26%20bye");
-    expect(buildChatUrl("919876543210", "Hi", "web")).toBe("https://web.whatsapp.com/send?phone=919876543210&text=Hi");
-    expect(buildChatUrl("919876543210", "Hi", "phone")).toBe("https://wa.me/919876543210?text=Hi");
-  });
-  it("extracts inbound messages for the 24-hour window", () => {
-    expect(extractInboundMessages({ entry: [{ changes: [{ value: { messages: [{ from: "919876543210", timestamp: "1700000000" }] } }] }] })).toEqual([{ from: "919876543210", timestamp: "1700000000" }]);
   });
 });
 

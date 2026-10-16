@@ -3,7 +3,7 @@ import { prisma } from "../prisma";
 import { loadRenderableDocument } from "../documents/load";
 import { renderTemplate, templateVars } from "./messages";
 
-/** Builds prefilled email / WhatsApp compose text from the stored message templates. */
+/** Builds prefilled email compose text from the stored message templates. */
 export async function composeDefaults(documentId: string, senderName: string) {
   const doc = await loadRenderableDocument(documentId);
   if (!doc) return null;
@@ -17,6 +17,5 @@ export async function composeDefaults(documentId: string, senderName: string) {
   };
   return {
     email: { DOCUMENT: make("EMAIL", docKey), PAYMENT_REMINDER: make("EMAIL", "PAYMENT_REMINDER") },
-    whatsapp: { DOCUMENT: make("WHATSAPP", docKey), PAYMENT_REMINDER: make("WHATSAPP", "PAYMENT_REMINDER") },
   };
 }

@@ -1,4 +1,4 @@
-import { FileSignature, FileSpreadsheet, FileText, History, LayoutDashboard, Megaphone, Package, Receipt, Send, Settings, Users } from "lucide-react";
+import { FileSignature, FileSpreadsheet, FileText, History, LayoutDashboard, Package, Receipt, Send, Settings, Users } from "lucide-react";
 
 export const NAV_GROUPS = [
   { label: "Overview", items: [{ href: "/", label: "Dashboard", icon: LayoutDashboard }] },
@@ -21,7 +21,6 @@ export const NAV_GROUPS = [
   {
     label: "Activity",
     items: [
-      { href: "/promotions", label: "Promotions", icon: Megaphone },
       { href: "/communications", label: "Communications", icon: Send },
       { href: "/history", label: "Document History", icon: History },
     ],

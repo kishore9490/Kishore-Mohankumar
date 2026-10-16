@@ -96,7 +96,7 @@ export function CustomerForm({ id, defaults, onSaved, compact }: { id?: string; 
       </Field>
       <Checkbox
         label="Customer has opted in to receive WhatsApp messages"
-        description="WhatsApp Business rules require customer opt-in before business-initiated messages."
+        description="Exported as opted_in in Customers → Export CSV; the WhatsApp sender script only messages opted-in customers by default."
         {...register("whatsappConsent")}
       />
     </div>

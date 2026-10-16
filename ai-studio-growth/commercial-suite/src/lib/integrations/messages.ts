@@ -29,21 +29,6 @@ export const TEMPLATE_PLACEHOLDERS = ["customerName", "customerCompany", "docume
 /** Delivery status ranking — webhook updates never move a message backwards. */
 export const STATUS_RANK: Record<string, number> = { PREPARED: 0, QUEUED: 1, SENT_TO_PROVIDER: 2, SENT_MANUAL: 2, DELIVERED: 3, READ: 4, FAILED: 5 };
 
-export function mapWhatsAppStatus(s: string): "SENT_TO_PROVIDER" | "DELIVERED" | "READ" | "FAILED" | null {
-  switch (s) {
-    case "sent":
-      return "SENT_TO_PROVIDER";
-    case "delivered":
-      return "DELIVERED";
-    case "read":
-      return "READ";
-    case "failed":
-      return "FAILED";
-    default:
-      return null;
-  }
-}
-
 export const DELIVERY_STATUS_META: Record<string, { label: string; tone: "neutral" | "info" | "success" | "warning" | "danger" | "purple"; help: string }> = {
   PREPARED: { label: "Prepared", tone: "neutral", help: "Chat opened in WhatsApp Business (or development mock) — not yet confirmed as sent." },
   SENT_MANUAL: { label: "Sent (confirmed)", tone: "success", help: "Sent from the WhatsApp Business app and confirmed by a team member." },

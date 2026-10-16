@@ -69,7 +69,7 @@ Save → **Deploy / Rebuild**. Enable SSL for the subdomain (hPanel → Security
 - **Company:** legal name, address, GSTIN, state, bank details, logos.
 - **Integrations → Email (Brevo):** API key (`xkeysib-…`), verified sender → Save → Test connection → Send test.
   Add the shown webhook URL in Brevo → Transactional → Settings → Webhooks for delivery/open tracking.
-- **Integrations → WhatsApp:** keep **WhatsApp Business app** mode, choose where chats open, enter your business number.
+- **WhatsApp:** not in the app — use the Python script in `tools/whatsapp-sender/` on your computer (see its README).
 - **Users & invitations:** invite your team.
 
 ## Updating later
