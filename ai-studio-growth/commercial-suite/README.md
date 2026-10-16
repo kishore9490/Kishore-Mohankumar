@@ -188,7 +188,11 @@ supplied reference proposal and can be replaced at any time.
 
 ---
 
-## Future deployment (Hostinger)
+## Deployment
+
+**Hostinger Web/Cloud hosting:** follow [DEPLOY-HOSTINGER.md](./DEPLOY-HOSTINGER.md) (Neon PostgreSQL + Browserless for PDFs, `/setup` first-run page).
+
+### Hostinger VPS
 
 Next.js server rendering and Chromium-based PDFs need a **Node.js server**, so use a **Hostinger VPS** (shared
 web hosting cannot run this app). Recommended setup on Ubuntu:

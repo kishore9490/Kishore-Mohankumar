@@ -32,7 +32,7 @@ function asset(name: string): Buffer | null {
 }
 
 /** Idempotent base setup: company profile, sequences, admin user, message templates, integration prefs. */
-export async function seedBase(db: PrismaClient, opts: { log?: (m: string) => void } = {}) {
+export async function seedBase(db: PrismaClient, opts: { log?: (m: string) => void; createAdmin?: boolean } = {}) {
   const log = opts.log ?? (() => {});
   let company = await db.companyProfile.findFirst({ where: { isDefault: true } });
   if (!company) {
@@ -78,7 +78,7 @@ export async function seedBase(db: PrismaClient, opts: { log?: (m: string) => vo
   }
 
   // Invite-only: the first administrator is created without a password and receives a one-time link.
-  if ((await db.user.count()) === 0) {
+  if (opts.createAdmin !== false && (await db.user.count()) === 0) {
     const adminEmail = (process.env.SEED_ADMIN_EMAIL || "admin@aistudiocraft.local").toLowerCase();
     const { token } = await inviteUser(db, { name: process.env.SEED_ADMIN_NAME || "Administrator", email: adminEmail, role: "ADMIN" }, null);
     const base = (process.env.PUBLIC_APP_URL || process.env.APP_URL || "http://localhost:3000").replace(/\/$/, "");

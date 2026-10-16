@@ -35,8 +35,14 @@ async function getBrowser(): Promise<Browser> {
     if (b && b.connected) return b;
     browserPromise = null;
   }
+  // Hosting without Chrome (e.g. shared web hosting): connect to a remote browser service such as Browserless.
+  const ws = process.env.BROWSER_WS_ENDPOINT;
+  if (ws) {
+    browserPromise = puppeteer.connect({ browserWSEndpoint: ws });
+    return browserPromise;
+  }
   const executablePath = findBrowserExecutable();
-  if (!executablePath) throw new PdfRenderError("PDF engine unavailable: no Chromium executable found. Set CHROMIUM_PATH.");
+  if (!executablePath) throw new PdfRenderError("PDF engine unavailable: no Chromium executable found. Set CHROMIUM_PATH, or BROWSER_WS_ENDPOINT for a remote browser.");
   browserPromise = puppeteer.launch({
     executablePath,
     headless: true,
@@ -60,7 +66,9 @@ async function withSlot<T>(fn: () => Promise<T>): Promise<T> {
 }
 
 function appBaseUrl(): string {
-  return (process.env.INTERNAL_APP_URL || `http://127.0.0.1:${process.env.PORT || 3000}`).replace(/\/$/, "");
+  // A remote browser cannot reach 127.0.0.1 — it must load the print view via the public URL.
+  const fallback = process.env.BROWSER_WS_ENDPOINT && process.env.PUBLIC_APP_URL ? process.env.PUBLIC_APP_URL : `http://127.0.0.1:${process.env.PORT || 3000}`;
+  return (process.env.INTERNAL_APP_URL || fallback).replace(/\/$/, "");
 }
 
 function loadFooterFont(): Buffer | null {

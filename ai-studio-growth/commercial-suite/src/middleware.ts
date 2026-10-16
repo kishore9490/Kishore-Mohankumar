@@ -8,6 +8,7 @@ import { NextResponse, type NextRequest } from "next/server";
 const PUBLIC_PREFIXES = [
   "/login",
   "/invite/", // single-use invitation links — verified by token
+  "/setup", // first-run bootstrap — requires SETUP_TOKEN and an empty user table
   "/api/webhooks/", // provider webhooks — verified by signature / secret token
   "/share/", // short-lived signed document links — verified by token
   "/print/", // server-side PDF rendering — verified by signed render token
