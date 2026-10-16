@@ -4,6 +4,7 @@ import { Fragment } from "react";
 import { describeDatabaseUrl, describeDbError, serverMessage } from "@/lib/db-health";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { BootstrapForm } from "@/components/auth/bootstrap-form";
+import { InstallTablesForm } from "@/components/auth/install-tables-form";
 import { buttonClass } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
@@ -18,6 +19,15 @@ export default async function SetupPage() {
     const err = describeDbError(e);
     const url = describeDatabaseUrl();
     const server = serverMessage(e);
+    if (err.title === "Database tables are missing") {
+      return (
+        <AuthShell>
+          <h2 className="font-display text-xl font-bold text-ink">Database connected — create the tables</h2>
+          <p className="mt-2 text-sm text-muted">The login to <span className="font-mono">{url.rows.find(([k]) => k === "Database")?.[1]}</span> works, but the app&apos;s tables have not been created yet. Create them now (one time, takes a few seconds).</p>
+          {tokenOk ? <InstallTablesForm /> : <p className="mt-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-800 ring-1 ring-amber-200">Add SETUP_TOKEN (16+ characters) in the hosting environment variables and redeploy first.</p>}
+        </AuthShell>
+      );
+    }
     return (
       <AuthShell>
         <h2 className="font-display text-xl font-bold text-ink">Database connection problem</h2>

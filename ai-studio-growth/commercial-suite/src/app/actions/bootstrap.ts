@@ -7,6 +7,7 @@ import { inviteUser } from "@/lib/auth/accounts";
 import { seedBase, seedSampleData } from "@/lib/sample-data";
 import { rateLimit } from "@/lib/auth/rate-limit";
 import { headers } from "next/headers";
+import { applyPendingMigrations } from "@/lib/db-migrate";
 
 /**
  * First-run bootstrap for hosts without a terminal (e.g. Hostinger web hosting).
@@ -38,4 +39,23 @@ export async function bootstrapAction(input: z.input<typeof schema>): Promise<{ 
   const { userId, token } = await inviteUser(prisma, { name: parsed.data.name, email: parsed.data.email, role: "ADMIN" }, null);
   if (parsed.data.samples) await seedSampleData(prisma, userId);
   redirect(`/invite/${token}`);
+}
+
+/** Creates the database tables from the bundled migrations (only while the app has no tables yet). */
+export async function installTablesAction(token: string): Promise<{ error: string } | void> {
+  const ip = ((await headers()).get("x-forwarded-for") ?? "local").split(",")[0].trim();
+  if (!rateLimit(`setup:${ip}`, 10, 15 * 60_000).ok) return { error: "Too many attempts. Please wait a few minutes." };
+  if (!tokenMatches(String(token ?? "").slice(0, 200))) return { error: "The setup token is not valid. Check SETUP_TOKEN in your hosting environment variables." };
+  try {
+    await prisma.user.count();
+    return { error: "The tables already exist. Reload this page." };
+  } catch {
+    // Expected: tables are missing.
+  }
+  try {
+    await applyPendingMigrations(prisma);
+  } catch (e) {
+    return { error: `Could not create the tables: ${e instanceof Error ? e.message.split("\n").filter(Boolean).slice(-1)[0] : String(e)}` };
+  }
+  redirect("/setup");
 }
