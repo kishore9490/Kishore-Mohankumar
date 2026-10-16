@@ -16,7 +16,7 @@ import { docHref } from "@/components/documents/doc-link";
 export const metadata = { title: "Document History" };
 export const dynamic = "force-dynamic";
 
-const ACTION_GROUPS: Record<string, string> = { "document.": "Documents", "invoice.": "Invoices", "payment.": "Payments", "email.": "Email", "whatsapp.": "WhatsApp", "pdf.": "PDF", "company.": "Settings", "numbering.": "Settings", "user.": "Users", "samples.": "Sample data" };
+const ACTION_GROUPS: Record<string, string> = { "document.": "Documents", "invoice.": "Invoices", "payment.": "Payments", "email.": "Email", "pdf.": "PDF", "company.": "Settings", "numbering.": "Settings", "user.": "Users", "samples.": "Sample data", "system.": "System errors" };
 
 export default async function HistoryPage({ searchParams }: { searchParams: Promise<{ q?: string; action?: string; document?: string }> }) {
   await requireUser();

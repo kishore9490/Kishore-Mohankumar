@@ -31,7 +31,16 @@ type Provider = "app" | "brevo";
 
 async function load<S, K>(provider: Provider): Promise<{ settings: S; secrets: K }> {
   const row = await prisma.integrationConfiguration.findUnique({ where: { provider } });
-  const settings = ((row?.settings as S) ?? {}) as S;
+  let rawSettings: unknown = row?.settings ?? {};
+  if (typeof rawSettings === "string") {
+    // some MySQL/MariaDB setups hand JSON columns back as text
+    try {
+      rawSettings = JSON.parse(rawSettings);
+    } catch {
+      rawSettings = {};
+    }
+  }
+  const settings = (rawSettings && typeof rawSettings === "object" && !Array.isArray(rawSettings) ? rawSettings : {}) as S;
   const raw = tryDecryptSecret(row?.secretsEnc);
   let secrets = {} as K;
   if (raw) {
