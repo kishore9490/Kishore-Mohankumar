@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { describeDbError } from "@/lib/db-health";
+import { Fragment } from "react";
+import { describeDatabaseUrl, describeDbError, serverMessage } from "@/lib/db-health";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { BootstrapForm } from "@/components/auth/bootstrap-form";
 import { buttonClass } from "@/components/ui/button";
@@ -15,6 +16,8 @@ export default async function SetupPage() {
     users = await prisma.user.count();
   } catch (e) {
     const err = describeDbError(e);
+    const url = describeDatabaseUrl();
+    const server = serverMessage(e);
     return (
       <AuthShell>
         <h2 className="font-display text-xl font-bold text-ink">Database connection problem</h2>
@@ -22,7 +25,15 @@ export default async function SetupPage() {
           <div className="font-semibold">{err.title}</div>
           <p className="mt-1">{err.detail}</p>
         </div>
-        <p className="mt-4 text-xs text-muted">After fixing the environment variable, redeploy or restart the app and reload this page.</p>
+        {server && <p className="mt-3 rounded-lg bg-canvas px-3 py-2 font-mono text-xs break-words text-ink ring-1 ring-line">{server}</p>}
+        <div className="mt-4 text-[13px] font-medium text-ink">What the app received in DATABASE_URL</div>
+        <dl className="mt-2 grid grid-cols-[110px_1fr] gap-x-3 gap-y-1 rounded-lg bg-white p-3 text-[13px] ring-1 ring-line">
+          {url.rows.map(([k, v]) => (<Fragment key={k}><dt className="text-muted">{k}</dt><dd className="font-mono break-all text-ink">{v}</dd></Fragment>))}
+        </dl>
+        {url.warnings.length > 0 && (
+          <ul className="mt-3 list-disc space-y-1 pl-5 text-[13px] text-amber-800">{url.warnings.map((w) => <li key={w}>{w}</li>)}</ul>
+        )}
+        <p className="mt-4 text-xs text-muted">Compare these with hPanel → Databases → Management. After changing the environment variable, redeploy or restart the app and reload this page.</p>
       </AuthShell>
     );
   }

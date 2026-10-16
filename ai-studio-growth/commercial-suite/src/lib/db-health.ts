@@ -43,3 +43,38 @@ export function describeDbError(e: unknown): { title: string; detail: string } {
       return { title: "Database error", detail: `${code ? `Code ${code}. ` : ""}${e instanceof Error ? e.message.split("\n").filter(Boolean).slice(-1)[0]?.slice(0, 200) ?? "" : ""}` };
   }
 }
+
+/** Non-secret view of DATABASE_URL so the person deploying can spot typos (the password is never shown). */
+export function describeDatabaseUrl(): { rows: [string, string][]; warnings: string[] } {
+  const raw = process.env.DATABASE_URL ?? "";
+  const warnings: string[] = [];
+  if (!raw) return { rows: [["DATABASE_URL", "not set"]], warnings: ["DATABASE_URL is empty."] };
+  if (raw !== raw.trim()) warnings.push("DATABASE_URL has spaces at the start or end — remove them.");
+  if (/^["'<]|["'>]$/.test(raw.trim())) warnings.push("DATABASE_URL is wrapped in quotes or < > — remove them.");
+  const m = raw.trim().replace(/^["'<]|["'>]$/g, "").match(/^mysql:\/\/([^:@/]*)(?::(.*))?@([^:/?#]+)(?::(\d+))?\/([^?#]*)/);
+  if (!m) return { rows: [["DATABASE_URL", "could not be read"]], warnings: [...warnings, "Use the format mysql://USERNAME:PASSWORD@HOST:3306/DATABASE_NAME"] };
+  const [, user, pass = "", host, port = "3306", db] = m;
+  if (/YOUR_PASSWORD|PASSWORD$/i.test(pass)) warnings.push("The password is still the placeholder text — put your real database password.");
+  if (!pass) warnings.push("No password found in DATABASE_URL.");
+  if (/[@:/#?%\s]/.test(pass)) warnings.push("The password contains @ : / # ? % or spaces — change it in hPanel to letters and numbers only.");
+  if (pass.includes("@")) warnings.push("An @ in the password makes the app read the wrong host.");
+  if (user && !/^u\d+_/.test(user)) warnings.push("Hostinger usernames start with u…_ (e.g. u643405007_quote).");
+  if (db && !/^u\d+_/.test(db)) warnings.push("Hostinger database names start with u…_ (e.g. u643405007_quote).");
+  return {
+    rows: [
+      ["Username", user || "(empty)"],
+      ["Password", pass ? `${pass.length} characters (hidden)` : "(empty)"],
+      ["Host", host],
+      ["Port", port],
+      ["Database", db || "(empty)"],
+    ],
+    warnings,
+  };
+}
+
+/** The database server's own message (never contains the password), e.g. "Access denied for user 'x'@'host'". */
+export function serverMessage(e: unknown): string {
+  const msg = e instanceof Error ? e.message : String(e);
+  const line = msg.split("\n").map((l) => l.trim()).filter(Boolean).find((l) => /denied|authentication|reach|unknown|exist|refused/i.test(l));
+  return (line ?? "").slice(0, 300);
+}
