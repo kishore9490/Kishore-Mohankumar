@@ -25,7 +25,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
               <BrandMark />
             </div>
             <SidebarNav isAdmin={user.role === "ADMIN"} />
-            <div className="mt-auto px-3 pt-6 text-[11px] leading-relaxed text-indigo-200/40">Internal use only · Infinitia Hub × AI Studio Craft</div>
+            <div className="mt-auto px-3 pt-6 text-[11px] leading-relaxed text-indigo-200/40">Internal use only · Infinitia Hub × AI Studio Craft<br />Build {process.env.NEXT_PUBLIC_BUILD_ID}</div>
           </aside>
           <Topbar user={user} />
           <main className="mx-auto w-full max-w-[1400px] px-4 py-6 md:px-8 md:py-8">{children}</main>
