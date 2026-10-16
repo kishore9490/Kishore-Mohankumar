@@ -46,6 +46,9 @@ mysql://u643405007_quote:YOUR_PASSWORD@localhost:3306/u643405007_quote
 | `SESSION_SECRET` | 64 random characters — **never change it later** (encrypts MFA secrets and saved API keys). Generate with the command below. |
 | `PUBLIC_APP_URL` | `https://quote.aistudiocraft.in` |
 | `SETUP_TOKEN` | Any secret phrase of 16+ characters, used once on the setup page |
+| `BREVO_API_KEY` | *(optional)* Brevo API key (`xkeysib-…`) — alternative to entering it in Settings → Integrations |
+| `BREVO_SENDER_EMAIL` | *(optional)* Verified Brevo sender, e.g. `quotes@aistudiocraft.in` |
+| `BREVO_SENDER_NAME` | *(optional)* Sender name shown to customers |
 
 Generate `SESSION_SECRET` in PowerShell:
 
@@ -71,6 +74,9 @@ Save → **Deploy / Rebuild**. Enable SSL for the subdomain (hPanel → Security
   Add the shown webhook URL in Brevo → Transactional → Settings → Webhooks for delivery/open tracking.
 - **WhatsApp:** not in the app — use the Python script in `tools/whatsapp-sender/` on your computer (see its README).
 - **Users & invitations:** invite your team.
+
+**Check email without the app:** open `https://quote.aistudiocraft.in/api/health?token=YOUR_SETUP_TOKEN&testEmail=you@example.com`
+— it shows the email configuration and sends a test email (or the exact Brevo error).
 
 ## Updating later
 

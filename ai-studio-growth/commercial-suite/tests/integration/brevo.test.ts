@@ -61,6 +61,30 @@ d("email via Brevo (fake API)", () => {
     await expect(brevo.brevoSendEmail({ to: "a@example.com", subject: "x", text: "y" })).rejects.toThrow(/not configured/);
   });
 
+  it("can be configured with BREVO_* environment variables (Settings values take priority)", async () => {
+    process.env.BREVO_API_KEY = "xkeysib-test-key";
+    process.env.BREVO_SENDER_EMAIL = "quotes@aistudiocraft.in";
+    process.env.BREVO_SENDER_NAME = "Env Sender";
+    try {
+      const s = await config.brevoStatus();
+      expect(s.configured).toBe(true);
+      expect(await config.brevoKeyFromEnv()).toBe(true);
+      await brevo.brevoSendEmail({ to: "env@example.com", subject: "env", text: "from env" });
+      const sent = requests.filter((q) => q.path === "/v3/smtp/email").at(-1)!;
+      expect(sent.apiKey).toBe("xkeysib-test-key");
+      expect((sent.body as { sender: unknown }).sender).toEqual({ email: "quotes@aistudiocraft.in", name: "Env Sender" });
+      await config.saveBrevo({ senderName: "Settings Sender" });
+      expect((await config.brevoStatus()).senderName).toBe("Settings Sender");
+      const row = await prisma.integrationConfiguration.findUniqueOrThrow({ where: { provider: "brevo" } });
+      expect(JSON.stringify(row)).not.toContain("quotes@aistudiocraft.in"); // env values are never copied into the database
+    } finally {
+      delete process.env.BREVO_API_KEY;
+      delete process.env.BREVO_SENDER_EMAIL;
+      delete process.env.BREVO_SENDER_NAME;
+      await prisma.integrationConfiguration.deleteMany({ where: { provider: "brevo" } });
+    }
+  });
+
   it("stores the API key encrypted and checks the connection and sender", async () => {
     await config.saveBrevo({ senderEmail: "quotes@aistudiocraft.in", senderName: "AI Studio Craft", replyTo: "owner@aistudiocraft.in", deliveryMode: "live" }, { apiKey: "xkeysib-test-key" });
     const row = await prisma.integrationConfiguration.findUniqueOrThrow({ where: { provider: "brevo" } });

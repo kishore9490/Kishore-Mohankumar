@@ -73,7 +73,21 @@ async function save<S extends object, K extends object>(provider: Provider, sett
 }
 
 export const loadApp = () => load<AppSettings, Record<string, never>>("app");
-export const loadBrevo = () => load<BrevoSettings, BrevoSecrets>("brevo");
+/** Settings saved in the app win; BREVO_* environment variables fill anything not set there. */
+export async function loadBrevo(): Promise<{ settings: BrevoSettings; secrets: BrevoSecrets }> {
+  const { settings, secrets } = await load<BrevoSettings, BrevoSecrets>("brevo");
+  const env = (k: string) => process.env[k]?.trim() || undefined;
+  return {
+    settings: { ...settings, senderEmail: settings.senderEmail ?? env("BREVO_SENDER_EMAIL"), senderName: settings.senderName ?? env("BREVO_SENDER_NAME"), replyTo: settings.replyTo ?? env("BREVO_REPLY_TO") },
+    secrets: { ...secrets, apiKey: secrets.apiKey ?? env("BREVO_API_KEY") },
+  };
+}
+
+/** True when the Brevo API key comes from the BREVO_API_KEY environment variable. */
+export async function brevoKeyFromEnv(): Promise<boolean> {
+  const { secrets } = await load<BrevoSettings, BrevoSecrets>("brevo");
+  return !secrets.apiKey && !!process.env.BREVO_API_KEY?.trim();
+}
 export const saveApp = (s: Partial<AppSettings>) => save<AppSettings, Record<string, never>>("app", s);
 export const saveBrevo = (s: Partial<BrevoSettings>, k?: Partial<BrevoSecrets>) => save<BrevoSettings, BrevoSecrets>("brevo", s, k);
 
