@@ -1,5 +1,6 @@
 import "server-only";
 import { prisma } from "../prisma";
+import { jsonStringList } from "../utils";
 import { toRenderCompany } from "./load";
 import { addDaysISO, todayISO, toISODate } from "../dates";
 import { DOCUMENT_TYPE_META, type DocumentType } from "./meta";
@@ -31,7 +32,7 @@ export async function loadEditorData(includeCustomerId?: string) {
   const editorProducts: EditorProduct[] = products.map((p) => ({
     id: p.id, name: p.name, category: p.category, shortDescription: p.shortDescription, detailedDescription: p.detailedDescription, hsnSac: p.hsnSac,
     unit: p.unit, defaultQuantity: p.defaultQuantity.toString(), defaultPrice: p.defaultPrice.toString(), taxRate: p.taxRate.toString(),
-    billingFrequency: p.billingFrequency, inclusions: p.inclusions, exclusions: p.exclusions,
+    billingFrequency: p.billingFrequency, inclusions: jsonStringList(p.inclusions), exclusions: jsonStringList(p.exclusions),
   }));
   return { companies: editorCompanies, customers: editorCustomers, products: editorProducts };
 }

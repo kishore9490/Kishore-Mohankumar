@@ -366,7 +366,7 @@ export async function recordPayment(
   userId: string | null,
 ) {
   return db.$transaction(async (tx) => {
-    await tx.$queryRaw`SELECT id FROM "Document" WHERE id = ${input.documentId} FOR UPDATE`;
+    await tx.$queryRaw`SELECT id FROM \`Document\` WHERE id = ${input.documentId} FOR UPDATE`;
     const doc = await tx.document.findUnique({ where: { id: input.documentId } });
     if (!doc) throw new ServiceError("Invoice not found.");
     if (doc.type !== "INVOICE") throw new ServiceError("Payments can only be recorded against tax invoices.");
@@ -403,7 +403,7 @@ export async function deletePayment(db: PrismaClient, paymentId: string, userId:
   return db.$transaction(async (tx) => {
     const p = await tx.payment.findUnique({ where: { id: paymentId } });
     if (!p) throw new ServiceError("Payment not found.");
-    await tx.$queryRaw`SELECT id FROM "Document" WHERE id = ${p.documentId} FOR UPDATE`;
+    await tx.$queryRaw`SELECT id FROM \`Document\` WHERE id = ${p.documentId} FOR UPDATE`;
     const doc = await tx.document.findUniqueOrThrow({ where: { id: p.documentId } });
     const newPaid = dec(doc.amountPaid.toString()).minus(dec(p.amount.toString()));
     await tx.payment.delete({ where: { id: paymentId } });

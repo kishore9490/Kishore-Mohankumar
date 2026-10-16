@@ -1,12 +1,12 @@
 // AI Studio Craft Commercial Suite — data model
-// Production target: PostgreSQL. Monetary values use DECIMAL columns (never float).
+// Production target: MySQL / MariaDB (Hostinger). Monetary values use DECIMAL columns (never float).
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql" // MySQL 8 / MariaDB 10.6+ (Hostinger databases)
   url      = env("DATABASE_URL")
 }
 
@@ -20,13 +20,13 @@ enum Role {
 model User {
   id           String    @id @default(cuid())
   email        String    @unique
-  name         String
+  name         String @db.VarChar(255)
   // Null until the invited user accepts their invitation and sets a password
   passwordHash String?
   role         Role      @default(STAFF)
   active       Boolean   @default(true)
   // TOTP multi-factor authentication (secret encrypted at rest)
-  mfaSecretEnc String?
+  mfaSecretEnc String? @db.Text
   mfaEnabled   Boolean   @default(false)
   mfaLastStep  Int?      // last accepted TOTP time-step — prevents code replay
   invitedAt    DateTime?
@@ -51,7 +51,7 @@ model Session {
   tokenHash String   @unique
   userId    String
   expiresAt DateTime
-  userAgent String?
+  userAgent String? @db.VarChar(500)
   createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -88,7 +88,7 @@ model AuthChallenge {
   tokenHash        String           @unique
   userId           String
   purpose          ChallengePurpose
-  pendingSecretEnc String?          // TOTP secret being enrolled (encrypted)
+  pendingSecretEnc String? @db.Text // TOTP secret being enrolled (encrypted)
   attempts         Int              @default(0)
   expiresAt        DateTime
   createdAt        DateTime         @default(now())
@@ -120,9 +120,9 @@ enum RoundingMode {
 model CompanyProfile {
   id                  String       @id @default(cuid())
   // Branding (presentation) — kept separate from legal/tax identity
-  brandName           String
-  coBrandName         String?
-  tagline             String?
+  brandName           String @db.VarChar(255)
+  coBrandName         String? @db.VarChar(255)
+  tagline             String? @db.Text
   logoPrimary         Bytes?
   logoPrimaryMime     String?
   logoSecondary       Bytes?
@@ -132,8 +132,8 @@ model CompanyProfile {
   primaryColor        String       @default("#0F1B3D")
   accentColor         String       @default("#6D28D9")
   // Legal / tax identity
-  legalName           String?
-  address             String?
+  legalName           String? @db.VarChar(255)
+  address             String? @db.Text
   phone               String?
   email               String?
   website             String?
@@ -148,13 +148,13 @@ model CompanyProfile {
   bankIfsc            String?
   bankBranch          String?
   upiId               String?
-  paymentInstructions String?
+  paymentInstructions String? @db.Text
   authorisedSignatory String?
   // Defaults
-  documentFooter      String?
-  termsQuotation      String?
-  termsInvoice        String?
-  termsProposal       String?
+  documentFooter      String? @db.Text
+  termsQuotation      String? @db.Text
+  termsInvoice        String? @db.Text
+  termsProposal       String? @db.Text
   currency            String       @default("INR")
   defaultTaxRate      Decimal      @default(18) @db.Decimal(5, 2)
   roundingMode        RoundingMode @default(NEAREST_RUPEE)
@@ -198,16 +198,16 @@ enum CommunicationChannel {
 
 model Customer {
   id               String               @id @default(cuid())
-  name             String
+  name             String @db.VarChar(255)
   contactPerson    String?
   email            String?
   phone            String?
-  billingAddress   String?
-  shippingAddress  String?
+  billingAddress   String? @db.Text
+  shippingAddress  String? @db.Text
   gstin            String?
   state            String?
   stateCode        String?
-  notes            String?
+  notes            String? @db.Text
   preferredChannel CommunicationChannel @default(EMAIL)
   whatsappConsent  Boolean              @default(false)
   // Last inbound WhatsApp message (from webhook) — free-form replies are allowed for 24h after it
@@ -235,9 +235,9 @@ enum BillingFrequency {
 
 model ProductService {
   id                  String           @id @default(cuid())
-  name                String
-  shortDescription    String?
-  detailedDescription String?
+  name                String @db.VarChar(255)
+  shortDescription    String? @db.VarChar(500)
+  detailedDescription String? @db.Text
   category            String
   sku                 String?          @unique
   hsnSac              String?
@@ -246,8 +246,8 @@ model ProductService {
   defaultPrice        Decimal          @default(0) @db.Decimal(14, 2)
   taxRate             Decimal          @default(18) @db.Decimal(5, 2)
   billingFrequency    BillingFrequency @default(ONE_TIME)
-  inclusions          String[]
-  exclusions          String[]
+  inclusions          Json // string[]
+  exclusions          Json // string[]
   active              Boolean          @default(true)
   isSample            Boolean          @default(false)
   createdAt           DateTime         @default(now())
@@ -297,7 +297,7 @@ model Document {
   customerId        String
   template          DocumentTemplate
   status            DocumentStatus   @default(DRAFT)
-  title             String?
+  title             String? @db.VarChar(255)
   reference         String?
   issueDate         DateTime         @db.Date
   validUntil        DateTime?        @db.Date
@@ -306,9 +306,9 @@ model Document {
   placeOfSupplyCode String?
   taxMode           TaxMode          @default(INTRA_STATE)
   customerSnapshot  Json             // billing details frozen when saved
-  notes             String?
-  terms             String?
-  paymentTerms      String?
+  notes             String? @db.Text
+  terms             String? @db.Text
+  paymentTerms      String? @db.Text
   // Server-computed totals (never trusted from the client)
   subtotal          Decimal          @default(0) @db.Decimal(14, 2)
   discountTotal     Decimal          @default(0) @db.Decimal(14, 2)
@@ -360,8 +360,8 @@ model DocumentLineItem {
   documentId       String
   position         Int
   productServiceId String?
-  name             String
-  description      String?
+  name             String @db.VarChar(255)
+  description      String? @db.Text
   details          Json?             // { detailedDescription, inclusions[], exclusions[] } snapshot
   hsnSac           String?
   quantity         Decimal           @db.Decimal(14, 3)
@@ -408,7 +408,7 @@ model ProposalSection {
   documentId String
   position   Int
   type       ProposalSectionType
-  title      String
+  title      String @db.VarChar(255)
   enabled    Boolean             @default(true)
   content    Json                // { body, items: [{ title, detail }], highlight }
 
@@ -435,7 +435,7 @@ model Payment {
   amount       Decimal       @db.Decimal(14, 2)
   method       PaymentMethod
   reference    String?
-  notes        String?
+  notes        String? @db.Text
   recordedById String?
   createdAt    DateTime      @default(now())
 
@@ -484,10 +484,10 @@ model CommunicationLog {
   messageType       MessageType
   mode              DeliveryMode
   recipient         String
-  subject           String?
+  subject           String? @db.VarChar(255)
   status            DeliveryStatus
   providerMessageId String?        @unique
-  errorMessage      String?
+  errorMessage      String? @db.Text
   attachmentName    String?
   createdById       String?
   createdAt         DateTime       @default(now())
@@ -508,7 +508,7 @@ model CommunicationLog {
 model WebhookEvent {
   id         String   @id @default(cuid())
   provider   String
-  eventKey   String   @unique
+  eventKey   String @db.VarChar(255) @unique
   receivedAt DateTime @default(now())
 }
 
@@ -519,7 +519,7 @@ model IntegrationConfiguration {
   enabled   Boolean  @default(true)
   settings  Json
   // Credentials entered in Settings, AES-256-GCM encrypted. Never sent to the browser.
-  secretsEnc String?
+  secretsEnc String? @db.Text
   updatedAt DateTime @updatedAt
 }
 
@@ -528,8 +528,8 @@ model MessageTemplate {
   channel   MessageChannel
   key       String // e.g. QUOTATION, INVOICE, PROPOSAL, PROFORMA, PAYMENT_REMINDER
   name      String
-  subject   String?
-  body      String
+  subject   String? @db.VarChar(255)
+  body      String @db.Text
   updatedAt DateTime       @updatedAt
 
   @@unique([channel, key])
@@ -555,7 +555,7 @@ model AuditEvent {
   documentId String?
   userId     String?
   action     String
-  summary    String
+  summary    String @db.VarChar(500)
   createdAt  DateTime @default(now())
 
   document Document? @relation(fields: [documentId], references: [id], onDelete: SetNull)
@@ -570,8 +570,8 @@ model AuditEvent {
 /// A promotional message sent one-by-one from the WhatsApp Business app to opted-in customers.
 model Campaign {
   id          String   @id @default(cuid())
-  name        String
-  message     String
+  name        String @db.VarChar(255)
+  message     String @db.Text
   createdById String?
   archived    Boolean  @default(false)
   createdAt   DateTime @default(now())

@@ -21,7 +21,7 @@ export default async function CustomersPage({ searchParams }: { searchParams: Pr
     ...(status === "archived" ? { archived: true } : status === "all" ? {} : { archived: false }),
     ...(channel ? { preferredChannel: channel as Prisma.CustomerWhereInput["preferredChannel"] } : {}),
     ...(q
-      ? { OR: [{ name: { contains: q, mode: "insensitive" } }, { contactPerson: { contains: q, mode: "insensitive" } }, { email: { contains: q, mode: "insensitive" } }, { gstin: { contains: q, mode: "insensitive" } }, { phone: { contains: q } }] }
+      ? { OR: [{ name: { contains: q } }, { contactPerson: { contains: q } }, { email: { contains: q } }, { gstin: { contains: q } }, { phone: { contains: q } }] }
       : {}),
   };
   const customers = await prisma.customer.findMany({ where, orderBy: { name: "asc" }, include: { _count: { select: { documents: true } } }, take: 500 });

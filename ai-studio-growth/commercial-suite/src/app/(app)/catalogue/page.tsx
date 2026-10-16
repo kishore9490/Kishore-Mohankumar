@@ -24,7 +24,7 @@ export default async function CataloguePage({ searchParams }: { searchParams: Pr
   const where: Prisma.ProductServiceWhereInput = {
     ...(status === "inactive" ? { active: false } : status === "all" ? {} : { active: true }),
     ...(category ? { category } : {}),
-    ...(q ? { OR: [{ name: { contains: q, mode: "insensitive" } }, { sku: { contains: q, mode: "insensitive" } }, { shortDescription: { contains: q, mode: "insensitive" } }] } : {}),
+    ...(q ? { OR: [{ name: { contains: q } }, { sku: { contains: q } }, { shortDescription: { contains: q } }] } : {}),
   };
   const [items, cats] = await Promise.all([
     prisma.productService.findMany({ where, orderBy: [{ category: "asc" }, { name: "asc" }], include: { _count: { select: { lineItems: true } } } }),

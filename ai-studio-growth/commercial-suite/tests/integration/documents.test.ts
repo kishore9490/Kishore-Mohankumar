@@ -35,7 +35,7 @@ async function issuedInvoice(total = "20000") {
   return id;
 }
 
-d("document services (PostgreSQL)", () => {
+d("document services (MySQL/MariaDB)", () => {
   beforeAll(async () => {
     const company = await seedBase(db);
     companyId = company.id;

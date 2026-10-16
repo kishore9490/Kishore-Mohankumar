@@ -1,6 +1,6 @@
 /**
  * One-time local setup.
- *   npm run setup -- "postgresql://postgres:PASSWORD@localhost:5432/commercial_suite?schema=public" [admin@email] ["Admin Name"]
+ *   npm run setup -- "mysql://USER:PASSWORD@localhost:3306/DATABASE" [admin@email] ["Admin Name"]
  * - writes .env (keeps an existing SESSION_SECRET — it must stay the same, it protects MFA and integration secrets)
  * - detects Chrome / Edge for PDF generation
  * - applies database migrations and seeds base data + sample data
@@ -21,7 +21,7 @@ if (existsSync(envPath)) {
 }
 const dbUrl = dbUrlArg || current.DATABASE_URL;
 if (!dbUrl) {
-  console.error('Usage: npm run setup -- "postgresql://postgres:PASSWORD@localhost:5432/commercial_suite?schema=public" [admin@email] ["Admin Name"]');
+  console.error('Usage: npm run setup -- "mysql://USER:PASSWORD@localhost:3306/DATABASE" [admin@email] ["Admin Name"]');
   process.exit(1);
 }
 const browsers = [

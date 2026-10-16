@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { jsonStringList } from "@/lib/utils";
 import { requireUser } from "@/lib/auth/session";
 import { PageHeader } from "@/components/ui/page-header";
 import { ProductForm } from "@/components/forms/product-form";
@@ -23,7 +24,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
         defaults={{
           name: p.name, shortDescription: p.shortDescription ?? "", detailedDescription: p.detailedDescription ?? "", category: p.category, sku: p.sku ?? "",
           hsnSac: p.hsnSac ?? "", unit: p.unit, defaultQuantity: p.defaultQuantity.toString(), defaultPrice: p.defaultPrice.toString(), taxRate: p.taxRate.toString(),
-          billingFrequency: p.billingFrequency, inclusions: p.inclusions, exclusions: p.exclusions, active: p.active,
+          billingFrequency: p.billingFrequency, inclusions: jsonStringList(p.inclusions), exclusions: jsonStringList(p.exclusions), active: p.active,
         }}
       />
     </div>

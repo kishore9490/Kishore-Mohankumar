@@ -19,7 +19,7 @@ async function enrolledUser(email = "staff@example.com") {
   return { userId, secret, recoveryCodes: res.recoveryCodes! };
 }
 
-d("invitations & MFA (PostgreSQL)", () => {
+d("invitations & MFA (MySQL/MariaDB)", () => {
   afterAll(async () => db.$disconnect());
   beforeEach(async () => {
     await db.authChallenge.deleteMany();

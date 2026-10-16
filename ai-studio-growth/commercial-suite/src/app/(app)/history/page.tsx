@@ -24,7 +24,7 @@ export default async function HistoryPage({ searchParams }: { searchParams: Prom
   const where: Prisma.AuditEventWhereInput = {
     ...(action ? { action: { startsWith: action } } : {}),
     ...(document ? { documentId: document } : {}),
-    ...(q ? { summary: { contains: q, mode: "insensitive" } } : {}),
+    ...(q ? { summary: { contains: q } } : {}),
   };
   const events = await prisma.auditEvent.findMany({ where, orderBy: { createdAt: "desc" }, take: 300, include: { user: { select: { name: true } }, document: { select: { id: true, type: true, number: true, customer: { select: { name: true } } } } } });
   return (

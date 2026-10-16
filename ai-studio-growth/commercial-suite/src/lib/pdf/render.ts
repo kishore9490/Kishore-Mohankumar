@@ -41,14 +41,30 @@ async function getBrowser(): Promise<Browser> {
     browserPromise = puppeteer.connect({ browserWSEndpoint: ws });
     return browserPromise;
   }
-  const executablePath = findBrowserExecutable();
-  if (!executablePath) throw new PdfRenderError("PDF engine unavailable: no Chromium executable found. Set CHROMIUM_PATH, or BROWSER_WS_ENDPOINT for a remote browser.");
-  browserPromise = puppeteer.launch({
-    executablePath,
-    headless: true,
-    args: ["--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu", "--font-render-hinting=none"],
-  });
-  return browserPromise;
+  // PDF_ENGINE=bundled forces the bundled Chromium even if a system Chrome exists.
+  const executablePath = process.env.PDF_ENGINE === "bundled" ? null : findBrowserExecutable();
+  if (executablePath) {
+    browserPromise = puppeteer.launch({
+      executablePath,
+      headless: true,
+      args: ["--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu", "--font-render-hinting=none"],
+    });
+    return browserPromise;
+  }
+  // No Chrome installed (e.g. shared web hosting): use the self-contained Chromium bundled with
+  // @sparticuz/chromium (Linux x64). It is unpacked to the temp directory on first use.
+  if (process.platform === "linux" && process.arch === "x64") {
+    browserPromise = (async () => {
+      const { default: chromium } = await import("@sparticuz/chromium");
+      chromium.setGraphicsMode = false;
+      return puppeteer.launch({ executablePath: await chromium.executablePath(), headless: true, args: [...chromium.args, "--font-render-hinting=none"] });
+    })().catch((e) => {
+      browserPromise = null;
+      throw new PdfRenderError(`PDF engine could not start the bundled Chromium (${(e as Error).message.split("\n")[0]}). Set BROWSER_WS_ENDPOINT to use a remote browser instead.`);
+    });
+    return browserPromise;
+  }
+  throw new PdfRenderError("PDF engine unavailable: no Chrome found. Install Chrome / set CHROMIUM_PATH, or set BROWSER_WS_ENDPOINT for a remote browser.");
 }
 
 // Limit concurrent renders to keep memory predictable on small servers.

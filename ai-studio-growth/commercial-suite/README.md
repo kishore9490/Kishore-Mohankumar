@@ -9,13 +9,13 @@ Access is **invite-only** with **authenticator-app MFA** for every user.
 
 ## Quick start (Windows / macOS / Linux)
 
-Prerequisites: Node.js 20+, PostgreSQL running with an empty database, Chrome or Edge.
+Prerequisites: Node.js 20+ and an empty MySQL 8 / MariaDB 10.6+ database (e.g. Hostinger). Chrome is optional — a bundled Chromium is used on Linux.
 
 ```bash
 git clone -b ccr-c1686265-rhp1vi https://github.com/kishore9490/Kishore-Mohankumar.git
 cd Kishore-Mohankumar/ai-studio-growth/commercial-suite
 npm install
-npm run setup -- "postgresql://postgres:YOUR_PASSWORD@localhost:5432/commercial_suite?schema=public" you@company.com "Your Name"
+npm run setup -- "mysql://USER:PASSWORD@localhost:3306/DATABASE" you@company.com "Your Name"
 npm run dev
 ```
 
@@ -61,10 +61,10 @@ authenticator app, save the recovery codes — done. Then configure email and Wh
 - **Next.js 15.5** (App Router, Server Actions) · **React 19** · **TypeScript**
 - **Tailwind CSS 4** with hand-written shadcn-style components (Radix Dialog/Dropdown), **Lucide** icons, **Sonner** toasts
 - **React Hook Form** + **Zod** (shared client/server schemas)
-- **PostgreSQL 16** + **Prisma 6** (DECIMAL money columns, transactions, unique constraints)
+- **MySQL 8 / MariaDB** (Hostinger) + **Prisma 6** (DECIMAL money columns, transactions, row locks, unique constraints)
 - **decimal.js** for all monetary arithmetic
-- **puppeteer-core** (headless Chromium) + **pdf-lib** for PDF generation
-- **Vitest** (unit + PostgreSQL integration tests) and a **puppeteer-core** end-to-end browser test
+- **puppeteer-core** (installed Chrome, bundled `@sparticuz/chromium`, or a remote browser) + **pdf-lib** for PDF generation
+- **Vitest** (unit + MySQL/MariaDB integration tests) and a **puppeteer-core** end-to-end browser test
 - Self-hosted fonts via **Fontsource** (Lato for documents, Inter / Plus Jakarta Sans for the UI)
 
 Project layout:
@@ -79,7 +79,7 @@ src/app/share/       short-lived secure document links
 src/app/actions/     server actions (validated, authorised)
 src/lib/             money & GST engine, services, auth, integrations, PDF, validation
 src/components/      UI kit, shell, editor, document renderers
-tests/               unit, integration (PostgreSQL), e2e (browser)
+tests/               unit, integration (MySQL/MariaDB), e2e (browser)
 ```
 
 ---
@@ -87,7 +87,7 @@ tests/               unit, integration (PostgreSQL), e2e (browser)
 ## Prerequisites
 
 - Node.js **20+** (developed on 22) and npm
-- PostgreSQL **14+** (developed on 16)
+- MySQL **8+** or MariaDB **10.6+** (developed on MariaDB 10.11)
 - Chromium or Google Chrome (for PDF generation), path set in `CHROMIUM_PATH`
 
 ## Installation
@@ -102,8 +102,7 @@ cp .env.example .env             # then fill in DATABASE_URL, SESSION_SECRET, SE
 
 ```bash
 # create a role and database (example)
-psql -U postgres -c "CREATE ROLE commercial WITH LOGIN PASSWORD 'change-me' CREATEDB;"
-createdb -U postgres -O commercial commercial_suite
+mysql -u root -e "CREATE DATABASE quote_studio CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; CREATE USER 'qs'@'localhost' IDENTIFIED BY 'change-me'; GRANT ALL ON quote_studio.* TO 'qs'@'localhost';"
 
 npm run db:migrate               # prisma migrate deploy (non-destructive)
 npm run db:seed                  # company profile, admin user, templates (+ sample data unless SEED_SAMPLE_DATA=false)
@@ -134,7 +133,7 @@ npm run start                    # next start -H 0.0.0.0 -p 3000
 ```bash
 npm run typecheck                # tsc --noEmit
 npm run lint                     # eslint
-TEST_DATABASE_URL=postgresql://…/commercial_suite_test npm test   # unit + integration (applies migrations to the test DB)
+TEST_DATABASE_URL=mysql://…/quote_studio_test npm test   # unit + integration (applies migrations to the test DB)
 APP_URL=http://127.0.0.1:3000 npm run test:e2e                     # browser workflow test against a running server
 ```
 
@@ -146,7 +145,7 @@ See `.env.example` for the full list. Summary:
 
 | Variable | Purpose |
 |---|---|
-| `DATABASE_URL` | PostgreSQL connection |
+| `DATABASE_URL` | MySQL / MariaDB connection (`mysql://user:pass@host:3306/db`) |
 | `SESSION_SECRET` | 32+ chars; signs render tokens and encrypts stored secrets — never change it |
 | `ENCRYPTION_KEY` | Optional dedicated encryption key (defaults to `SESSION_SECRET`) |
 | `SEED_ADMIN_EMAIL`, `SEED_ADMIN_NAME` | First administrator (created as an invitation) |
@@ -170,7 +169,7 @@ encrypted in the database — no environment variables needed.
 
 ## Sandbox vs production persistence
 
-The sandbox uses the same stack as production — **PostgreSQL + Prisma** — so there is no persistence difference.
+The sandbox was tested with **MariaDB 10.11 + Prisma** (the same family as Hostinger's MySQL), so there is no persistence difference.
 Company logos are stored in the database (bytea) and PDFs are generated on demand (not stored), so no file
 storage is required.
 
@@ -190,16 +189,16 @@ supplied reference proposal and can be replaced at any time.
 
 ## Deployment
 
-**Hostinger Web/Cloud hosting:** follow [DEPLOY-HOSTINGER.md](./DEPLOY-HOSTINGER.md) (Neon PostgreSQL + Browserless for PDFs, `/setup` first-run page).
+**Hostinger Web/Cloud hosting:** follow [DEPLOY-HOSTINGER.md](./DEPLOY-HOSTINGER.md) — Hostinger MySQL database, bundled Chromium for PDFs, `/setup` first-run page. No external services needed.
 
 ### Hostinger VPS
 
 Next.js server rendering and Chromium-based PDFs need a **Node.js server**, so use a **Hostinger VPS** (shared
 web hosting cannot run this app). Recommended setup on Ubuntu:
 
-1. `apt install -y nodejs npm postgresql chromium nginx` (Node 20+ via NodeSource if needed); install fonts
+1. `apt install -y nodejs npm mariadb-server chromium nginx` (Node 20+ via NodeSource if needed); install fonts
    (`fonts-crosextra-carlito fonts-dejavu`) for consistent PDF glyph fallback.
-2. Create the PostgreSQL role/database; set `.env` with production values, `PUBLIC_APP_URL=https://your-domain`,
+2. Create the MySQL database and user; set `.env` with production values, `PUBLIC_APP_URL=https://your-domain`,
    `CHROMIUM_PATH=/usr/bin/chromium` and real Brevo/WhatsApp credentials.
 3. `npm ci && npm run build && npm run db:migrate && SEED_SAMPLE_DATA=false npm run db:seed`.
 4. Run with a process manager: `pm2 start npm --name commercial-suite -- start` and `pm2 save`.

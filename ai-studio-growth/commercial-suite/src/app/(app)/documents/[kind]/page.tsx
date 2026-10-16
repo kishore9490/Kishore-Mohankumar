@@ -33,7 +33,7 @@ export default async function DocumentListPage({ params, searchParams }: { param
   const where: Prisma.DocumentWhereInput = {
     type,
     ...(customer ? { customerId: customer } : {}),
-    ...(q ? { OR: [{ number: { contains: q, mode: "insensitive" } }, { title: { contains: q, mode: "insensitive" } }, { customer: { name: { contains: q, mode: "insensitive" } } }] } : {}),
+    ...(q ? { OR: [{ number: { contains: q } }, { title: { contains: q } }, { customer: { name: { contains: q } } }] } : {}),
   };
   const docs = await prisma.document.findMany({ where, orderBy: [{ issueDate: "desc" }, { createdAt: "desc" }], include: { customer: { select: { id: true, name: true } } }, take: 500 });
   const rows = docs

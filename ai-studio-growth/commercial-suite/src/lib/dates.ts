@@ -13,7 +13,7 @@ export function toISODate(value: Date | string | null | undefined): string {
   return value.toISOString().slice(0, 10);
 }
 
-/** Parse YYYY-MM-DD into a UTC-midnight Date (matches Postgres DATE columns). */
+/** Parse YYYY-MM-DD into a UTC-midnight Date (matches SQL DATE columns). */
 export function parseISODate(value: string): Date {
   return new Date(`${value.slice(0, 10)}T00:00:00.000Z`);
 }
