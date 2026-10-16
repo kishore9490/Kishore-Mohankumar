@@ -6,8 +6,8 @@ export const metadata = { title: "Document", robots: { index: false, follow: fal
 
 export default function PrintLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
-      <body style={{ margin: 0, background: "#eef0f7" }}>{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <body suppressHydrationWarning style={{ margin: 0, background: "#eef0f7" }}>{children}</body>
     </html>
   );
 }

@@ -6,8 +6,8 @@ export const metadata = { title: "Sign in · Commercial Suite", robots: { index:
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
-      <body className="font-sans">{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <body className="font-sans" suppressHydrationWarning>{children}</body>
     </html>
   );
 }

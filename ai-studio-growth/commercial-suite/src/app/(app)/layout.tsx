@@ -17,8 +17,8 @@ export const metadata: Metadata = {
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const user = await requireUser();
   return (
-    <html lang="en">
-      <body className="font-sans">
+    <html lang="en" suppressHydrationWarning>
+      <body className="font-sans" suppressHydrationWarning>
         <div className="min-h-screen lg:pl-64">
           <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col overflow-y-auto bg-navy-900 px-3 py-5 lg:flex">
             <div className="mb-7 px-2">
