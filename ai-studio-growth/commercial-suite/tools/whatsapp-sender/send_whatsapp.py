@@ -22,9 +22,11 @@ from __future__ import annotations
 
 import argparse
 import csv
+import mimetypes
 import random
 import re
 import sys
+import threading
 import time
 from datetime import datetime
 from pathlib import Path
@@ -32,6 +34,7 @@ from urllib.parse import quote
 
 HERE = Path(__file__).resolve().parent
 DEFAULT_PROFILE = HERE / "wa-profile"
+DEFAULT_SESSION = HERE / "wa-session.db"
 DEFAULT_LOG = HERE / "sent-log.csv"
 WA_URL = "https://web.whatsapp.com"
 
@@ -251,11 +254,6 @@ def main() -> None:
         print("\nDry run — nothing was sent." if args.dry_run else "\nNothing to send.")
         return
 
-    try:
-        from playwright.sync_api import sync_playwright
-    except ImportError:
-        sys.exit("Playwright is not installed. Run:  pip install -r requirements.txt  and  python -m playwright install chromium")
-
     if not args.yes:
         answer = input(f"\nSend {len(todo)} WhatsApp message(s) now? Type 'yes' to continue: ")
         if answer.strip().lower() != "yes":
@@ -263,6 +261,104 @@ def main() -> None:
 
     log = Path(args.log)
     counts = {"sent": 0, "unverified": 0, "failed": 0}
+
+    def record(n: int, item: dict, status: str, detail: str) -> None:
+        counts[status] += 1
+        write_log(log, args.campaign, item["phone"], item["name"], status, detail)
+        print(f"[{n}/{len(todo)}] {item['phone']} {item['name']} … {status}" + (f" — {detail}" if detail else ""), flush=True)
+
+    def pause(n: int) -> None:
+        if n < len(todo):
+            wait = random.uniform(args.delay_min, args.delay_max)
+            print(f"    waiting {wait:.0f}s before the next message", flush=True)
+            time.sleep(wait)
+
+    if args.engine == "neonize":
+        run_neonize(todo, record, pause)
+    else:
+        run_browser(todo, record, pause)
+    print(f"\nDone: {counts['sent']} sent, {counts['unverified']} unverified, {counts['failed']} failed. Log: {log}")
+
+
+def run_neonize(todo: list[dict], record, pause) -> None:
+    try:
+        from neonize.client import NewClient
+        from neonize.events import ConnectedEv, ConnectFailureEv, LoggedOutEv, PairStatusEv, TemporaryBanEv
+    except ImportError:
+        sys.exit("neonize is not installed. Run:  pip install -r requirements.txt")
+    import logging
+
+    logging.getLogger("whatsmeow").setLevel(logging.WARNING)
+    client = NewClient(str(Path(args.session).resolve()))
+    started = threading.Event()
+    problem: list[str] = []
+
+    def send_all() -> None:
+        try:
+            for n, item in enumerate(todo, 1):
+                try:
+                    status, detail = neonize_send_one(client, item)
+                except Exception as e:  # keep going; record the error
+                    status, detail = "failed", f"{type(e).__name__}: {str(e).splitlines()[0][:150] if str(e) else ''}"
+                record(n, item, status, detail)
+                if problem:
+                    break
+                pause(n)
+            time.sleep(3)  # let the last upload/ack finish
+        finally:
+            client.stop()
+
+    @client.event(PairStatusEv)
+    def _paired(_c, ev):
+        print(f"Linked to WhatsApp account +{ev.ID.User}.", flush=True)
+
+    @client.event(ConnectedEv)
+    def _connected(_c, _ev):
+        if not started.is_set():
+            started.set()
+            print("Connected to WhatsApp.", flush=True)
+            threading.Thread(target=send_all, daemon=True).start()
+
+    def _fatal(msg: str):
+        def handler(_c, _ev):
+            problem.append(msg)
+            print(f"\n{msg}", flush=True)
+            client.stop()
+        return handler
+
+    client.event(LoggedOutEv)(_fatal("WhatsApp logged this device out. Delete wa-session.db and run again to scan a new QR code."))
+    client.event(TemporaryBanEv)(_fatal("WhatsApp has temporarily restricted this number. Stop sending and wait before trying again."))
+    client.event(ConnectFailureEv)(_fatal("Could not connect to WhatsApp (connection refused). Check your internet connection and try again."))
+
+    print("Connecting to WhatsApp… If a QR code appears, scan it: WhatsApp → Settings → Linked devices → Link a device.", flush=True)
+    try:
+        client.connect()  # blocks until send_all() calls stop(), or Ctrl+C
+    except Exception as e:
+        sys.exit(f"Could not connect to WhatsApp: {str(e).splitlines()[0][:200]}\nCheck your internet connection (a firewall/VPN may block WhatsApp) and try again.")
+    if not started.is_set() and not problem:
+        print("Stopped before connecting — nothing was sent.")
+
+
+def neonize_send_one(client, item: dict) -> tuple[str, str]:
+    found = client.is_on_whatsapp(item["phone"])
+    if not found or not found[0].IsIn:
+        return "failed", "number is not on WhatsApp"
+    jid = found[0].JID
+    if item["attach"]:
+        path = Path(item["attach"]).resolve()
+        mime = mimetypes.guess_type(path.name)[0] or "application/octet-stream"
+        msg = client.build_document_message(str(path), caption=item["message"] or None, title=path.stem, filename=path.name, mimetype=mime)
+        client.send_message(jid, msg)
+    else:
+        client.send_message(jid, item["message"])
+    return "sent", ""  # accepted by WhatsApp's servers
+
+
+def run_browser(todo: list[dict], record, pause) -> None:
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        sys.exit("Playwright is not installed. Run:  pip install playwright  and  python -m playwright install chromium")
     with sync_playwright() as p:
         launch = {"headless": args.headless, "viewport": {"width": 1280, "height": 860}}
         if args.browser_path:
@@ -273,21 +369,14 @@ def main() -> None:
         page = ctx.pages[0] if ctx.pages else ctx.new_page()
         wait_for_login(page)
         for n, item in enumerate(todo, 1):
-            print(f"[{n}/{len(todo)}] {item['phone']} {item['name']} … ", end="", flush=True)
             try:
                 status, detail = send_one(page, item)
             except Exception as e:  # keep going; record the error
                 status, detail = "failed", f"{type(e).__name__}: {str(e).splitlines()[0][:150]}"
-            counts[status] += 1
-            write_log(log, args.campaign, item["phone"], item["name"], status, detail)
-            print(status + (f" — {detail}" if detail else ""))
-            if n < len(todo):
-                wait = random.uniform(args.delay_min, args.delay_max)
-                print(f"    waiting {wait:.0f}s before the next message")
-                time.sleep(wait)
+            record(n, item, status, detail)
+            pause(n)
         time.sleep(3)
         ctx.close()
-    print(f"\nDone: {counts['sent']} sent, {counts['unverified']} unverified, {counts['failed']} failed. Log: {log}")
 
 
 def parse_args(argv=None):
@@ -308,9 +397,11 @@ def parse_args(argv=None):
     ap.add_argument("--include-not-opted-in", action="store_true", help="Also message contacts whose opted_in is not yes")
     ap.add_argument("--dry-run", action="store_true", help="Show what would be sent without opening WhatsApp")
     ap.add_argument("--yes", action="store_true", help="Do not ask for confirmation")
-    ap.add_argument("--headless", action="store_true", help="Run the browser hidden (log in once without it first)")
-    ap.add_argument("--chrome", action="store_true", help="Use your installed Google Chrome instead of Playwright's Chromium")
-    ap.add_argument("--profile", default=str(DEFAULT_PROFILE), help="Folder that keeps the WhatsApp Web login")
+    ap.add_argument("--headless", action="store_true", help="browser engine: run the browser hidden (log in once without it first)")
+    ap.add_argument("--engine", choices=["neonize", "browser"], default="neonize", help="neonize (default, no browser) or browser (WhatsApp Web via Playwright)")
+    ap.add_argument("--session", default=str(DEFAULT_SESSION), help="neonize: file that keeps the linked-device login")
+    ap.add_argument("--chrome", action="store_true", help="browser engine: use your installed Google Chrome")
+    ap.add_argument("--profile", default=str(DEFAULT_PROFILE), help="browser engine: folder that keeps the WhatsApp Web login")
     ap.add_argument("--log", default=str(DEFAULT_LOG), help="CSV log of every attempt")
     ap.add_argument("--browser-path", help=argparse.SUPPRESS)
     ap.add_argument("--wa-url", default=WA_URL, help=argparse.SUPPRESS)  # for testing against a local page

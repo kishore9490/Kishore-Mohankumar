@@ -1,4 +1,5 @@
 wa-profile/
+wa-session.db*
 sent-log.csv
 *.pdf
 __pycache__/
