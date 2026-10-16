@@ -1,8 +1,7 @@
 import "server-only";
 import { createHash, randomUUID } from "node:crypto";
-import { existsSync, readdirSync, readFileSync } from "node:fs";
-import path from "node:path";
 import type { PrismaClient } from "@prisma/client";
+import { MIGRATIONS } from "@/lib/generated/migrations";
 
 /**
  * Applies pending Prisma migrations using the app's own database connection — for hosts where the
@@ -10,13 +9,6 @@ import type { PrismaClient } from "@prisma/client";
  * in `_prisma_migrations` exactly like the CLI does, so later `migrate deploy` runs stay consistent.
  */
 export async function applyPendingMigrations(db: PrismaClient): Promise<{ applied: string[] }> {
-  const dir = path.join(process.cwd(), "prisma", "migrations");
-  if (!existsSync(dir)) throw new Error(`Migrations folder not found at ${dir}`);
-  const names = readdirSync(dir, { withFileTypes: true })
-    .filter((d) => d.isDirectory() && existsSync(path.join(dir, d.name, "migration.sql")))
-    .map((d) => d.name)
-    .sort();
-
   await db.$executeRawUnsafe(
     "CREATE TABLE IF NOT EXISTS `_prisma_migrations` (`id` VARCHAR(36) PRIMARY KEY NOT NULL, `checksum` VARCHAR(64) NOT NULL, `finished_at` DATETIME(3), `migration_name` VARCHAR(255) NOT NULL, `logs` TEXT, `rolled_back_at` DATETIME(3), `started_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3), `applied_steps_count` INTEGER UNSIGNED NOT NULL DEFAULT 0) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
   );
@@ -24,9 +16,8 @@ export async function applyPendingMigrations(db: PrismaClient): Promise<{ applie
     "SELECT `migration_name` FROM `_prisma_migrations` WHERE `finished_at` IS NOT NULL AND `rolled_back_at` IS NULL",
   );
   const applied: string[] = [];
-  for (const name of names) {
+  for (const { name, sql } of MIGRATIONS) {
     if (done.some((d) => d.migration_name === name)) continue;
-    const sql = readFileSync(path.join(dir, name, "migration.sql"), "utf8");
     const checksum = createHash("sha256").update(sql).digest("hex");
     const statements = sql
       .split("\n")
