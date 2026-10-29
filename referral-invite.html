@@ -20,19 +20,20 @@ window.INFINITIA_LOGO = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBD
    ===================================================================== */
 window.BRAND = {
   name: "Infinitia Hub",
-  tagline: "",                       // e.g. "Digital growth for ambitious businesses" (blank = hidden)
+  tagline: "Intelligent Systems",    // blank = hidden
   logoUrl: window.INFINITIA_LOGO,    // embedded below; or "logo.png" next to this file / a https:// URL. Blank = initials.
   logoHasName: true,                 // the logo already shows the brand name, so don't repeat it as text
   primaryColor: "#5B2BE0",           // main brand colour (violet from the logo)
   accentColor: "#D62FE3",            // second colour for gradients (magenta from the logo)
-  phone: "+91 98765 43210",
-  whatsapp: "+919876543210",         // full international number, digits only (+ optional)
-  email: "hello@yourbrand.com",
-  website: "https://yourbrand.com",
-  referralLink: "https://yourbrand.com/refer",   // ?ref=CODE is added automatically
+  phone: "+91 89715 92393",
+  whatsapp: "+918971592393",         // full international number; used for the "chat with us" link
+  email: "info@infinitiahub.com",
+  website: "https://infinitiahub.com",
+  referralLink: "https://infinitiahub.com/",     // ?ref=CODE is added automatically
+  qrTarget: "whatsapp",              // what the QR code opens: "whatsapp" (chat with the code filled in) or "link"
   codePrefix: "IH",
-  reward: "Get 10% off your first order",        // what the invited friend gets
-  rewardNote: "Mention this code when you contact us."
+  reward: "Get 20% off your first order",        // what the invited friend gets
+  rewardNote: "Scan the QR to chat with us on WhatsApp."
 };
 </script>
 <style>
@@ -192,6 +193,8 @@ window.BRAND = {
             <div><label for="b_reward">Friend’s reward</label><input type="text" id="b_reward" maxlength="60"></div>
           </div>
           <label for="b_note">Reward note</label><input type="text" id="b_note" maxlength="90">
+          <label for="b_qr">QR code opens</label>
+          <select id="b_qr"><option value="whatsapp">WhatsApp chat with the code filled in</option><option value="link">Referral link (website)</option></select>
           <div class="actions"><button class="btn btn-ghost full" id="b_reset" type="button">Restore defaults from file</button></div>
         </details>
       </div>
@@ -204,7 +207,7 @@ window.BRAND = {
 (() => {
   "use strict";
   const $ = (id) => document.getElementById(id);
-  const STORE = "infinitia-referral-v3";
+  const STORE = "infinitia-referral-v4";
   const load = () => { try { return JSON.parse(localStorage.getItem(STORE)) || {}; } catch { return {}; } };
   const save = () => { try { localStorage.setItem(STORE, JSON.stringify({ brand, state: { ...state, message: state.messageEdited ? state.message : null } })); } catch {} };
 
@@ -227,6 +230,7 @@ window.BRAND = {
   // {brand} {friend} {referrer} {reward}
   const T = {
     en: {
+      scanChat: "Scan to chat", chat: "💬 Chat with {brand} on WhatsApp:", pfHi: "Hi {brand}!", pfRef: "I was referred by {referrer}.", pfCode: "My referral code is {code}.",
       recommendedBy: "Recommended by", msgsWe: {
         friendly: "We've worked with {brand} and we think you'll love them too. Use our code to get started — {reward}!",
         professional: "We're happy to recommend {brand} — reliable, responsive and excellent to work with. Use our referral code — {reward}.",
@@ -242,6 +246,7 @@ window.BRAND = {
       },
     },
     kn: {
+      scanChat: "ಚಾಟ್ ಮಾಡಲು ಸ್ಕ್ಯಾನ್ ಮಾಡಿ", chat: "💬 {brand} ಜೊತೆ WhatsApp ನಲ್ಲಿ ಮಾತನಾಡಿ:", pfHi: "ನಮಸ್ಕಾರ {brand}!", pfRef: "{referrer} ಅವರು ನಿಮ್ಮನ್ನು ಶಿಫಾರಸು ಮಾಡಿದರು.", pfCode: "ನನ್ನ ರೆಫರಲ್ ಕೋಡ್: {code}",
       recommendedBy: "ಶಿಫಾರಸು ಮಾಡಿದವರು", msgsWe: {
         friendly: "ನಾವು {brand} ಜೊತೆ ಕೆಲಸ ಮಾಡಿದ್ದೇವೆ, ನಿಮಗೂ ಖಂಡಿತ ಇಷ್ಟವಾಗುತ್ತದೆ. ನಮ್ಮ ಕೋಡ್ ಬಳಸಿ — {reward}!",
         professional: "{brand} ಅನ್ನು ನಾವು ವಿಶ್ವಾಸದಿಂದ ಶಿಫಾರಸು ಮಾಡುತ್ತೇವೆ. ವಿಶ್ವಾಸಾರ್ಹ ಮತ್ತು ಉತ್ತಮ ಸೇವೆ. ನಮ್ಮ ಕೋಡ್ ಬಳಸಿ — {reward}.",
@@ -257,6 +262,7 @@ window.BRAND = {
       },
     },
     hi: {
+      scanChat: "चैट के लिए स्कैन करें", chat: "💬 {brand} से WhatsApp पर बात करें:", pfHi: "नमस्ते {brand}!", pfRef: "{referrer} ने आपकी सिफ़ारिश की है।", pfCode: "मेरा रेफ़रल कोड: {code}",
       recommendedBy: "सिफ़ारिशकर्ता", msgsWe: {
         friendly: "हमने {brand} के साथ काम किया है, आपको भी ज़रूर पसंद आएगा। हमारा कोड इस्तेमाल करें — {reward}!",
         professional: "{brand} भरोसेमंद और बेहतरीन हैं। हमारी ओर से इनकी पूरी सिफ़ारिश है। हमारा रेफ़रल कोड इस्तेमाल करें — {reward}।",
@@ -272,6 +278,7 @@ window.BRAND = {
       },
     },
     ta: {
+      scanChat: "சாட் செய்ய ஸ்கேன் செய்யவும்", chat: "💬 {brand} உடன் WhatsApp-இல் பேசுங்கள்:", pfHi: "வணக்கம் {brand}!", pfRef: "{referrer} உங்களைப் பரிந்துரைத்தார்.", pfCode: "என் பரிந்துரைக் குறியீடு: {code}",
       recommendedBy: "பரிந்துரைத்தவர்", msgsWe: {
         friendly: "நாங்கள் {brand} உடன் பணியாற்றியுள்ளோம், உங்களுக்கும் நிச்சயம் பிடிக்கும். எங்கள் குறியீட்டைப் பயன்படுத்துங்கள் — {reward}!",
         professional: "{brand}-ஐ நம்பிக்கையுடன் பரிந்துரைக்கிறோம். நம்பகமான, தரமான சேவை. எங்கள் குறியீட்டைப் பயன்படுத்துங்கள் — {reward}.",
@@ -287,6 +294,7 @@ window.BRAND = {
       },
     },
     te: {
+      scanChat: "చాట్ కోసం స్కాన్ చేయండి", chat: "💬 {brand} తో WhatsApp లో మాట్లాడండి:", pfHi: "నమస్తే {brand}!", pfRef: "{referrer} మిమ్మల్ని సిఫార్సు చేశారు.", pfCode: "నా రిఫరల్ కోడ్: {code}",
       recommendedBy: "సిఫార్సు చేసినవారు", msgsWe: {
         friendly: "మేము {brand} తో పని చేశాము, మీకు కూడా తప్పకుండా నచ్చుతుంది. మా కోడ్ వాడండి — {reward}!",
         professional: "{brand} ని మేము నమ్మకంగా సిఫార్సు చేస్తున్నాము. నమ్మకమైన, నాణ్యమైన సేవ. మా కోడ్ వాడండి — {reward}.",
@@ -330,12 +338,24 @@ window.BRAND = {
     if (!base) return "";
     try { const u = new URL(base); u.searchParams.set("ref", state.code); return u.toString(); } catch { return base; }
   };
+  /** wa.me link that opens a chat with the business, with who-referred-me and the code pre-typed. */
+  const chatUrl = () => {
+    const num = String(brand.whatsapp || "").replace(/\D/g, "");
+    if (num.length < 8) return "";
+    const t = T[state.lang], v = { brand: brand.name, referrer: state.referrer.trim(), code: state.code };
+    const msg = [fill(t.pfHi, v), v.referrer ? fill(t.pfRef, v) : "", fill(t.pfCode, v)].filter(Boolean).join(" ");
+    // Encode punctuation too, so chat apps don't cut the link at a trailing "." or "!"
+    const enc = encodeURIComponent(msg).replace(/[!'()*.]/g, (ch) => "%" + ch.charCodeAt(0).toString(16).toUpperCase());
+    return `https://wa.me/${num}?text=${enc}`;
+  };
+  const qrUrl = () => (brand.qrTarget === "whatsapp" && chatUrl()) || refUrl();
   const shareText = () => {
     const t = T[state.lang];
     const lines = [];
     if (state.friend) lines.push(fill(t.hi, { friend: state.friend }));
     lines.push(state.message);
     lines.push(`${t.code}: ${state.code}`);
+    if (chatUrl()) lines.push(`${fill(t.chat, { brand: brand.name })}\n${chatUrl()}`);
     if (refUrl()) lines.push(refUrl());
     if (signature()) lines.push(fill(t.from, { referrer: signature() }));
     return lines.join("\n\n");
@@ -618,7 +638,7 @@ window.BRAND = {
     if (contactLines.length) { ctx.fillStyle = LN; ctx.fillRect(ix, footerTop, iw, 2); }
 
     // Reward box with the QR code beside it
-    const url = refUrl();
+    const url = qrUrl();
     const showQr = !!(url && window.qrcode);
     const Q = { square: 170, portrait: 190, story: 230 }[state.format];
     const boxW = showQr ? iw - Q - 28 : iw;
@@ -663,7 +683,7 @@ window.BRAND = {
         ctx.fillStyle = "#fff"; ctx.fillRect(qx - (dark ? 10 : 0), qy - (dark ? 10 : 0), Q + (dark ? 20 : 0), Q + (dark ? 20 : 0)); ctx.fillStyle = "#0B1437";
         for (let r = 0; r < n; r++) for (let col = 0; col < n; col++) if (qr.isDark(r, col)) ctx.fillRect(qx + (col + 1) * cell, qy + (r + 1) * cell, Math.ceil(cell), Math.ceil(cell));
         ctx.font = textFont(500, 20); ctx.fillStyle = MU; ctx.textAlign = "center";
-        ctx.fillText(t.scan, qx + Q / 2, qy + Q + 28); ctx.textAlign = "left";
+        ctx.fillText(url === refUrl() ? t.scan : t.scanChat, qx + Q / 2, qy + Q + 28); ctx.textAlign = "left";
       } catch {}
     }
 
@@ -816,6 +836,7 @@ window.BRAND = {
   function fillBrandForm() {
     bind.forEach(([id, k]) => ($(id).value = brand[k] || ""));
     $("b_hasname").checked = !!brand.logoHasName;
+    $("b_qr").value = brand.qrTarget === "link" ? "link" : "whatsapp";
     $("b_primary").value = hex(brand.primaryColor); $("b_primary_hex").value = hex(brand.primaryColor);
     $("b_accent").value = hex(brand.accentColor); $("b_accent_hex").value = hex(brand.accentColor);
     document.documentElement.style.setProperty("--brand", hex(brand.primaryColor));
@@ -833,6 +854,7 @@ window.BRAND = {
     r.onload = () => { brand.logoUrl = r.result; loadLogo().then(refresh); };
     r.readAsDataURL(f);
   });
+  $("b_qr").addEventListener("change", (e) => { brand.qrTarget = e.target.value; refresh(); });
   $("b_hasname").addEventListener("change", (e) => { brand.logoHasName = e.target.checked; refresh(); });
   $("b_logo_clear").addEventListener("click", () => { brand.logoUrl = ""; $("b_logo").value = ""; loadLogo().then(refresh); });
   $("b_reset").addEventListener("click", () => { brand = { ...window.BRAND }; fillBrandForm(); resetMessageIfUntouched(); loadLogo().then(refresh); toast("Brand restored from file"); });
