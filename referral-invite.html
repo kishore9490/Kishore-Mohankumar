@@ -85,6 +85,11 @@ window.BRAND = {
   .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%) translateY(120%);background:var(--ink);color:#fff;padding:12px 18px;border-radius:12px;font-weight:500;font-size:14px;transition:transform .25s;z-index:10;max-width:calc(100% - 32px)}
   .toast.show{transform:translateX(-50%) translateY(0)}
   .swatch{display:flex;gap:8px;align-items:center}
+  .gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .tpl{border:2px solid transparent;background:#fff;border-radius:14px;padding:4px 4px 6px;cursor:pointer;font:500 12px Inter,sans-serif;color:var(--ink-2);display:flex;flex-direction:column;gap:5px;align-items:stretch;box-shadow:0 0 0 1px var(--line)}
+  .tpl canvas{width:100%;height:auto;border-radius:9px;display:block;background:#EEF0F6;aspect-ratio:4/5}
+  .tpl[aria-pressed=true]{border-color:var(--brand);color:var(--ink);font-weight:600;box-shadow:0 6px 16px -8px var(--brand)}
+  .tpl:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
   .swatch input[type=color]{width:44px;height:44px;border:1px solid #D3D7E3;border-radius:12px;padding:3px;background:#fff}
   .muted{color:var(--muted);font-size:12px}
   @media (prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -158,7 +163,7 @@ window.BRAND = {
         </div>
 
         <label>Design</label>
-        <div class="chips" id="designs" role="group" aria-label="Design"></div>
+        <div class="gallery" id="designs" role="group" aria-label="Design"></div>
       </div>
 
       <div class="panel">
@@ -214,7 +219,10 @@ window.BRAND = {
     { code: "te", label: "తెలుగు", font: "Noto Sans Telugu" },
   ];
   const TONES = [["friendly","Friendly"],["professional","Professional"],["short","Short"],["excited","Excited"]];
-  const DESIGNS = [["elegant","Elegant"],["bold","Bold"],["minimal","Minimal"]];
+  const DESIGNS = [
+    ["elegant", "Elegant"], ["bold", "Bold"], ["midnight", "Midnight"], ["infinity", "Infinity"],
+    ["festive", "Festive"], ["ticket", "Ticket"], ["frame", "Frame"], ["minimal", "Minimal"],
+  ];
 
   // {brand} {friend} {referrer} {reward}
   const T = {
@@ -426,35 +434,124 @@ window.BRAND = {
   }
 
   // ---------- render ----------
-  function draw() {
-    const c = $("card");
-    const [W, H] = FORMATS[state.format];
-    c.width = W; c.height = H;
-    const ctx = c.getContext("2d");
-    const P = hex(brand.primaryColor), A = hex(brand.accentColor);
-    const t = T[state.lang];
-    const d = state.design;
+  // Deterministic random numbers so confetti etc. don't jump around while typing.
+  function seeded(seed) { return () => { seed |= 0; seed = (seed + 0x6D2B79F5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+  const mixHex = (a, b, k) => { const x = rgb(a), y = rgb(b); return "#" + x.map((v, i) => Math.round(v + (y[i] - v) * k).toString(16).padStart(2, "0")).join(""); };
 
-    // Background
-    if (d === "bold") {
+  function lemniscate(ctx, cx0, cy0, a, squash) {
+    ctx.beginPath();
+    for (let i = 0; i <= 240; i++) { const th = (i / 240) * Math.PI * 2, den = 1 + Math.sin(th) ** 2; const px = cx0 + (a * Math.cos(th)) / den, py = cy0 + ((a * Math.sin(th) * Math.cos(th)) / den) * squash; i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); }
+  }
+  function paintBand(ctx, d, x, y, w, h, P, A) {
+    ctx.save(); rr(ctx, x, y, w, h + 44, 44); ctx.clip();
+    ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+    const g = ctx.createLinearGradient(x, y, x + w, y + h);
+    if (d === "festive") { g.addColorStop(0, "#FF8A3D"); g.addColorStop(1, "#FF3D8B"); } else { g.addColorStop(0, P); g.addColorStop(1, A); }
+    ctx.fillStyle = g; ctx.fillRect(x, y, w, h);
+    if (d === "festive") {
+      const rnd = seeded(11), cols = ["#FFE066", "#FFFFFF", "#7CF2C8", "#FFD1E8"];
+      for (let i = 0; i < 60; i++) { ctx.fillStyle = cols[i % 4]; ctx.globalAlpha = 0.9; ctx.save(); ctx.translate(x + rnd() * w, y + rnd() * h); ctx.rotate(rnd() * 3); ctx.fillRect(-7, -3, 14, 6); ctx.restore(); }
+      ctx.globalAlpha = 1;
+    } else {
+      for (let i = 0; i < 4; i++) { ctx.beginPath(); ctx.arc(x + w, y, 120 + i * 110, 0, Math.PI * 2); ctx.lineWidth = 2; ctx.strokeStyle = "rgba(255,255,255,0.16)"; ctx.stroke(); }
+    }
+    ctx.restore();
+  }
+  function paintBackground(ctx, d, W, H, P, A) {
+    if (d === "bold" || d === "ticket") {
       const g = ctx.createLinearGradient(0, 0, W, H); g.addColorStop(0, P); g.addColorStop(1, A);
       ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-      ctx.fillStyle = "rgba(255,255,255,0.08)";
-      for (let i = 0; i < 4; i++) { ctx.beginPath(); ctx.arc(W, 0, 260 + i * 180, 0, Math.PI * 2); ctx.lineWidth = 2; ctx.strokeStyle = "rgba(255,255,255,0.12)"; ctx.stroke(); }
+      if (d === "bold") {
+        for (let i = 0; i < 4; i++) { ctx.beginPath(); ctx.arc(W, 0, 260 + i * 180, 0, Math.PI * 2); ctx.lineWidth = 2; ctx.strokeStyle = "rgba(255,255,255,0.12)"; ctx.stroke(); }
+      } else {
+        ctx.save(); ctx.strokeStyle = "rgba(255,255,255,0.10)"; ctx.lineWidth = 18;
+        for (let x = -H; x < W + H; x += 70) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + H, H); ctx.stroke(); }
+        ctx.restore();
+      }
     } else if (d === "minimal") {
-      ctx.fillStyle = "#F4F5F9"; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = "#FFFFFF"; ctx.fillRect(0, 0, W, H);
+    } else if (d === "midnight") {
+      const g = ctx.createLinearGradient(0, 0, W, H); g.addColorStop(0, "#0A0A1C"); g.addColorStop(1, "#1A1038");
+      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+      for (const [x, y, r, c] of [[0.1, 0.08, 0.7, P], [0.95, 0.95, 0.75, A]]) {
+        const rg = ctx.createRadialGradient(W * x, H * y, 0, W * x, H * y, W * r);
+        rg.addColorStop(0, rgba(c, 0.55)); rg.addColorStop(1, rgba(c, 0)); ctx.fillStyle = rg; ctx.fillRect(0, 0, W, H);
+      }
+    } else if (d === "infinity") {
+      ctx.fillStyle = "#FFFFFF"; ctx.fillRect(0, 0, W, H);
+      const bgG = ctx.createLinearGradient(0, 0, 0, H); bgG.addColorStop(0, rgba(P, 0.10)); bgG.addColorStop(1, rgba(A, 0.14));
+      ctx.fillStyle = bgG; ctx.fillRect(0, 0, W, H);
+      const lg = ctx.createLinearGradient(0, 0, W, 0); lg.addColorStop(0, rgba(P, 0.55)); lg.addColorStop(1, rgba(A, 0.55));
+      ctx.strokeStyle = lg;
+      for (let k = 0; k < 9; k++) {
+        const a = W * (0.42 + k * 0.05), cxp = W / 2, cyp = H * 0.5;
+        ctx.lineWidth = 3 - k * 0.2; ctx.globalAlpha = 0.5 - k * 0.04; lemniscate(ctx, cxp, cyp, a, 1.3); ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    } else if (d === "festive") {
+      const g = ctx.createLinearGradient(0, 0, W, H); g.addColorStop(0, "#FF9A3D"); g.addColorStop(0.55, "#FF4F8B"); g.addColorStop(1, A);
+      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+      const rnd = seeded(7), cols = ["#FFE066", "#FFFFFF", P, "#7CF2C8", "#FFD1E8"];
+      for (let i = 0; i < 140; i++) {
+        const x = rnd() * W, y = rnd() * H, sz = 8 + rnd() * 16; ctx.fillStyle = cols[i % cols.length]; ctx.globalAlpha = 0.85;
+        ctx.save(); ctx.translate(x, y); ctx.rotate(rnd() * Math.PI);
+        if (i % 3 === 0) { ctx.beginPath(); ctx.arc(0, 0, sz / 2, 0, Math.PI * 2); ctx.fill(); } else ctx.fillRect(-sz / 2, -sz / 4, sz, sz / 2);
+        ctx.restore();
+      }
+      ctx.globalAlpha = 1;
+    } else if (d === "frame") {
+      ctx.fillStyle = "#F6F4FF"; ctx.fillRect(0, 0, W, H);
+      const rnd = seeded(3);
+      for (let i = 0; i < 60; i++) { ctx.fillStyle = rgba(i % 2 ? P : A, 0.18); ctx.beginPath(); ctx.arc(rnd() * W, rnd() * H, 3 + rnd() * 5, 0, Math.PI * 2); ctx.fill(); }
     } else {
       const g = ctx.createLinearGradient(0, 0, W, H); g.addColorStop(0, rgba(P, 0.16)); g.addColorStop(1, rgba(A, 0.22));
       ctx.fillStyle = "#FFFFFF"; ctx.fillRect(0, 0, W, H); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
       const rg = ctx.createRadialGradient(W * 0.9, H * 0.05, 10, W * 0.9, H * 0.05, W * 0.6);
       rg.addColorStop(0, rgba(A, 0.35)); rg.addColorStop(1, rgba(A, 0)); ctx.fillStyle = rg; ctx.fillRect(0, 0, W, H);
     }
+  }
+
+  function draw(c, d = state.design, scale = 1) {
+    const [W, H] = FORMATS[state.format];
+    c.width = Math.round(W * scale); c.height = Math.round(H * scale);
+    const ctx = c.getContext("2d");
+    ctx.scale(scale, scale);
+    const P = hex(brand.primaryColor), A = hex(brand.accentColor);
+    const t = T[state.lang];
+    const dark = d === "midnight";
+    // Colour theme for text and surfaces on the card
+    const TX = dark ? "#F4F3FF" : "#0B1437";
+    const MU = dark ? "#B4B2D8" : "#5B6383";
+    const LN = dark ? "rgba(255,255,255,0.14)" : "#E3E6EF";
+    const CARD = dark ? "#15132F" : "#FFFFFF";
+    const HL = dark ? mixHex(P, "#FFFFFF", 0.5) : P;
+    const BOXF = dark ? "rgba(255,255,255,0.06)" : rgba(P, 0.08);
+    const BOXS = dark ? "rgba(255,255,255,0.18)" : rgba(P, 0.28);
+
+    paintBackground(ctx, d, W, H, P, A);
 
     // Card surface
     const m = 64, cx = m, cy = m, cw = W - 2 * m, ch = H - 2 * m, pad = 64;
-    ctx.save(); ctx.shadowColor = "rgba(11,20,55,0.22)"; ctx.shadowBlur = 50; ctx.shadowOffsetY = 18;
-    rr(ctx, cx, cy, cw, ch, 44); ctx.fillStyle = "#FFFFFF"; ctx.fill(); ctx.restore();
-    if (d === "minimal") { rr(ctx, cx, cy + 40, 10, ch - 80, 5); ctx.fillStyle = P; ctx.fill(); }
+    const flat = d === "minimal";
+    ctx.save(); if (!flat) { ctx.shadowColor = dark ? "rgba(0,0,0,0.5)" : "rgba(11,20,55,0.22)"; ctx.shadowBlur = 50; ctx.shadowOffsetY = 18; }
+    rr(ctx, cx, cy, cw, ch, 44); ctx.fillStyle = CARD; ctx.fill(); ctx.restore();
+    if (dark) { rr(ctx, cx, cy, cw, ch, 44); ctx.strokeStyle = "rgba(255,255,255,0.10)"; ctx.lineWidth = 2; ctx.stroke(); }
+    if (d === "frame") {
+      const fg = ctx.createLinearGradient(cx, cy, cx + cw, cy + ch); fg.addColorStop(0, P); fg.addColorStop(1, A);
+      ctx.save(); rr(ctx, cx, cy, cw, ch, 44); ctx.lineWidth = 16; ctx.strokeStyle = fg; ctx.clip(); ctx.stroke(); ctx.restore();
+    }
+    if (d === "infinity" || d === "festive") {
+      const tg = ctx.createLinearGradient(cx, 0, cx + cw, 0); tg.addColorStop(0, P); tg.addColorStop(1, A);
+      ctx.save(); rr(ctx, cx, cy, cw, ch, 44); ctx.clip(); ctx.fillStyle = tg; ctx.fillRect(cx, cy, cw, 14); ctx.restore();
+    }
+    if (flat) { rr(ctx, cx, cy, cw, ch, 44); ctx.strokeStyle = "#E3E6EF"; ctx.lineWidth = 2; ctx.stroke(); rr(ctx, cx, cy + 40, 10, ch - 80, 5); ctx.fillStyle = P; ctx.fill(); }
+    if (d === "infinity") {
+      // Infinity watermark inside the card
+      const wg = ctx.createLinearGradient(cx, 0, cx + cw, 0); wg.addColorStop(0, rgba(P, 0.10)); wg.addColorStop(1, rgba(A, 0.12));
+      ctx.save(); rr(ctx, cx, cy, cw, ch, 44); ctx.clip(); ctx.strokeStyle = wg; ctx.lineCap = "round";
+      ctx.lineWidth = 46; lemniscate(ctx, cx + cw * 0.62, cy + ch * 0.42, cw * 0.48, 1.2); ctx.stroke(); ctx.restore();
+    }
+    const bandOn = d === "bold" || d === "festive";
     const ix = cx + pad, iw = cw - pad * 2;
     let y = cy + pad;
 
@@ -466,17 +563,24 @@ window.BRAND = {
       // Logo already carries the name (wordmark or stacked lockup): show it large on its own.
       const maxH = ratio >= 1.7 ? (state.format === "square" ? 90 : 110) : { square: 100, portrait: 140, story: 210 }[state.format];
       const lh = Math.min(maxH, (iw * 0.72) / ratio), lw = lh * ratio;
+      const chip = dark || bandOn;
+      ctx.font = "400 27px Inter, sans-serif";
+      const tagW = brand.tagline ? wrap(ctx, brand.tagline, iw).slice(0, 2) : [];
+      if (bandOn) paintBand(ctx, d, cx, cy, cw, (y + lh + 56 + tagW.length * 36 + 14) - cy + 66, P, A);
+      if (chip) { rr(ctx, ix - 16, y - 16, lw + 32, lh + 32, 22); ctx.fillStyle = logoImg.bg || "#FFFFFF"; ctx.fill(); }
       ctx.drawImage(logoImg.src, ix, y, lw, lh);
-      let ty = y + lh + 40;
-      if (brand.tagline) { ctx.font = "400 27px Inter, sans-serif"; ctx.fillStyle = "#5B6383"; wrap(ctx, brand.tagline, iw).slice(0, 2).forEach((l) => { ctx.fillText(l, ix, ty); ty += 36; }); }
+      let ty = y + lh + (chip ? 56 : 40);
+      ctx.font = "400 27px Inter, sans-serif"; ctx.fillStyle = bandOn ? "rgba(255,255,255,0.9)" : MU;
+      tagW.forEach((l) => { ctx.fillText(l, ix, ty); ty += 36; });
       y = ty + 14;
     } else {
+      if (bandOn) paintBand(ctx, d, cx, cy, cw, y + L + 56 - cy + 66, P, A);
       if (logoImg) {
         if (logoImg.opaque) {
           ctx.save(); rr(ctx, ix, y, L, L, 28); ctx.clip(); drawContained(ctx, logoImg, ix, y, L, L); ctx.restore();
-          rr(ctx, ix, y, L, L, 28); ctx.strokeStyle = "#E3E6EF"; ctx.lineWidth = 2; ctx.stroke();
+          rr(ctx, ix, y, L, L, 28); ctx.strokeStyle = LN; ctx.lineWidth = 2; ctx.stroke();
         } else {
-          rr(ctx, ix, y, L, L, 28); ctx.fillStyle = logoImg.bg || "#fff"; ctx.fill(); ctx.strokeStyle = "#E3E6EF"; ctx.lineWidth = 2; ctx.stroke();
+          rr(ctx, ix, y, L, L, 28); ctx.fillStyle = logoImg.bg || "#fff"; ctx.fill(); ctx.strokeStyle = LN; ctx.lineWidth = 2; ctx.stroke();
           drawContained(ctx, logoImg, ix + 12, y + 12, L - 24, L - 24);
         }
       } else {
@@ -495,9 +599,9 @@ window.BRAND = {
       const tagLines = brand.tagline ? wrap(ctx, brand.tagline, nw).slice(0, 2) : [];
       const blockH = nameLines.length * 50 + tagLines.length * 34;
       let ty = y + (L - blockH) / 2 + 40;
-      ctx.font = "700 42px Inter, sans-serif"; ctx.fillStyle = "#0B1437";
+      ctx.font = "700 42px Inter, sans-serif"; ctx.fillStyle = bandOn ? "#FFFFFF" : TX;
       nameLines.forEach((l) => { ctx.fillText(l, nx, ty); ty += 50; });
-      ctx.font = "400 26px Inter, sans-serif"; ctx.fillStyle = "#5B6383"; ty -= 8;
+      ctx.font = "400 26px Inter, sans-serif"; ctx.fillStyle = bandOn ? "rgba(255,255,255,0.9)" : MU; ty -= 8;
       tagLines.forEach((l) => { ctx.fillText(l, nx, ty); ty += 34; });
       y += L + 56;
     }
@@ -506,12 +610,12 @@ window.BRAND = {
     const bottom = cy + ch - pad;
     const fontL = `"${LANGS.find((l) => l.code === state.lang).font}"`;
     const contacts = [brand.phone, (brand.website || "").replace(/^https?:\/\/(www\.)?/i, "").replace(/\/$/, ""), brand.email].filter(Boolean);
-    ctx.font = "400 24px Inter, sans-serif"; ctx.fillStyle = "#5B6383";
+    ctx.font = "400 24px Inter, sans-serif"; ctx.fillStyle = MU;
     const contactLines = contacts.length ? wrap(ctx, contacts.join("   ·   "), iw).slice(0, 2) : [];
     let fy = bottom - 4 - (contactLines.length - 1) * 34;
     contactLines.forEach((l) => { ctx.fillText(l, ix, fy); fy += 34; });
     const footerTop = contactLines.length ? bottom - contactLines.length * 34 - 26 : bottom + 30;
-    if (contactLines.length) { ctx.fillStyle = "#E3E6EF"; ctx.fillRect(ix, footerTop, iw, 2); }
+    if (contactLines.length) { ctx.fillStyle = LN; ctx.fillRect(ix, footerTop, iw, 2); }
 
     // Reward box with the QR code beside it
     const url = refUrl();
@@ -530,12 +634,19 @@ window.BRAND = {
     const contentH = 30 + rewardLines.length * 42 + (rewardLines.length ? 10 : 0) + 26 + 10 + codeH + (noteLines.length ? 12 + noteLines.length * 28 : 0) + 28;
     const rowH = Math.max(contentH, showQr ? Q + 40 : 0);
     const boxTop = footerTop - 30 - rowH;
-    rr(ctx, ix, boxTop, boxW, rowH, 28); ctx.fillStyle = rgba(P, 0.08); ctx.fill(); ctx.strokeStyle = rgba(P, 0.28); ctx.lineWidth = 2; ctx.stroke();
+    rr(ctx, ix, boxTop, boxW, rowH, 28); ctx.fillStyle = BOXF; ctx.fill(); ctx.strokeStyle = BOXS; ctx.lineWidth = 2; ctx.stroke();
+    if (d === "ticket") {
+      // Tear-off notches and perforation above the reward row
+      const ny = boxTop - 26;
+      ctx.save(); ctx.beginPath(); ctx.arc(cx, ny, 30, 0, Math.PI * 2); ctx.arc(cx + cw, ny, 30, 0, Math.PI * 2); ctx.clip();
+      paintBackground(ctx, d, W, H, P, A); ctx.restore();
+      ctx.setLineDash([14, 12]); ctx.strokeStyle = LN; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(cx + 44, ny); ctx.lineTo(cx + cw - 44, ny); ctx.stroke(); ctx.setLineDash([]);
+    }
     let by = boxTop + (rowH - contentH) / 2 + 30;
-    ctx.fillStyle = P; ctx.font = `600 32px Inter, ${fontL}, sans-serif`;
+    ctx.fillStyle = HL; ctx.font = `600 32px Inter, ${fontL}, sans-serif`;
     rewardLines.forEach((l) => { by += 30; ctx.fillText(l, ix + 28, by); by += 12; });
     if (rewardLines.length) by += 10;
-    by += 20; ctx.font = textFont(600, 20); ctx.fillStyle = "#5B6383"; ctx.fillText(t.code.toUpperCase(), ix + 28, by); by += 14;
+    by += 20; ctx.font = textFont(600, 20); ctx.fillStyle = MU; ctx.fillText(t.code.toUpperCase(), ix + 28, by); by += 14;
     ctx.font = `700 ${codeSize}px ui-monospace, Menlo, Consolas, monospace`;
     const codeW = ctx.measureText(state.code).width + 44;
     rr(ctx, ix + 28, by, codeW, codeH, 14); ctx.fillStyle = P; ctx.fill();
@@ -543,24 +654,24 @@ window.BRAND = {
     rr(ctx, ix + 34, by + 6, codeW - 12, codeH - 12, 10); ctx.stroke(); ctx.setLineDash([]);
     ctx.fillStyle = onColor(P); ctx.fillText(state.code, ix + 50, by + codeH / 2 + codeSize * 0.36);
     by += codeH;
-    ctx.font = "400 22px Inter, sans-serif"; ctx.fillStyle = "#5B6383";
+    ctx.font = "400 22px Inter, sans-serif"; ctx.fillStyle = MU;
     noteLines.forEach((l, i) => { ctx.fillText(l, ix + 28, by + 12 + 22 + i * 28); });
     if (showQr) {
       try {
         const qr = qrcode(0, "M"); qr.addData(url); qr.make();
         const n = qr.getModuleCount(), cell = Q / (n + 2), qx = ix + iw - Q, qy = boxTop + (rowH - Q - 34) / 2;
-        ctx.fillStyle = "#fff"; ctx.fillRect(qx, qy, Q, Q); ctx.fillStyle = "#0B1437";
+        ctx.fillStyle = "#fff"; ctx.fillRect(qx - (dark ? 10 : 0), qy - (dark ? 10 : 0), Q + (dark ? 20 : 0), Q + (dark ? 20 : 0)); ctx.fillStyle = "#0B1437";
         for (let r = 0; r < n; r++) for (let col = 0; col < n; col++) if (qr.isDark(r, col)) ctx.fillRect(qx + (col + 1) * cell, qy + (r + 1) * cell, Math.ceil(cell), Math.ceil(cell));
-        ctx.font = textFont(500, 20); ctx.fillStyle = "#5B6383"; ctx.textAlign = "center";
+        ctx.font = textFont(500, 20); ctx.fillStyle = MU; ctx.textAlign = "center";
         ctx.fillText(t.scan, qx + Q / 2, qy + Q + 28); ctx.textAlign = "left";
       } catch {}
     }
 
     // Main message area between header and box
-    const areaTop = y, areaBottom = boxTop - 40;
-    ctx.fillStyle = P; ctx.font = textFont(600, 30);
+    const areaTop = y, areaBottom = boxTop - (d === "ticket" ? 62 : 40);
+    ctx.fillStyle = bandOn ? "#FFFFFF" : HL; ctx.font = textFont(600, 30);
     ctx.fillText(t.invited.toUpperCase(), ix, areaTop + 24);
-    let my = areaTop + 24 + 30;
+    let my = areaTop + 24 + 30 + (bandOn ? 24 : 0);
     const greetText = state.friend ? fill(t.hi, { friend: state.friend }) : "";
     const hasSig = !!state.referrer.trim();
     const A2 = state.format === "square" ? 68 : 84;
@@ -589,8 +700,8 @@ window.BRAND = {
     }
     const spare = Math.max(0, areaBottom - (my + 16 + chosen.total));
     my += 16 + Math.min(spare * 0.4, 140);
-    if (chosen.greet) { ctx.font = textFont(600, chosen.s, true); ctx.fillStyle = "#0B1437"; my += chosen.s; ctx.fillText(chosen.greet, ix, my); my += chosen.s * 0.4 + 10; }
-    ctx.font = textFont(500, chosen.s, true); ctx.fillStyle = "#0B1437";
+    if (chosen.greet) { ctx.font = textFont(600, chosen.s, true); ctx.fillStyle = TX; my += chosen.s; ctx.fillText(chosen.greet, ix, my); my += chosen.s * 0.4 + 10; }
+    ctx.font = textFont(500, chosen.s, true); ctx.fillStyle = TX;
     for (const l of chosen.lines) { my += chosen.s * 1.18; ctx.fillText(l, ix, my); my += chosen.s * 0.24; }
     if (hasSig) {
       const sy = my + 28;
@@ -600,29 +711,26 @@ window.BRAND = {
       if (refLogoImg) {
         if (refLogoImg.opaque && TW === A2) {
           ctx.save(); rr(ctx, ix, sy, A2, A2, 22); ctx.clip(); drawContained(ctx, refLogoImg, ix, sy, A2, A2); ctx.restore();
-          rr(ctx, ix, sy, A2, A2, 22); ctx.strokeStyle = "#E3E6EF"; ctx.lineWidth = 2; ctx.stroke();
+          rr(ctx, ix, sy, A2, A2, 22); ctx.strokeStyle = LN; ctx.lineWidth = 2; ctx.stroke();
         } else {
-          rr(ctx, ix, sy, TW, A2, 22); ctx.fillStyle = refLogoImg.bg || "#fff"; ctx.fill(); ctx.strokeStyle = "#E3E6EF"; ctx.lineWidth = 2; ctx.stroke();
+          rr(ctx, ix, sy, TW, A2, 22); ctx.fillStyle = refLogoImg.bg || "#fff"; ctx.fill(); ctx.strokeStyle = LN; ctx.lineWidth = 2; ctx.stroke();
           drawContained(ctx, refLogoImg, ix + 9, sy + 9, TW - 18, A2 - 18);
         }
       } else {
         ctx.beginPath(); if (state.refType === "business") ctx.roundRect(ix, sy, A2, A2, 22); else ctx.arc(ix + A2 / 2, sy + A2 / 2, A2 / 2, 0, Math.PI * 2);
-        ctx.fillStyle = rgba(P, 0.12); ctx.fill();
+        ctx.fillStyle = dark ? "rgba(255,255,255,0.10)" : rgba(P, 0.12); ctx.fill();
         const ini = state.referrer.trim().split(/\s+/).slice(0, 2).map((w) => Array.from(w)[0] || "").join("").toUpperCase();
-        ctx.fillStyle = P; ctx.font = "700 32px Inter, sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        ctx.fillStyle = HL; ctx.font = "700 32px Inter, sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
         ctx.fillText(ini, ix + A2 / 2, sy + A2 / 2 + 1); ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
       }
       const tx = ix + TW + 22, tw = iw - TW - 22;
       const clip = (str) => { let x = str; while (ctx.measureText(x).width > tw && x.length > 2) x = x.slice(0, -2); return x === str ? x : x + "…"; };
       const hasSub = !!state.refSub.trim();
       let ly = sy + (hasSub ? 22 : 32);
-      ctx.font = textFont(600, 20); ctx.fillStyle = "#5B6383"; ctx.fillText(t.recommendedBy.toUpperCase(), tx, ly);
-      ly += 38; ctx.font = "700 32px Inter, " + `"${LANGS.find((l) => l.code === state.lang).font}", sans-serif`; ctx.fillStyle = "#0B1437"; ctx.fillText(clip(state.referrer.trim()), tx, ly);
-      if (hasSub) { ly += 32; ctx.font = "400 24px Inter, sans-serif"; ctx.fillStyle = "#5B6383"; ctx.fillText(clip(state.refSub.trim()), tx, ly); }
+      ctx.font = textFont(600, 20); ctx.fillStyle = MU; ctx.fillText(t.recommendedBy.toUpperCase(), tx, ly);
+      ly += 38; ctx.font = "700 32px Inter, " + `"${LANGS.find((l) => l.code === state.lang).font}", sans-serif`; ctx.fillStyle = TX; ctx.fillText(clip(state.referrer.trim()), tx, ly);
+      if (hasSub) { ly += 32; ctx.font = "400 24px Inter, sans-serif"; ctx.fillStyle = MU; ctx.fillText(clip(state.refSub.trim()), tx, ly); }
     }
-
-    // Share link for WhatsApp button
-    $("waBtn").href = "https://wa.me/?text=" + encodeURIComponent(shareText());
   }
 
   // ---------- UI wiring ----------
@@ -653,7 +761,28 @@ window.BRAND = {
   applyRefType();
   chips($("langs"), LANGS.map((l) => [l.code, l.label]), "lang", resetMessageIfUntouched);
   chips($("tones"), TONES, "tone", resetMessageIfUntouched);
-  chips($("designs"), DESIGNS, "design");
+  // Design gallery with live mini previews
+  const thumbs = {};
+  for (const [value, label] of DESIGNS) {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "tpl"; b.dataset.value = value; b.setAttribute("aria-pressed", String(state.design === value));
+    b.setAttribute("aria-label", label + " design");
+    const cv = document.createElement("canvas"); thumbs[value] = cv;
+    const span = document.createElement("span"); span.textContent = label;
+    b.append(cv, span);
+    b.addEventListener("click", () => {
+      state.design = value;
+      $("designs").querySelectorAll(".tpl").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.value === value)));
+      refresh();
+    });
+    $("designs").appendChild(b);
+  }
+  if (!DESIGNS.some(([v]) => v === state.design)) state.design = "elegant";
+  let thumbTimer;
+  function drawThumbs() {
+    clearTimeout(thumbTimer);
+    thumbTimer = setTimeout(() => { for (const [v] of DESIGNS) draw(thumbs[v], v, 0.2); }, 250);
+  }
 
   document.querySelectorAll("[data-format]").forEach((b) => {
     b.setAttribute("aria-pressed", String(b.dataset.format === state.format));
@@ -742,7 +871,11 @@ window.BRAND = {
   function refresh() {
     $("pageTitle").textContent = "Refer " + (brand.name || "us");
     $("count").textContent = `${(state.message || "").length}/320`;
-    cancelAnimationFrame(raf); raf = requestAnimationFrame(() => { draw(); save(); });
+    cancelAnimationFrame(raf); raf = requestAnimationFrame(() => {
+      draw($("card"), state.design);
+      $("waBtn").href = "https://wa.me/?text=" + encodeURIComponent(shareText());
+      save(); drawThumbs();
+    });
   }
 
   fillBrandForm();
