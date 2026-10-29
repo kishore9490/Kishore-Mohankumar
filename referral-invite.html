@@ -335,6 +335,48 @@ window.BRAND = {
   const onColor = (h) => (lum(h) > 0.45 ? "#0B1437" : "#FFFFFF");
 
   // ---------- logo ----------
+  /**
+   * Prepare a logo for drawing: give SVGs without a size a real size, and trim
+   * empty margins (transparent or solid background) so the mark fills its space.
+   * Returns { src, w, h, opaque } where opaque = logo has a solid background.
+   */
+  function prepLogo(img) {
+    const nw = img.naturalWidth || img.width || 512, nh = img.naturalHeight || img.height || 512;
+    const k = Math.min(1, 900 / Math.max(nw, nh)) || 1;
+    const w = Math.max(1, Math.round((nw || 512) * k)), h = Math.max(1, Math.round((nh || 512) * k));
+    const c = document.createElement("canvas"); c.width = w; c.height = h;
+    const x = c.getContext("2d"); x.drawImage(img, 0, 0, w, h);
+    let data;
+    try { data = x.getImageData(0, 0, w, h).data; } catch { return { src: img, w: nw, h: nh, opaque: false }; }
+    const px = (i, j) => { const o = (j * w + i) * 4; return [data[o], data[o + 1], data[o + 2], data[o + 3]]; };
+    const corners = [px(0, 0), px(w - 1, 0), px(0, h - 1), px(w - 1, h - 1)];
+    const opaque = corners.every((p) => p[3] > 240);
+    const bg = corners[0];
+    const isContent = opaque
+      ? (p) => Math.abs(p[0] - bg[0]) + Math.abs(p[1] - bg[1]) + Math.abs(p[2] - bg[2]) > 48
+      : (p) => p[3] > 20;
+    let minX = w, minY = h, maxX = -1, maxY = -1;
+    for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) {
+      if (isContent(px(i, j))) { if (i < minX) minX = i; if (i > maxX) maxX = i; if (j < minY) minY = j; if (j > maxY) maxY = j; }
+    }
+    if (maxX < 0) return { src: c, w, h, opaque };
+    const m = Math.round(Math.max(maxX - minX, maxY - minY) * 0.04);
+    minX = Math.max(0, minX - m); minY = Math.max(0, minY - m); maxX = Math.min(w - 1, maxX + m); maxY = Math.min(h - 1, maxY + m);
+    // A solid square-ish background logo (app-icon style) is kept whole.
+    if (opaque && (maxX - minX) > w * 0.9 && (maxY - minY) > h * 0.9) return { src: c, w, h, opaque };
+    const cw = maxX - minX + 1, ch = maxY - minY + 1;
+    const out = document.createElement("canvas"); out.width = cw; out.height = ch;
+    out.getContext("2d").drawImage(c, minX, minY, cw, ch, 0, 0, cw, ch);
+    return { src: out, w: cw, h: ch, opaque: false, bg: opaque ? `rgb(${bg[0]},${bg[1]},${bg[2]})` : null };
+  }
+
+  /** Draw a logo inside a box, contained and centred. */
+  function drawContained(ctx, logo, x, y, bw, bh) {
+    const s = Math.min(bw / logo.w, bh / logo.h);
+    const lw = logo.w * s, lh = logo.h * s;
+    ctx.drawImage(logo.src, x + (bw - lw) / 2, y + (bh - lh) / 2, lw, lh);
+  }
+
   let logoImg = null;
   function loadLogo() {
     logoImg = null;
@@ -342,7 +384,7 @@ window.BRAND = {
     return new Promise((res) => {
       const img = new Image();
       if (/^https?:/i.test(brand.logoUrl)) img.crossOrigin = "anonymous";
-      img.onload = () => { logoImg = img; res(); };
+      img.onload = () => { logoImg = prepLogo(img); res(); };
       img.onerror = () => { logoImg = null; res(); };
       img.src = brand.logoUrl;
     });
@@ -352,7 +394,7 @@ window.BRAND = {
   function loadRefLogo() {
     refLogoImg = null;
     if (!state.refLogo || state.refType !== "business") return Promise.resolve();
-    return new Promise((res) => { const i = new Image(); i.onload = () => { refLogoImg = i; res(); }; i.onerror = () => res(); i.src = state.refLogo; });
+    return new Promise((res) => { const i = new Image(); i.onload = () => { refLogoImg = prepLogo(i); res(); }; i.onerror = () => res(); i.src = state.refLogo; });
   }
 
   // ---------- canvas helpers ----------
@@ -411,33 +453,47 @@ window.BRAND = {
     let y = cy + pad;
 
     // Header: logo + name
-    const L = 112;
-    rr(ctx, ix, y, L, L, 28);
-    if (logoImg) {
-      ctx.fillStyle = "#fff"; ctx.fill(); ctx.strokeStyle = "#E3E6EF"; ctx.lineWidth = 2; ctx.stroke();
-      const s = Math.min((L - 20) / logoImg.width, (L - 20) / logoImg.height);
-      const lw = logoImg.width * s, lh = logoImg.height * s;
-      ctx.drawImage(logoImg, ix + (L - lw) / 2, y + (L - lh) / 2, lw, lh);
+    const L = 120;
+    const ratio = logoImg ? logoImg.w / logoImg.h : 1;
+    const wideLogo = logoImg && ratio >= 1.7;
+    if (wideLogo) {
+      // Wordmark / horizontal logo: show it large on its own; it already carries the name.
+      const lh = Math.min(110, (iw * 0.72) / ratio), lw = lh * ratio;
+      ctx.drawImage(logoImg.src, ix, y, lw, lh);
+      let ty = y + lh + 40;
+      if (brand.tagline) { ctx.font = "400 27px Inter, sans-serif"; ctx.fillStyle = "#5B6383"; wrap(ctx, brand.tagline, iw).slice(0, 2).forEach((l) => { ctx.fillText(l, ix, ty); ty += 36; }); }
+      y = ty + 14;
     } else {
-      const g = ctx.createLinearGradient(ix, y, ix + L, y + L); g.addColorStop(0, P); g.addColorStop(1, A);
-      ctx.fillStyle = g; ctx.fill();
-      const ini = (brand.name || "?").trim().split(/\s+/).slice(0, 2).map((w) => Array.from(w)[0] || "").join("").toUpperCase();
-      ctx.fillStyle = onColor(P); ctx.font = "700 44px Inter, sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-      ctx.fillText(ini, ix + L / 2, y + L / 2 + 2); ctx.textAlign = "left";
+      if (logoImg) {
+        if (logoImg.opaque) {
+          ctx.save(); rr(ctx, ix, y, L, L, 28); ctx.clip(); drawContained(ctx, logoImg, ix, y, L, L); ctx.restore();
+          rr(ctx, ix, y, L, L, 28); ctx.strokeStyle = "#E3E6EF"; ctx.lineWidth = 2; ctx.stroke();
+        } else {
+          rr(ctx, ix, y, L, L, 28); ctx.fillStyle = logoImg.bg || "#fff"; ctx.fill(); ctx.strokeStyle = "#E3E6EF"; ctx.lineWidth = 2; ctx.stroke();
+          drawContained(ctx, logoImg, ix + 12, y + 12, L - 24, L - 24);
+        }
+      } else {
+        rr(ctx, ix, y, L, L, 28);
+        const g = ctx.createLinearGradient(ix, y, ix + L, y + L); g.addColorStop(0, P); g.addColorStop(1, A);
+        ctx.fillStyle = g; ctx.fill();
+        const ini = (brand.name || "?").trim().split(/\s+/).slice(0, 2).map((w) => Array.from(w)[0] || "").join("").toUpperCase();
+        ctx.fillStyle = onColor(P); ctx.font = "700 46px Inter, sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        ctx.fillText(ini, ix + L / 2, y + L / 2 + 2); ctx.textAlign = "left";
+      }
+      ctx.textBaseline = "alphabetic";
+      const nx = ix + L + 28, nw = iw - L - 28;
+      ctx.font = "700 42px Inter, sans-serif";
+      const nameLines = wrap(ctx, brand.name || "", nw).slice(0, 2);
+      ctx.font = "400 26px Inter, sans-serif";
+      const tagLines = brand.tagline ? wrap(ctx, brand.tagline, nw).slice(0, 2) : [];
+      const blockH = nameLines.length * 50 + tagLines.length * 34;
+      let ty = y + (L - blockH) / 2 + 40;
+      ctx.font = "700 42px Inter, sans-serif"; ctx.fillStyle = "#0B1437";
+      nameLines.forEach((l) => { ctx.fillText(l, nx, ty); ty += 50; });
+      ctx.font = "400 26px Inter, sans-serif"; ctx.fillStyle = "#5B6383"; ty -= 8;
+      tagLines.forEach((l) => { ctx.fillText(l, nx, ty); ty += 34; });
+      y += L + 56;
     }
-    ctx.textBaseline = "alphabetic";
-    const nx = ix + L + 28, nw = iw - L - 28;
-    ctx.fillStyle = "#0B1437"; ctx.font = "700 42px Inter, sans-serif";
-    const nameLines = wrap(ctx, brand.name || "", nw).slice(0, 2);
-    ctx.font = "400 26px Inter, sans-serif";
-    const tagLines = brand.tagline ? wrap(ctx, brand.tagline, nw).slice(0, 2) : [];
-    const blockH = nameLines.length * 50 + tagLines.length * 34;
-    let ty = y + (L - blockH) / 2 + 40;
-    ctx.font = "700 42px Inter, sans-serif"; ctx.fillStyle = "#0B1437";
-    nameLines.forEach((l) => { ctx.fillText(l, nx, ty); ty += 50; });
-    ctx.font = "400 26px Inter, sans-serif"; ctx.fillStyle = "#5B6383"; ty -= 8;
-    tagLines.forEach((l) => { ctx.fillText(l, nx, ty); ty += 34; });
-    y += L + 56;
 
     // Footer (QR + contacts), drawn from the bottom up
     const bottom = cy + ch - pad;
@@ -513,10 +569,17 @@ window.BRAND = {
     for (const l of chosen.lines) { my += chosen.s * 1.18; if (my > areaBottom) break; ctx.fillText(l, ix, my); my += chosen.s * 0.24; }
     if (state.referrer.trim()) {
       const A2 = 84, sy = Math.min(my + 36, areaBottom - A2);
+      // Wide referrer logos get a wider tile so they stay legible.
+      const rRatio = refLogoImg ? refLogoImg.w / refLogoImg.h : 1;
+      const TW = refLogoImg && rRatio > 1.3 ? Math.min(A2 * 2.4, A2 * rRatio * 0.9 + 16) : A2;
       if (refLogoImg) {
-        rr(ctx, ix, sy, A2, A2, 22); ctx.fillStyle = "#fff"; ctx.fill(); ctx.strokeStyle = "#E3E6EF"; ctx.lineWidth = 2; ctx.stroke();
-        const k = Math.min((A2 - 14) / refLogoImg.width, (A2 - 14) / refLogoImg.height);
-        ctx.drawImage(refLogoImg, ix + (A2 - refLogoImg.width * k) / 2, sy + (A2 - refLogoImg.height * k) / 2, refLogoImg.width * k, refLogoImg.height * k);
+        if (refLogoImg.opaque && TW === A2) {
+          ctx.save(); rr(ctx, ix, sy, A2, A2, 22); ctx.clip(); drawContained(ctx, refLogoImg, ix, sy, A2, A2); ctx.restore();
+          rr(ctx, ix, sy, A2, A2, 22); ctx.strokeStyle = "#E3E6EF"; ctx.lineWidth = 2; ctx.stroke();
+        } else {
+          rr(ctx, ix, sy, TW, A2, 22); ctx.fillStyle = refLogoImg.bg || "#fff"; ctx.fill(); ctx.strokeStyle = "#E3E6EF"; ctx.lineWidth = 2; ctx.stroke();
+          drawContained(ctx, refLogoImg, ix + 9, sy + 9, TW - 18, A2 - 18);
+        }
       } else {
         ctx.beginPath(); if (state.refType === "business") ctx.roundRect(ix, sy, A2, A2, 22); else ctx.arc(ix + A2 / 2, sy + A2 / 2, A2 / 2, 0, Math.PI * 2);
         ctx.fillStyle = rgba(P, 0.12); ctx.fill();
@@ -524,7 +587,7 @@ window.BRAND = {
         ctx.fillStyle = P; ctx.font = "700 32px Inter, sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
         ctx.fillText(ini, ix + A2 / 2, sy + A2 / 2 + 1); ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
       }
-      const tx = ix + A2 + 22, tw = iw - A2 - 22;
+      const tx = ix + TW + 22, tw = iw - TW - 22;
       const clip = (str) => { let x = str; while (ctx.measureText(x).width > tw && x.length > 2) x = x.slice(0, -2); return x === str ? x : x + "…"; };
       const hasSub = !!state.refSub.trim();
       let ly = sy + (hasSub ? 22 : 32);
