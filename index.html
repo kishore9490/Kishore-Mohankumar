@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Infinitia Hub Poster Studio</title>
+  <meta name="description" content="Create, edit and download marketing posters from 120+ editable templates.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236D28D9'/%3E%3Cstop offset='1' stop-color='%232563EB'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='8' fill='url(%23g)'/%3E%3Cpath d='M9 16c0-3 2-5 4.5-5S18 16 18 16s2 5 4.5 5S27 19 27 16s-2-5-4.5-5S18 16 18 16s-2 5-4.5 5S9 19 9 16z' fill='none' stroke='white' stroke-width='2.4' transform='translate(-2 0)'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Bebas+Neue&family=Cormorant+Garamond:wght@500;600;700&family=DM+Serif+Display&family=Great+Vibes&family=Inter:wght@400;500;600;700;800;900&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600&family=Montserrat:wght@400;500;600;700;800;900&family=Orbitron:wght@500;700;800;900&family=Outfit:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,500;1,700&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,500&family=Raleway:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="topbar">
+    <button class="logo" id="homeBtn" aria-label="Go to template gallery">
+      <span class="logo-mark" aria-hidden="true"></span>
+      <span class="logo-text"><strong id="appBrand">Infinitia Hub</strong><span>Poster Studio</span></span>
+    </button>
+    <div class="search">
+      <span class="ico" data-icon="search" aria-hidden="true"></span>
+      <input id="searchInput" type="search" placeholder="Search templates, styles, keywords…" aria-label="Search templates">
+    </div>
+    <nav class="top-actions" aria-label="Main">
+      <button class="btn ghost" id="myDesignsBtn"><span class="ico" data-icon="folder"></span><span class="lbl">My Designs</span></button>
+      <button class="btn ghost" id="brandKitBtn"><span class="ico" data-icon="palette"></span><span class="lbl">Brand Kit</span></button>
+      <button class="btn ghost" id="importLogoBtn"><span class="ico" data-icon="upload"></span><span class="lbl">Import Logo</span></button>
+      <button class="btn primary" id="newPosterBtn"><span class="ico" data-icon="plus"></span><span class="lbl">New Poster</span></button>
+    </nav>
+  </header>
+
+  <main id="main">
+    <!-- Gallery -->
+    <section id="galleryView" class="view gallery" aria-label="Template gallery">
+      <aside class="cats" aria-label="Categories">
+        <h2 class="side-title">Categories</h2>
+        <ul id="catList" role="list"></ul>
+      </aside>
+      <div class="gallery-main">
+        <div class="hero-strip">
+          <div>
+            <h1>Create a poster in minutes</h1>
+            <p>Pick a design, edit the text, add your logo and download a PNG or JPEG. Everything stays in your browser.</p>
+          </div>
+          <div class="count-pill" id="countPill" aria-live="polite"></div>
+        </div>
+        <div class="filters" role="group" aria-label="Filters">
+          <label class="sel"><span>Format</span>
+            <select id="fFormat">
+              <option value="all">All formats</option>
+              <option value="portrait">Portrait 4:5</option>
+              <option value="square">Square 1:1</option>
+              <option value="story">Story 9:16</option>
+              <option value="landscape">Landscape</option>
+              <option value="a4">A4 print</option>
+            </select></label>
+          <label class="sel"><span>Colour</span><select id="fTone"></select></label>
+          <label class="sel"><span>Style</span><select id="fStyle"></select></label>
+          <label class="sel"><span>Brand</span>
+            <select id="fBrand">
+              <option value="all">Any brand</option>
+              <option value="Infinitia Hub">Infinitia Hub</option>
+              <option value="AI Studio Craft">AI Studio Craft</option>
+              <option value="Any">Generic</option>
+            </select></label>
+          <label class="sel"><span>Sort</span>
+            <select id="fSort">
+              <option value="featured">Featured</option>
+              <option value="popular">Popular</option>
+              <option value="newest">Newest</option>
+              <option value="az">A – Z</option>
+            </select></label>
+          <button class="chip-toggle" id="fFav" aria-pressed="false"><span class="ico" data-icon="heart"></span>Favorites</button>
+          <button class="btn link" id="fReset">Clear filters</button>
+        </div>
+        <div id="grid" class="grid" role="list"></div>
+        <div id="emptyGallery" class="empty" hidden>
+          <span class="ico big" data-icon="search"></span>
+          <h3>No templates match</h3>
+          <p>Try a different search or clear the filters.</p>
+          <button class="btn" id="emptyReset">Clear filters</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- My designs -->
+    <section id="designsView" class="view designs" hidden aria-label="My designs">
+      <div class="designs-head">
+        <div>
+          <h1>My Designs</h1>
+          <p id="storageInfo" class="muted"></p>
+        </div>
+        <div class="row gap">
+          <button class="btn" id="importProjectBtn"><span class="ico" data-icon="fileIn"></span>Import project JSON</button>
+          <button class="btn primary" id="designsNewBtn"><span class="ico" data-icon="plus"></span>New Poster</button>
+        </div>
+      </div>
+      <div id="designGrid" class="grid designs-grid" role="list"></div>
+      <div id="emptyDesigns" class="empty" hidden>
+        <span class="ico big" data-icon="folder"></span>
+        <h3>No saved designs yet</h3>
+        <p>Open any template, edit it and press <strong>Save</strong>. Your designs are stored in this browser.</p>
+        <button class="btn primary" id="emptyBrowse">Browse templates</button>
+      </div>
+    </section>
+
+    <!-- Editor -->
+    <section id="editorView" class="view editor" hidden aria-label="Poster editor">
+      <div class="ed-toolbar">
+        <button class="btn ghost icon-only" id="edBack" aria-label="Back to gallery" title="Back"><span class="ico" data-icon="back"></span></button>
+        <button class="ed-name" id="edName" title="Rename design"><span id="edNameText">Untitled</span><span class="ico" data-icon="edit"></span></button>
+        <span class="dirty" id="edDirty" hidden>Unsaved</span>
+        <div class="ed-tools">
+          <button class="btn ghost icon-only" id="edUndo" aria-label="Undo" title="Undo (Ctrl+Z)"><span class="ico" data-icon="undo"></span></button>
+          <button class="btn ghost icon-only" id="edRedo" aria-label="Redo" title="Redo (Ctrl+Shift+Z)"><span class="ico" data-icon="redo"></span></button>
+          <button class="btn ghost" id="edReset" title="Reset to template"><span class="ico" data-icon="reset"></span><span class="lbl">Reset</span></button>
+          <button class="btn ghost" id="edDuplicate" title="Duplicate design"><span class="ico" data-icon="copy"></span><span class="lbl">Duplicate</span></button>
+          <button class="btn" id="edSave" title="Save (Ctrl+S)"><span class="ico" data-icon="save"></span><span class="lbl">Save</span></button>
+          <button class="btn primary" id="edDownload"><span class="ico" data-icon="download"></span><span class="lbl">Download PNG</span></button>
+        </div>
+      </div>
+      <div class="ed-body">
+        <div class="ed-left panel">
+          <div class="tabs" role="tablist" aria-label="Editor sections">
+            <button role="tab" class="tab" aria-selected="true" data-tab="content" id="tab-content">Content</button>
+            <button role="tab" class="tab" aria-selected="false" data-tab="design" id="tab-design">Design</button>
+            <button role="tab" class="tab" aria-selected="false" data-tab="brand" id="tab-brand">Brand</button>
+            <button role="tab" class="tab" aria-selected="false" data-tab="size" id="tab-size">Size</button>
+          </div>
+          <div class="tabpanel" role="tabpanel" data-panel="content" aria-labelledby="tab-content"></div>
+          <div class="tabpanel" role="tabpanel" data-panel="design" aria-labelledby="tab-design" hidden></div>
+          <div class="tabpanel" role="tabpanel" data-panel="brand" aria-labelledby="tab-brand" hidden></div>
+          <div class="tabpanel" role="tabpanel" data-panel="size" aria-labelledby="tab-size" hidden></div>
+        </div>
+        <div class="ed-stage" id="stage">
+          <div class="stage-inner">
+            <canvas id="preview" aria-label="Poster preview" role="img"></canvas>
+          </div>
+          <div class="stage-meta" id="stageMeta"></div>
+        </div>
+        <div class="ed-right panel" id="edRight"></div>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="modal" aria-labelledby="modalTitle">
+    <form method="dialog" class="modal-card" id="modalCard">
+      <div class="modal-head">
+        <h2 id="modalTitle">Title</h2>
+        <button class="btn ghost icon-only" value="cancel" aria-label="Close" formnovalidate><span class="ico" data-icon="x"></span></button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-foot" id="modalFoot"></div>
+    </form>
+  </dialog>
+
+  <div class="toasts" id="toasts" aria-live="polite" aria-atomic="false"></div>
+
+  <input type="file" id="fileLogo" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden>
+  <input type="file" id="fileImage" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden>
+  <input type="file" id="fileJson" accept="application/json,.json" hidden>
+
+  <script src="templates.js"></script>
+  <script src="renderer.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
