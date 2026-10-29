@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Referral Invite Maker</title>
+<title>Infinitia Hub Referral Invite</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Noto+Sans+Kannada:wght@400;600&family=Noto+Sans+Devanagari:wght@400;600&family=Noto+Sans+Tamil:wght@400;600&family=Noto+Sans+Telugu:wght@400;600&display=swap" rel="stylesheet">
@@ -15,8 +15,8 @@
    your browser.)
    ===================================================================== */
 window.BRAND = {
-  name: "Your Brand Name",
-  tagline: "What you do, in one line",
+  name: "Infinitia Hub",
+  tagline: "Your tagline here",
   logoUrl: "",                       // e.g. "logo.png" next to this file, or a https:// URL. Blank = initials.
   primaryColor: "#4F46E5",           // main brand colour
   accentColor: "#7C3AED",            // second colour for gradients
@@ -25,7 +25,7 @@ window.BRAND = {
   email: "hello@yourbrand.com",
   website: "https://yourbrand.com",
   referralLink: "https://yourbrand.com/refer",   // ?ref=CODE is added automatically
-  codePrefix: "REF",
+  codePrefix: "IH",
   reward: "Get 10% off your first order",        // what the invited friend gets
   rewardNote: "Mention this code when you contact us."
 };
@@ -89,8 +89,8 @@ window.BRAND = {
 <div class="wrap">
   <header class="top">
     <div>
-      <h1>Referral Invite Maker</h1>
-      <p>Create a branded invitation and share it in seconds.</p>
+      <h1 id="pageTitle">Refer Infinitia Hub</h1>
+      <p>Introduce us to your contacts with your own name or brand — ready to share in seconds.</p>
     </div>
   </header>
 
@@ -118,17 +118,23 @@ window.BRAND = {
     <!-- Editor -->
     <section aria-label="Editor">
       <div class="panel">
-        <h2>Invitation</h2>
-        <div class="row">
-          <div>
-            <label for="referrer">Your name</label>
-            <input type="text" id="referrer" maxlength="40" placeholder="e.g. Priya" autocomplete="name">
-          </div>
-          <div>
-            <label for="friend">Friend’s name <span class="muted">(optional)</span></label>
-            <input type="text" id="friend" maxlength="40" placeholder="e.g. Arjun">
-          </div>
+        <h2>Who is referring?</h2>
+        <div class="chips" id="refTypes" role="group" aria-label="Refer as"></div>
+        <label for="referrer" id="referrerLabel">Your name</label>
+        <input type="text" id="referrer" maxlength="40" autocomplete="name">
+        <label for="refSub" id="refSubLabel">Company or role <span class="muted">(optional)</span></label>
+        <input type="text" id="refSub" maxlength="50">
+        <div id="refLogoWrap" hidden>
+          <label for="refLogo">Your logo <span class="muted">(optional)</span></label>
+          <input type="file" id="refLogo" accept="image/png,image/jpeg,image/webp,image/svg+xml">
+          <div class="hint"><span>Shown next to your name on the card.</span><button class="chip" id="refLogoClear" type="button" style="min-height:30px;padding:2px 10px">Remove</button></div>
         </div>
+      </div>
+
+      <div class="panel">
+        <h2>Invitation</h2>
+        <label for="friend">Contact’s name <span class="muted">(optional)</span></label>
+        <input type="text" id="friend" maxlength="40" placeholder="e.g. Arjun">
 
         <label>Language</label>
         <div class="chips" id="langs" role="group" aria-label="Language"></div>
@@ -187,7 +193,7 @@ window.BRAND = {
 (() => {
   "use strict";
   const $ = (id) => document.getElementById(id);
-  const STORE = "referral-invite-v1";
+  const STORE = "infinitia-referral-v2";
   const load = () => { try { return JSON.parse(localStorage.getItem(STORE)) || {}; } catch { return {}; } };
   const save = () => { try { localStorage.setItem(STORE, JSON.stringify({ brand, state: { ...state, message: state.messageEdited ? state.message : null } })); } catch {} };
 
@@ -207,6 +213,12 @@ window.BRAND = {
   // {brand} {friend} {referrer} {reward}
   const T = {
     en: {
+      recommendedBy: "Recommended by", msgsWe: {
+        friendly: "We've worked with {brand} and we think you'll love them too. Use our code to get started — {reward}!",
+        professional: "We're happy to recommend {brand} — reliable, responsive and excellent to work with. Use our referral code — {reward}.",
+        short: "We recommend {brand}. {reward} with our code!",
+        excited: "We can't recommend {brand} enough! Use our code and {reward}! 🎉",
+      },
       invited: "You're invited!", hi: "Hi {friend},", from: "— {referrer}", code: "Your code", scan: "Scan to claim",
       msgs: {
         friendly: "I've been using {brand} and I really think you'll love it too. Use my code to get started — {reward}!",
@@ -216,6 +228,12 @@ window.BRAND = {
       },
     },
     kn: {
+      recommendedBy: "ಶಿಫಾರಸು ಮಾಡಿದವರು", msgsWe: {
+        friendly: "ನಾವು {brand} ಜೊತೆ ಕೆಲಸ ಮಾಡಿದ್ದೇವೆ, ನಿಮಗೂ ಖಂಡಿತ ಇಷ್ಟವಾಗುತ್ತದೆ. ನಮ್ಮ ಕೋಡ್ ಬಳಸಿ — {reward}!",
+        professional: "{brand} ಅನ್ನು ನಾವು ವಿಶ್ವಾಸದಿಂದ ಶಿಫಾರಸು ಮಾಡುತ್ತೇವೆ. ವಿಶ್ವಾಸಾರ್ಹ ಮತ್ತು ಉತ್ತಮ ಸೇವೆ. ನಮ್ಮ ಕೋಡ್ ಬಳಸಿ — {reward}.",
+        short: "{brand} ಪ್ರಯತ್ನಿಸಿ — ನಮ್ಮ ಕೋಡ್‌ನೊಂದಿಗೆ {reward}!",
+        excited: "{brand} ಅದ್ಭುತ! ಒಮ್ಮೆ ಪ್ರಯತ್ನಿಸಲೇಬೇಕು. ನಮ್ಮ ಕೋಡ್ ಬಳಸಿ — {reward}! 🎉",
+      },
       invited: "ನಿಮಗೆ ಆಹ್ವಾನ!", hi: "ನಮಸ್ಕಾರ {friend},", from: "— {referrer}", code: "ನಿಮ್ಮ ಕೋಡ್", scan: "ಸ್ಕ್ಯಾನ್ ಮಾಡಿ",
       msgs: {
         friendly: "ನಾನು {brand} ಬಳಸುತ್ತಿದ್ದೇನೆ, ನಿಮಗೂ ಖಂಡಿತ ಇಷ್ಟವಾಗುತ್ತದೆ. ನನ್ನ ಕೋಡ್ ಬಳಸಿ — {reward}!",
@@ -225,6 +243,12 @@ window.BRAND = {
       },
     },
     hi: {
+      recommendedBy: "सिफ़ारिशकर्ता", msgsWe: {
+        friendly: "हमने {brand} के साथ काम किया है, आपको भी ज़रूर पसंद आएगा। हमारा कोड इस्तेमाल करें — {reward}!",
+        professional: "{brand} भरोसेमंद और बेहतरीन हैं। हमारी ओर से इनकी पूरी सिफ़ारिश है। हमारा रेफ़रल कोड इस्तेमाल करें — {reward}।",
+        short: "{brand} आज़माइए — हमारे कोड से {reward}!",
+        excited: "{brand} कमाल का है! एक बार ज़रूर आज़माइए। हमारा कोड इस्तेमाल करें — {reward}! 🎉",
+      },
       invited: "आपको आमंत्रण!", hi: "नमस्ते {friend},", from: "— {referrer}", code: "आपका कोड", scan: "स्कैन करें",
       msgs: {
         friendly: "{brand} मुझे बहुत पसंद आया, आपको भी ज़रूर पसंद आएगा। मेरा कोड इस्तेमाल करें — {reward}!",
@@ -234,6 +258,12 @@ window.BRAND = {
       },
     },
     ta: {
+      recommendedBy: "பரிந்துரைத்தவர்", msgsWe: {
+        friendly: "நாங்கள் {brand} உடன் பணியாற்றியுள்ளோம், உங்களுக்கும் நிச்சயம் பிடிக்கும். எங்கள் குறியீட்டைப் பயன்படுத்துங்கள் — {reward}!",
+        professional: "{brand}-ஐ நம்பிக்கையுடன் பரிந்துரைக்கிறோம். நம்பகமான, தரமான சேவை. எங்கள் குறியீட்டைப் பயன்படுத்துங்கள் — {reward}.",
+        short: "{brand} முயற்சி செய்யுங்கள் — எங்கள் குறியீட்டுடன் {reward}!",
+        excited: "{brand} அருமை! கண்டிப்பாக முயற்சி செய்யுங்கள். எங்கள் குறியீட்டைப் பயன்படுத்துங்கள் — {reward}! 🎉",
+      },
       invited: "உங்களுக்கு அழைப்பு!", hi: "வணக்கம் {friend},", from: "— {referrer}", code: "உங்கள் குறியீடு", scan: "ஸ்கேன் செய்யவும்",
       msgs: {
         friendly: "நான் {brand} பயன்படுத்துகிறேன், உங்களுக்கும் நிச்சயம் பிடிக்கும். என் குறியீட்டைப் பயன்படுத்துங்கள் — {reward}!",
@@ -243,6 +273,12 @@ window.BRAND = {
       },
     },
     te: {
+      recommendedBy: "సిఫార్సు చేసినవారు", msgsWe: {
+        friendly: "మేము {brand} తో పని చేశాము, మీకు కూడా తప్పకుండా నచ్చుతుంది. మా కోడ్ వాడండి — {reward}!",
+        professional: "{brand} ని మేము నమ్మకంగా సిఫార్సు చేస్తున్నాము. నమ్మకమైన, నాణ్యమైన సేవ. మా కోడ్ వాడండి — {reward}.",
+        short: "{brand} ప్రయత్నించండి — మా కోడ్‌తో {reward}!",
+        excited: "{brand} అద్భుతం! ఒకసారి తప్పకుండా ప్రయత్నించండి. మా కోడ్ వాడండి — {reward}! 🎉",
+      },
       invited: "మీకు ఆహ్వానం!", hi: "నమస్తే {friend},", from: "— {referrer}", code: "మీ కోడ్", scan: "స్కాన్ చేయండి",
       msgs: {
         friendly: "నేను {brand} వాడుతున్నాను, మీకు కూడా తప్పకుండా నచ్చుతుంది. నా కోడ్ వాడండి — {reward}!",
@@ -266,12 +302,13 @@ window.BRAND = {
   };
 
   const state = {
-    referrer: "", friend: "", lang: "en", tone: "friendly", design: "elegant", format: "portrait",
+    refType: "person", referrer: "", refSub: "", refLogo: "", friend: "", lang: "en", tone: "friendly", design: "elegant", format: "portrait",
     code: "", message: "", messageEdited: false, ...(saved.state || {}),
   };
   if (!state.code) state.code = makeCode(state.referrer);
 
-  const suggestion = () => fill(T[state.lang].msgs[state.tone], { brand: brand.name, reward: lowerReward() });
+  const suggestion = () => fill(T[state.lang][state.refType === "business" ? "msgsWe" : "msgs"][state.tone], { brand: brand.name, reward: lowerReward() });
+  const signature = () => [state.referrer.trim(), state.refSub.trim()].filter(Boolean).join(", ");
   if (!state.messageEdited || !state.message) { state.message = suggestion(); state.messageEdited = false; }
 
   const refUrl = () => {
@@ -286,7 +323,7 @@ window.BRAND = {
     lines.push(state.message);
     lines.push(`${t.code}: ${state.code}`);
     if (refUrl()) lines.push(refUrl());
-    if (state.referrer) lines.push(fill(t.from, { referrer: state.referrer }));
+    if (signature()) lines.push(fill(t.from, { referrer: signature() }));
     return lines.join("\n\n");
   };
 
@@ -309,6 +346,13 @@ window.BRAND = {
       img.onerror = () => { logoImg = null; res(); };
       img.src = brand.logoUrl;
     });
+  }
+
+  let refLogoImg = null;
+  function loadRefLogo() {
+    refLogoImg = null;
+    if (!state.refLogo || state.refType !== "business") return Promise.resolve();
+    return new Promise((res) => { const i = new Image(); i.onload = () => { refLogoImg = i; res(); }; i.onerror = () => res(); i.src = state.refLogo; });
   }
 
   // ---------- canvas helpers ----------
@@ -458,7 +502,7 @@ window.BRAND = {
       ctx.font = textFont(500, s, true);
       const lines = wrap(ctx, state.message || "", iw);
       const gH = greet ? s * 1.4 + 10 : 0;
-      const total = gH + lines.length * s * 1.42 + (state.referrer ? 30 + 40 : 0);
+      const total = gH + lines.length * s * 1.42 + (state.referrer ? 40 + 96 : 0);
       chosen = { s, lines, gH, total };
       if (my + 20 + total <= areaBottom) break;
     }
@@ -467,7 +511,27 @@ window.BRAND = {
     if (greet) { ctx.font = textFont(600, chosen.s, true); ctx.fillStyle = "#0B1437"; my += chosen.s; ctx.fillText(greet, ix, my); my += chosen.s * 0.4 + 10; }
     ctx.font = textFont(500, chosen.s, true); ctx.fillStyle = "#0B1437";
     for (const l of chosen.lines) { my += chosen.s * 1.18; if (my > areaBottom) break; ctx.fillText(l, ix, my); my += chosen.s * 0.24; }
-    if (state.referrer) { my += 44; ctx.font = textFont(600, 30); ctx.fillStyle = "#36406B"; ctx.fillText(fill(t.from, { referrer: state.referrer }), ix, Math.min(my, areaBottom)); }
+    if (state.referrer.trim()) {
+      const A2 = 84, sy = Math.min(my + 36, areaBottom - A2);
+      if (refLogoImg) {
+        rr(ctx, ix, sy, A2, A2, 22); ctx.fillStyle = "#fff"; ctx.fill(); ctx.strokeStyle = "#E3E6EF"; ctx.lineWidth = 2; ctx.stroke();
+        const k = Math.min((A2 - 14) / refLogoImg.width, (A2 - 14) / refLogoImg.height);
+        ctx.drawImage(refLogoImg, ix + (A2 - refLogoImg.width * k) / 2, sy + (A2 - refLogoImg.height * k) / 2, refLogoImg.width * k, refLogoImg.height * k);
+      } else {
+        ctx.beginPath(); if (state.refType === "business") ctx.roundRect(ix, sy, A2, A2, 22); else ctx.arc(ix + A2 / 2, sy + A2 / 2, A2 / 2, 0, Math.PI * 2);
+        ctx.fillStyle = rgba(P, 0.12); ctx.fill();
+        const ini = state.referrer.trim().split(/\s+/).slice(0, 2).map((w) => Array.from(w)[0] || "").join("").toUpperCase();
+        ctx.fillStyle = P; ctx.font = "700 32px Inter, sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        ctx.fillText(ini, ix + A2 / 2, sy + A2 / 2 + 1); ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+      }
+      const tx = ix + A2 + 22, tw = iw - A2 - 22;
+      const clip = (str) => { let x = str; while (ctx.measureText(x).width > tw && x.length > 2) x = x.slice(0, -2); return x === str ? x : x + "…"; };
+      const hasSub = !!state.refSub.trim();
+      let ly = sy + (hasSub ? 22 : 32);
+      ctx.font = textFont(600, 20); ctx.fillStyle = "#5B6383"; ctx.fillText(t.recommendedBy.toUpperCase(), tx, ly);
+      ly += 38; ctx.font = "700 32px Inter, " + `"${LANGS.find((l) => l.code === state.lang).font}", sans-serif`; ctx.fillStyle = "#0B1437"; ctx.fillText(clip(state.referrer.trim()), tx, ly);
+      if (hasSub) { ly += 32; ctx.font = "400 24px Inter, sans-serif"; ctx.fillStyle = "#5B6383"; ctx.fillText(clip(state.refSub.trim()), tx, ly); }
+    }
 
     // Share link for WhatsApp button
     $("waBtn").href = "https://wa.me/?text=" + encodeURIComponent(shareText());
@@ -489,6 +553,16 @@ window.BRAND = {
     }
   }
   const resetMessageIfUntouched = () => { if (!state.messageEdited) { state.message = suggestion(); $("message").value = state.message; } };
+  function applyRefType() {
+    const biz = state.refType === "business";
+    $("referrerLabel").textContent = biz ? "Your business / brand name" : "Your name";
+    $("referrer").placeholder = biz ? "e.g. Sunrise Consultants" : "e.g. Priya Sharma";
+    $("refSubLabel").innerHTML = (biz ? "Contact person or tagline" : "Your company or role") + ' <span class="muted">(optional)</span>';
+    $("refSub").placeholder = biz ? "e.g. Ravi Kumar, Founder" : "e.g. Marketing Head, Acme";
+    $("refLogoWrap").hidden = !biz;
+  }
+  chips($("refTypes"), [["person", "Myself"], ["business", "My business / brand"]], "refType", () => { applyRefType(); resetMessageIfUntouched(); loadRefLogo().then(refresh); });
+  applyRefType();
   chips($("langs"), LANGS.map((l) => [l.code, l.label]), "lang", resetMessageIfUntouched);
   chips($("tones"), TONES, "tone", resetMessageIfUntouched);
   chips($("designs"), DESIGNS, "design");
@@ -506,6 +580,14 @@ window.BRAND = {
   $("message").value = state.message; $("code").value = state.code;
   $("referrer").addEventListener("input", (e) => { state.referrer = e.target.value.slice(0, 40); refresh(); });
   $("referrer").addEventListener("change", () => { if (/^[A-Z0-9]+-[A-Z0-9]{3}$/.test(state.code) || /^[A-Z0-9]+-[A-Z]+-[A-Z0-9]{3}$/.test(state.code)) { state.code = makeCode(state.referrer); $("code").value = state.code; refresh(); } });
+  $("refSub").value = state.refSub;
+  $("refSub").addEventListener("input", (e) => { state.refSub = e.target.value.slice(0, 50); refresh(); });
+  $("refLogo").addEventListener("change", (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    if (f.size > 1024 * 1024) { toast("Please use a logo under 1 MB."); return; }
+    const r = new FileReader(); r.onload = () => { state.refLogo = r.result; loadRefLogo().then(refresh); }; r.readAsDataURL(f);
+  });
+  $("refLogoClear").addEventListener("click", () => { state.refLogo = ""; $("refLogo").value = ""; loadRefLogo().then(refresh); });
   $("friend").addEventListener("input", (e) => { state.friend = e.target.value.slice(0, 40); refresh(); });
   $("message").addEventListener("input", (e) => { state.message = e.target.value; state.messageEdited = true; refresh(); });
   $("resetMsg").addEventListener("click", () => { state.messageEdited = false; resetMessageIfUntouched(); refresh(); });
@@ -540,7 +622,7 @@ window.BRAND = {
   let toastTimer;
   function toast(msg) { const el = $("toast"); el.textContent = msg; el.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove("show"), 2600); }
   const blob = () => new Promise((res) => $("card").toBlob(res, "image/png"));
-  const fileName = () => `${(brand.name || "invite").toLowerCase().replace(/[^a-z0-9]+/g, "-")}-invite-${state.format}.png`;
+  const fileName = () => `${[brand.name, state.referrer].filter(Boolean).join(" ").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "invite"}-referral-${state.format}.png`;
 
   async function copy(text, done) {
     try { await navigator.clipboard.writeText(text); toast(done); }
@@ -568,13 +650,14 @@ window.BRAND = {
 
   let raf;
   function refresh() {
+    $("pageTitle").textContent = "Refer " + (brand.name || "us");
     $("count").textContent = `${(state.message || "").length}/320`;
     cancelAnimationFrame(raf); raf = requestAnimationFrame(() => { draw(); save(); });
   }
 
   fillBrandForm();
   const fontsReady = document.fonts ? Promise.all(["400 20px Inter","600 20px Inter","700 20px Inter","500 20px Fraunces","600 20px Fraunces"].map((f) => document.fonts.load(f))).catch(() => {}) : Promise.resolve();
-  Promise.all([fontsReady, loadLogo()]).then(refresh);
+  Promise.all([fontsReady, loadLogo(), loadRefLogo()]).then(refresh);
   if (document.fonts) document.fonts.addEventListener("loadingdone", refresh);
 })();
 </script>
