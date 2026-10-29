@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Referral Invite Maker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Noto+Sans+Kannada:wght@400;600&family=Noto+Sans+Devanagari:wght@400;600&family=Noto+Sans+Tamil:wght@400;600&family=Noto+Sans+Telugu:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script>
+/* =====================================================================
+   YOUR BRAND DETAILS — edit these once. (You can also change them from
+   the "Brand settings" panel in the page; those changes are saved in
+   your browser.)
+   ===================================================================== */
+window.BRAND = {
+  name: "Your Brand Name",
+  tagline: "What you do, in one line",
+  logoUrl: "",                       // e.g. "logo.png" next to this file, or a https:// URL. Blank = initials.
+  primaryColor: "#4F46E5",           // main brand colour
+  accentColor: "#7C3AED",            // second colour for gradients
+  phone: "+91 98765 43210",
+  whatsapp: "+919876543210",         // full international number, digits only (+ optional)
+  email: "hello@yourbrand.com",
+  website: "https://yourbrand.com",
+  referralLink: "https://yourbrand.com/refer",   // ?ref=CODE is added automatically
+  codePrefix: "REF",
+  reward: "Get 10% off your first order",        // what the invited friend gets
+  rewardNote: "Mention this code when you contact us."
+};
+</script>
+<style>
+  :root{
+    --ink:#0B1437; --ink-2:#36406B; --muted:#5B6383; --line:#E3E6EF; --bg:#F7F7FB; --card:#fff;
+    --brand:#4F46E5; --brand-soft:#EEF2FF; --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,"Noto Sans Kannada","Noto Sans Devanagari","Noto Sans Tamil","Noto Sans Telugu",system-ui,sans-serif}
+  .wrap{max-width:1120px;margin:0 auto;padding:16px}
+  header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0 16px}
+  header.top h1{font:600 22px/1.2 Fraunces,Georgia,serif;margin:0;letter-spacing:-.01em}
+  header.top p{margin:2px 0 0;color:var(--muted);font-size:13px}
+  .grid{display:grid;gap:20px}
+  @media(min-width:900px){.grid{grid-template-columns:1fr 1fr;align-items:start}.preview-col{position:sticky;top:16px}}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:0 1px 2px rgba(11,20,55,.04),0 8px 24px -10px rgba(11,20,55,.12)}
+  .panel + .panel{margin-top:16px}
+  .panel h2{font-size:15px;margin:0 0 12px}
+  label{display:block;font-size:13px;font-weight:500;color:var(--ink-2);margin:12px 0 6px}
+  label:first-of-type{margin-top:0}
+  input[type=text],input[type=url],input[type=email],input[type=tel],textarea,select{
+    width:100%;font:inherit;color:var(--ink);background:#fff;border:1px solid #D3D7E3;border-radius:12px;padding:10px 12px;min-height:44px}
+  textarea{min-height:120px;resize:vertical;line-height:1.55}
+  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 4px var(--brand-soft)}
+  .row{display:grid;gap:10px;grid-template-columns:1fr 1fr}
+  .hint{font-size:12px;color:var(--muted);margin-top:4px;display:flex;justify-content:space-between}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{border:1px solid #D3D7E3;background:#fff;border-radius:999px;padding:8px 14px;font:inherit;font-size:13px;font-weight:500;cursor:pointer;min-height:40px;color:var(--ink)}
+  .chip[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:12px;padding:0 16px;min-height:46px;font:600 15px Inter,sans-serif;cursor:pointer;text-decoration:none;transition:transform .1s,filter .15s}
+  .btn:active{transform:translateY(1px)}
+  .btn-primary{background:var(--brand);color:#fff}
+  .btn-wa{background:#25D366;color:#073B1C}
+  .btn-dark{background:var(--ink);color:#fff}
+  .btn-ghost{background:#fff;color:var(--ink);border:1px solid #D3D7E3}
+  .btn:hover{filter:brightness(.96)}
+  .btn:focus-visible,.chip:focus-visible,summary:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+  .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+  .actions .full{grid-column:1/-1}
+  .preview{background:repeating-conic-gradient(#EEF0F6 0 25%,#F7F8FB 0 50%) 0 0/20px 20px;border-radius:14px;padding:14px;display:flex;justify-content:center}
+  canvas#card{width:100%;max-width:420px;height:auto;border-radius:10px;box-shadow:0 18px 40px -18px rgba(11,20,55,.45)}
+  .formats{display:flex;gap:8px;justify-content:center;margin-top:12px}
+  details.brand summary{cursor:pointer;font-weight:600;list-style:none;display:flex;justify-content:space-between;align-items:center}
+  details.brand summary::-webkit-details-marker{display:none}
+  details.brand summary::after{content:"Edit ▾";font-weight:500;font-size:13px;color:var(--brand)}
+  details.brand[open] summary::after{content:"Close ▴"}
+  .code{display:flex;gap:8px}
+  .code input{font-family:ui-monospace,Menlo,monospace;letter-spacing:.06em;text-transform:uppercase}
+  .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%) translateY(120%);background:var(--ink);color:#fff;padding:12px 18px;border-radius:12px;font-weight:500;font-size:14px;transition:transform .25s;z-index:10;max-width:calc(100% - 32px)}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+  .swatch{display:flex;gap:8px;align-items:center}
+  .swatch input[type=color]{width:44px;height:44px;border:1px solid #D3D7E3;border-radius:12px;padding:3px;background:#fff}
+  .muted{color:var(--muted);font-size:12px}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Referral Invite Maker</h1>
+      <p>Create a branded invitation and share it in seconds.</p>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- Preview -->
+    <section class="preview-col" aria-label="Preview">
+      <div class="panel">
+        <div class="preview"><canvas id="card" width="1080" height="1350" role="img" aria-label="Referral invitation preview"></canvas></div>
+        <div class="formats" role="group" aria-label="Image size">
+          <button class="chip" data-format="square" aria-pressed="false">Square</button>
+          <button class="chip" data-format="portrait" aria-pressed="true">Portrait</button>
+          <button class="chip" data-format="story" aria-pressed="false">Story</button>
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary full" id="shareBtn">Share invitation</button>
+          <a class="btn btn-wa" id="waBtn" target="_blank" rel="noopener">WhatsApp</a>
+          <button class="btn btn-dark" id="downloadBtn">Download image</button>
+          <button class="btn btn-ghost" id="copyMsgBtn">Copy message</button>
+          <button class="btn btn-ghost" id="copyLinkBtn">Copy link</button>
+        </div>
+        <p class="muted" style="margin:10px 2px 0">Tip: on phones, “Share invitation” sends the image and message together (Instagram, WhatsApp, etc.).</p>
+      </div>
+    </section>
+
+    <!-- Editor -->
+    <section aria-label="Editor">
+      <div class="panel">
+        <h2>Invitation</h2>
+        <div class="row">
+          <div>
+            <label for="referrer">Your name</label>
+            <input type="text" id="referrer" maxlength="40" placeholder="e.g. Priya" autocomplete="name">
+          </div>
+          <div>
+            <label for="friend">Friend’s name <span class="muted">(optional)</span></label>
+            <input type="text" id="friend" maxlength="40" placeholder="e.g. Arjun">
+          </div>
+        </div>
+
+        <label>Language</label>
+        <div class="chips" id="langs" role="group" aria-label="Language"></div>
+
+        <label>Tone</label>
+        <div class="chips" id="tones" role="group" aria-label="Tone"></div>
+
+        <label for="message">Message</label>
+        <textarea id="message" maxlength="320"></textarea>
+        <div class="hint"><button class="chip" id="resetMsg" type="button" style="min-height:32px;padding:4px 12px">Reset to suggestion</button><span id="count">0/320</span></div>
+
+        <label for="code">Referral code</label>
+        <div class="code">
+          <input type="text" id="code" maxlength="20">
+          <button class="btn btn-ghost" id="newCode" type="button" aria-label="Generate new code">↻</button>
+        </div>
+
+        <label>Design</label>
+        <div class="chips" id="designs" role="group" aria-label="Design"></div>
+      </div>
+
+      <div class="panel">
+        <details class="brand" id="brandPanel">
+          <summary>Brand settings</summary>
+          <p class="muted">Saved in this browser. To make them permanent for everyone, edit the BRAND block at the top of this file.</p>
+          <label for="b_name">Brand name</label><input type="text" id="b_name">
+          <label for="b_tagline">Tagline</label><input type="text" id="b_tagline">
+          <label for="b_logo">Logo</label>
+          <input type="file" id="b_logo" accept="image/png,image/jpeg,image/webp,image/svg+xml">
+          <div class="hint"><span>PNG with transparent background works best.</span><button class="chip" id="b_logo_clear" type="button" style="min-height:30px;padding:2px 10px">Remove</button></div>
+          <div class="row">
+            <div><label for="b_primary">Primary colour</label><div class="swatch"><input type="color" id="b_primary"><input type="text" id="b_primary_hex" maxlength="7"></div></div>
+            <div><label for="b_accent">Accent colour</label><div class="swatch"><input type="color" id="b_accent"><input type="text" id="b_accent_hex" maxlength="7"></div></div>
+          </div>
+          <div class="row">
+            <div><label for="b_phone">Phone</label><input type="tel" id="b_phone"></div>
+            <div><label for="b_whatsapp">WhatsApp number</label><input type="tel" id="b_whatsapp"></div>
+          </div>
+          <label for="b_email">Email</label><input type="email" id="b_email">
+          <label for="b_website">Website</label><input type="url" id="b_website">
+          <label for="b_link">Referral link</label><input type="url" id="b_link">
+          <div class="row">
+            <div><label for="b_prefix">Code prefix</label><input type="text" id="b_prefix" maxlength="8"></div>
+            <div><label for="b_reward">Friend’s reward</label><input type="text" id="b_reward" maxlength="60"></div>
+          </div>
+          <label for="b_note">Reward note</label><input type="text" id="b_note" maxlength="90">
+          <div class="actions"><button class="btn btn-ghost full" id="b_reset" type="button">Restore defaults from file</button></div>
+        </details>
+      </div>
+    </section>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  "use strict";
+  const $ = (id) => document.getElementById(id);
+  const STORE = "referral-invite-v1";
+  const load = () => { try { return JSON.parse(localStorage.getItem(STORE)) || {}; } catch { return {}; } };
+  const save = () => { try { localStorage.setItem(STORE, JSON.stringify({ brand, state: { ...state, message: state.messageEdited ? state.message : null } })); } catch {} };
+
+  const saved = load();
+  let brand = { ...window.BRAND, ...(saved.brand || {}) };
+
+  const LANGS = [
+    { code: "en", label: "English", font: "Inter" },
+    { code: "kn", label: "ಕನ್ನಡ", font: "Noto Sans Kannada" },
+    { code: "hi", label: "हिन्दी", font: "Noto Sans Devanagari" },
+    { code: "ta", label: "தமிழ்", font: "Noto Sans Tamil" },
+    { code: "te", label: "తెలుగు", font: "Noto Sans Telugu" },
+  ];
+  const TONES = [["friendly","Friendly"],["professional","Professional"],["short","Short"],["excited","Excited"]];
+  const DESIGNS = [["elegant","Elegant"],["bold","Bold"],["minimal","Minimal"]];
+
+  // {brand} {friend} {referrer} {reward}
+  const T = {
+    en: {
+      invited: "You're invited!", hi: "Hi {friend},", from: "— {referrer}", code: "Your code", scan: "Scan to claim",
+      msgs: {
+        friendly: "I've been using {brand} and I really think you'll love it too. Use my code to get started — {reward}!",
+        professional: "I'd like to recommend {brand}. They've been reliable and excellent to work with. Use my referral code — {reward}.",
+        short: "Try {brand} — I love it. {reward} with my code!",
+        excited: "You HAVE to try {brand}! Honestly one of my best finds. Use my code and {reward}! 🎉",
+      },
+    },
+    kn: {
+      invited: "ನಿಮಗೆ ಆಹ್ವಾನ!", hi: "ನಮಸ್ಕಾರ {friend},", from: "— {referrer}", code: "ನಿಮ್ಮ ಕೋಡ್", scan: "ಸ್ಕ್ಯಾನ್ ಮಾಡಿ",
+      msgs: {
+        friendly: "ನಾನು {brand} ಬಳಸುತ್ತಿದ್ದೇನೆ, ನಿಮಗೂ ಖಂಡಿತ ಇಷ್ಟವಾಗುತ್ತದೆ. ನನ್ನ ಕೋಡ್ ಬಳಸಿ — {reward}!",
+        professional: "{brand} ಅನ್ನು ನಾನು ಶಿಫಾರಸು ಮಾಡುತ್ತೇನೆ. ಅವರು ವಿಶ್ವಾಸಾರ್ಹರು ಮತ್ತು ಉತ್ತಮ ಸೇವೆ ನೀಡುತ್ತಾರೆ. ನನ್ನ ಕೋಡ್ ಬಳಸಿ — {reward}.",
+        short: "{brand} ಪ್ರಯತ್ನಿಸಿ — ನನ್ನ ಕೋಡ್‌ನೊಂದಿಗೆ {reward}!",
+        excited: "{brand} ಅದ್ಭುತ! ನೀವು ಒಮ್ಮೆ ಪ್ರಯತ್ನಿಸಲೇಬೇಕು. ನನ್ನ ಕೋಡ್ ಬಳಸಿ — {reward}! 🎉",
+      },
+    },
+    hi: {
+      invited: "आपको आमंत्रण!", hi: "नमस्ते {friend},", from: "— {referrer}", code: "आपका कोड", scan: "स्कैन करें",
+      msgs: {
+        friendly: "{brand} मुझे बहुत पसंद आया, आपको भी ज़रूर पसंद आएगा। मेरा कोड इस्तेमाल करें — {reward}!",
+        professional: "{brand} भरोसेमंद और बेहतरीन हैं। मेरी ओर से इनकी पूरी सिफ़ारिश है। मेरा रेफ़रल कोड इस्तेमाल करें — {reward}।",
+        short: "{brand} आज़माइए — मेरे कोड से {reward}!",
+        excited: "{brand} कमाल का है! एक बार ज़रूर आज़माइए। मेरा कोड इस्तेमाल करें — {reward}! 🎉",
+      },
+    },
+    ta: {
+      invited: "உங்களுக்கு அழைப்பு!", hi: "வணக்கம் {friend},", from: "— {referrer}", code: "உங்கள் குறியீடு", scan: "ஸ்கேன் செய்யவும்",
+      msgs: {
+        friendly: "நான் {brand} பயன்படுத்துகிறேன், உங்களுக்கும் நிச்சயம் பிடிக்கும். என் குறியீட்டைப் பயன்படுத்துங்கள் — {reward}!",
+        professional: "{brand}-ஐ நம்பிக்கையுடன் பரிந்துரைக்கிறேன். நம்பகமான, தரமான சேவை. என் குறியீட்டைப் பயன்படுத்துங்கள் — {reward}.",
+        short: "{brand} முயற்சி செய்யுங்கள் — என் குறியீட்டுடன் {reward}!",
+        excited: "{brand} அருமை! கண்டிப்பாக முயற்சி செய்யுங்கள். என் குறியீட்டைப் பயன்படுத்துங்கள் — {reward}! 🎉",
+      },
+    },
+    te: {
+      invited: "మీకు ఆహ్వానం!", hi: "నమస్తే {friend},", from: "— {referrer}", code: "మీ కోడ్", scan: "స్కాన్ చేయండి",
+      msgs: {
+        friendly: "నేను {brand} వాడుతున్నాను, మీకు కూడా తప్పకుండా నచ్చుతుంది. నా కోడ్ వాడండి — {reward}!",
+        professional: "{brand} ని నేను నమ్మకంగా సిఫార్సు చేస్తున్నాను. నమ్మకమైన, నాణ్యమైన సేవ. నా కోడ్ వాడండి — {reward}.",
+        short: "{brand} ప్రయత్నించండి — నా కోడ్‌తో {reward}!",
+        excited: "{brand} అద్భుతం! ఒకసారి తప్పకుండా ప్రయత్నించండి. నా కోడ్ వాడండి — {reward}! 🎉",
+      },
+    },
+  };
+  const FORMATS = { square: [1080, 1080], portrait: [1080, 1350], story: [1080, 1920] };
+
+  const fill = (s, v) => s.replace(/\{(\w+)\}/g, (_, k) => v[k] ?? "");
+  const rand = (n) => Array.from(crypto.getRandomValues(new Uint8Array(n)), (b) => "23456789ABCDEFGHJKMNPQRSTUVWXYZ"[b % 31]).join("");
+  const makeCode = (name) => {
+    const part = (name || "").normalize("NFKD").replace(/[^A-Za-z]/g, "").slice(0, 5).toUpperCase();
+    return [String(brand.codePrefix || "REF").toUpperCase().replace(/[^A-Z0-9]/g, ""), part, rand(3)].filter(Boolean).join("-");
+  };
+  const lowerReward = () => {
+    const r = (brand.reward || "").trim();
+    return r ? r.charAt(0).toLowerCase() + r.slice(1) : "a special welcome offer";
+  };
+
+  const state = {
+    referrer: "", friend: "", lang: "en", tone: "friendly", design: "elegant", format: "portrait",
+    code: "", message: "", messageEdited: false, ...(saved.state || {}),
+  };
+  if (!state.code) state.code = makeCode(state.referrer);
+
+  const suggestion = () => fill(T[state.lang].msgs[state.tone], { brand: brand.name, reward: lowerReward() });
+  if (!state.messageEdited || !state.message) { state.message = suggestion(); state.messageEdited = false; }
+
+  const refUrl = () => {
+    const base = (brand.referralLink || brand.website || "").trim();
+    if (!base) return "";
+    try { const u = new URL(base); u.searchParams.set("ref", state.code); return u.toString(); } catch { return base; }
+  };
+  const shareText = () => {
+    const t = T[state.lang];
+    const lines = [];
+    if (state.friend) lines.push(fill(t.hi, { friend: state.friend }));
+    lines.push(state.message);
+    lines.push(`${t.code}: ${state.code}`);
+    if (refUrl()) lines.push(refUrl());
+    if (state.referrer) lines.push(fill(t.from, { referrer: state.referrer }));
+    return lines.join("\n\n");
+  };
+
+  // ---------- colours ----------
+  const hex = (h) => (/^#[0-9a-f]{6}$/i.test(h) ? h : "#4F46E5");
+  const rgb = (h) => { const n = parseInt(hex(h).slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
+  const rgba = (h, a) => `rgba(${rgb(h).join(",")},${a})`;
+  const lum = (h) => { const c = rgb(h).map((v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; };
+  const onColor = (h) => (lum(h) > 0.45 ? "#0B1437" : "#FFFFFF");
+
+  // ---------- logo ----------
+  let logoImg = null;
+  function loadLogo() {
+    logoImg = null;
+    if (!brand.logoUrl) return Promise.resolve();
+    return new Promise((res) => {
+      const img = new Image();
+      if (/^https?:/i.test(brand.logoUrl)) img.crossOrigin = "anonymous";
+      img.onload = () => { logoImg = img; res(); };
+      img.onerror = () => { logoImg = null; res(); };
+      img.src = brand.logoUrl;
+    });
+  }
+
+  // ---------- canvas helpers ----------
+  function rr(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); }
+  function wrap(ctx, text, maxW) {
+    const out = [];
+    for (const para of String(text).split("\n")) {
+      const words = para.split(/\s+/).filter(Boolean);
+      let line = "";
+      for (const w of words) {
+        const test = line ? line + " " + w : w;
+        if (ctx.measureText(test).width <= maxW || !line) line = test;
+        else { out.push(line); line = w; }
+      }
+      out.push(line);
+    }
+    return out;
+  }
+  function textFont(weight, size, serif) {
+    const lang = LANGS.find((l) => l.code === state.lang);
+    const fam = serif ? `Fraunces, "${lang.font}", Georgia, serif` : `Inter, "${lang.font}", sans-serif`;
+    return `${weight} ${size}px ${fam}`;
+  }
+
+  // ---------- render ----------
+  function draw() {
+    const c = $("card");
+    const [W, H] = FORMATS[state.format];
+    c.width = W; c.height = H;
+    const ctx = c.getContext("2d");
+    const P = hex(brand.primaryColor), A = hex(brand.accentColor);
+    const t = T[state.lang];
+    const d = state.design;
+
+    // Background
+    if (d === "bold") {
+      const g = ctx.createLinearGradient(0, 0, W, H); g.addColorStop(0, P); g.addColorStop(1, A);
+      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = "rgba(255,255,255,0.08)";
+      for (let i = 0; i < 4; i++) { ctx.beginPath(); ctx.arc(W, 0, 260 + i * 180, 0, Math.PI * 2); ctx.lineWidth = 2; ctx.strokeStyle = "rgba(255,255,255,0.12)"; ctx.stroke(); }
+    } else if (d === "minimal") {
+      ctx.fillStyle = "#F4F5F9"; ctx.fillRect(0, 0, W, H);
+    } else {
+      const g = ctx.createLinearGradient(0, 0, W, H); g.addColorStop(0, rgba(P, 0.16)); g.addColorStop(1, rgba(A, 0.22));
+      ctx.fillStyle = "#FFFFFF"; ctx.fillRect(0, 0, W, H); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+      const rg = ctx.createRadialGradient(W * 0.9, H * 0.05, 10, W * 0.9, H * 0.05, W * 0.6);
+      rg.addColorStop(0, rgba(A, 0.35)); rg.addColorStop(1, rgba(A, 0)); ctx.fillStyle = rg; ctx.fillRect(0, 0, W, H);
+    }
+
+    // Card surface
+    const m = 64, cx = m, cy = m, cw = W - 2 * m, ch = H - 2 * m, pad = 64;
+    ctx.save(); ctx.shadowColor = "rgba(11,20,55,0.22)"; ctx.shadowBlur = 50; ctx.shadowOffsetY = 18;
+    rr(ctx, cx, cy, cw, ch, 44); ctx.fillStyle = "#FFFFFF"; ctx.fill(); ctx.restore();
+    if (d === "minimal") { rr(ctx, cx, cy + 40, 10, ch - 80, 5); ctx.fillStyle = P; ctx.fill(); }
+    const ix = cx + pad, iw = cw - pad * 2;
+    let y = cy + pad;
+
+    // Header: logo + name
+    const L = 112;
+    rr(ctx, ix, y, L, L, 28);
+    if (logoImg) {
+      ctx.fillStyle = "#fff"; ctx.fill(); ctx.strokeStyle = "#E3E6EF"; ctx.lineWidth = 2; ctx.stroke();
+      const s = Math.min((L - 20) / logoImg.width, (L - 20) / logoImg.height);
+      const lw = logoImg.width * s, lh = logoImg.height * s;
+      ctx.drawImage(logoImg, ix + (L - lw) / 2, y + (L - lh) / 2, lw, lh);
+    } else {
+      const g = ctx.createLinearGradient(ix, y, ix + L, y + L); g.addColorStop(0, P); g.addColorStop(1, A);
+      ctx.fillStyle = g; ctx.fill();
+      const ini = (brand.name || "?").trim().split(/\s+/).slice(0, 2).map((w) => Array.from(w)[0] || "").join("").toUpperCase();
+      ctx.fillStyle = onColor(P); ctx.font = "700 44px Inter, sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillText(ini, ix + L / 2, y + L / 2 + 2); ctx.textAlign = "left";
+    }
+    ctx.textBaseline = "alphabetic";
+    const nx = ix + L + 28, nw = iw - L - 28;
+    ctx.fillStyle = "#0B1437"; ctx.font = "700 42px Inter, sans-serif";
+    const nameLines = wrap(ctx, brand.name || "", nw).slice(0, 2);
+    ctx.font = "400 26px Inter, sans-serif";
+    const tagLines = brand.tagline ? wrap(ctx, brand.tagline, nw).slice(0, 2) : [];
+    const blockH = nameLines.length * 50 + tagLines.length * 34;
+    let ty = y + (L - blockH) / 2 + 40;
+    ctx.font = "700 42px Inter, sans-serif"; ctx.fillStyle = "#0B1437";
+    nameLines.forEach((l) => { ctx.fillText(l, nx, ty); ty += 50; });
+    ctx.font = "400 26px Inter, sans-serif"; ctx.fillStyle = "#5B6383"; ty -= 8;
+    tagLines.forEach((l) => { ctx.fillText(l, nx, ty); ty += 34; });
+    y += L + 56;
+
+    // Footer (QR + contacts), drawn from the bottom up
+    const bottom = cy + ch - pad;
+    const url = refUrl();
+    const Q = state.format === "story" ? 230 : 190;
+    let qrDrawn = false;
+    if (url && window.qrcode) {
+      try {
+        const qr = qrcode(0, "M"); qr.addData(url); qr.make();
+        const n = qr.getModuleCount(), cell = Q / (n + 2), qx = ix + iw - Q, qy = bottom - Q - 34;
+        ctx.fillStyle = "#fff"; ctx.fillRect(qx, qy, Q, Q); ctx.fillStyle = "#0B1437";
+        for (let r = 0; r < n; r++) for (let col = 0; col < n; col++) if (qr.isDark(r, col)) ctx.fillRect(qx + (col + 1) * cell, qy + (r + 1) * cell, Math.ceil(cell), Math.ceil(cell));
+        ctx.font = textFont(500, 20); ctx.fillStyle = "#5B6383"; ctx.textAlign = "center";
+        ctx.fillText(t.scan, qx + Q / 2, bottom - 4); ctx.textAlign = "left";
+        qrDrawn = true;
+      } catch {}
+    }
+    const contacts = [brand.phone, (brand.website || "").replace(/^https?:\/\/(www\.)?/i, "").replace(/\/$/, ""), brand.email].filter(Boolean);
+    ctx.font = "400 25px Inter, sans-serif"; ctx.fillStyle = "#5B6383";
+    let fy = bottom - 4;
+    const cw2 = iw - (qrDrawn ? Q + 30 : 0);
+    [...contacts].reverse().forEach((cline) => {
+      let s = cline; while (ctx.measureText(s).width > cw2 && s.length > 4) s = s.slice(0, -2);
+      ctx.fillText(s === cline ? s : s + "…", ix, fy); fy -= 40;
+    });
+    const footerTop = Math.min(fy - 20, qrDrawn ? bottom - Q - 34 : fy) - 30;
+    ctx.fillStyle = "#E3E6EF"; ctx.fillRect(ix, footerTop, iw, 2);
+
+    // Reward + code box
+    let boxBottom = footerTop - 36;
+    ctx.font = "600 34px " + `Inter, "${LANGS.find((l) => l.code === state.lang).font}", sans-serif`;
+    const rewardLines = brand.reward ? wrap(ctx, "🎁  " + brand.reward, iw - 64).slice(0, 2) : [];
+    ctx.font = "400 22px Inter, sans-serif";
+    const noteLines = brand.rewardNote ? wrap(ctx, brand.rewardNote, iw - 64).slice(0, 2) : [];
+    const boxH = 40 + rewardLines.length * 44 + 18 + 30 + 70 + (noteLines.length ? 14 + noteLines.length * 30 : 0) + 30;
+    const boxTop = boxBottom - boxH;
+    rr(ctx, ix, boxTop, iw, boxH, 28); ctx.fillStyle = rgba(P, 0.08); ctx.fill(); ctx.strokeStyle = rgba(P, 0.28); ctx.lineWidth = 2; ctx.stroke();
+    let by = boxTop + 40 + 30;
+    ctx.fillStyle = P; ctx.font = "600 34px " + `Inter, "${LANGS.find((l) => l.code === state.lang).font}", sans-serif`;
+    rewardLines.forEach((l) => { ctx.fillText(l, ix + 32, by); by += 44; });
+    by += 6;
+    ctx.font = textFont(600, 20); ctx.fillStyle = "#5B6383"; ctx.fillText(t.code.toUpperCase(), ix + 32, by); by += 16;
+    ctx.font = "700 40px ui-monospace, Menlo, Consolas, monospace";
+    const codeW = ctx.measureText(state.code).width + 48;
+    rr(ctx, ix + 32, by, codeW, 64, 16); ctx.fillStyle = P; ctx.fill();
+    ctx.setLineDash([8, 6]); ctx.strokeStyle = onColor(P) === "#FFFFFF" ? "rgba(255,255,255,.55)" : "rgba(11,20,55,.4)"; ctx.lineWidth = 2;
+    rr(ctx, ix + 38, by + 6, codeW - 12, 52, 12); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = onColor(P); ctx.fillText(state.code, ix + 56, by + 46);
+    by += 64 + 14;
+    ctx.font = "400 22px Inter, sans-serif"; ctx.fillStyle = "#5B6383";
+    noteLines.forEach((l) => { by += 30; ctx.fillText(l, ix + 32, by - 4); });
+
+    // Main message area between header and box
+    const areaTop = y, areaBottom = boxTop - 40;
+    ctx.fillStyle = P; ctx.font = textFont(600, 30);
+    ctx.fillText(t.invited.toUpperCase(), ix, areaTop + 24);
+    let my = areaTop + 24 + 30;
+    const greet = state.friend ? fill(t.hi, { friend: state.friend }) : "";
+    const sizes = state.format === "story" ? [58, 54, 50, 46, 42, 38, 34, 30] : [50, 46, 42, 38, 35, 32, 29, 26, 24];
+    let chosen = null;
+    for (const s of sizes) {
+      ctx.font = textFont(500, s, true);
+      const lines = wrap(ctx, state.message || "", iw);
+      const gH = greet ? s * 1.4 + 10 : 0;
+      const total = gH + lines.length * s * 1.42 + (state.referrer ? 30 + 40 : 0);
+      chosen = { s, lines, gH, total };
+      if (my + 20 + total <= areaBottom) break;
+    }
+    const spare = Math.max(0, areaBottom - (my + 20 + chosen.total));
+    my += 20 + Math.min(spare * 0.4, 140);
+    if (greet) { ctx.font = textFont(600, chosen.s, true); ctx.fillStyle = "#0B1437"; my += chosen.s; ctx.fillText(greet, ix, my); my += chosen.s * 0.4 + 10; }
+    ctx.font = textFont(500, chosen.s, true); ctx.fillStyle = "#0B1437";
+    for (const l of chosen.lines) { my += chosen.s * 1.18; if (my > areaBottom) break; ctx.fillText(l, ix, my); my += chosen.s * 0.24; }
+    if (state.referrer) { my += 44; ctx.font = textFont(600, 30); ctx.fillStyle = "#36406B"; ctx.fillText(fill(t.from, { referrer: state.referrer }), ix, Math.min(my, areaBottom)); }
+
+    // Share link for WhatsApp button
+    $("waBtn").href = "https://wa.me/?text=" + encodeURIComponent(shareText());
+  }
+
+  // ---------- UI wiring ----------
+  function chips(container, items, key, onChange) {
+    container.innerHTML = "";
+    for (const [value, label] of items) {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "chip"; b.textContent = label; b.dataset.value = value;
+      b.setAttribute("aria-pressed", String(state[key] === value));
+      b.addEventListener("click", () => {
+        state[key] = value;
+        container.querySelectorAll(".chip").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.value === value)));
+        onChange && onChange(); refresh();
+      });
+      container.appendChild(b);
+    }
+  }
+  const resetMessageIfUntouched = () => { if (!state.messageEdited) { state.message = suggestion(); $("message").value = state.message; } };
+  chips($("langs"), LANGS.map((l) => [l.code, l.label]), "lang", resetMessageIfUntouched);
+  chips($("tones"), TONES, "tone", resetMessageIfUntouched);
+  chips($("designs"), DESIGNS, "design");
+
+  document.querySelectorAll("[data-format]").forEach((b) => {
+    b.setAttribute("aria-pressed", String(b.dataset.format === state.format));
+    b.addEventListener("click", () => {
+      state.format = b.dataset.format;
+      document.querySelectorAll("[data-format]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+      refresh();
+    });
+  });
+
+  $("referrer").value = state.referrer; $("friend").value = state.friend;
+  $("message").value = state.message; $("code").value = state.code;
+  $("referrer").addEventListener("input", (e) => { state.referrer = e.target.value.slice(0, 40); refresh(); });
+  $("referrer").addEventListener("change", () => { if (/^[A-Z0-9]+-[A-Z0-9]{3}$/.test(state.code) || /^[A-Z0-9]+-[A-Z]+-[A-Z0-9]{3}$/.test(state.code)) { state.code = makeCode(state.referrer); $("code").value = state.code; refresh(); } });
+  $("friend").addEventListener("input", (e) => { state.friend = e.target.value.slice(0, 40); refresh(); });
+  $("message").addEventListener("input", (e) => { state.message = e.target.value; state.messageEdited = true; refresh(); });
+  $("resetMsg").addEventListener("click", () => { state.messageEdited = false; resetMessageIfUntouched(); refresh(); });
+  $("code").addEventListener("input", (e) => { state.code = e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, "").slice(0, 20); e.target.value = state.code; refresh(); });
+  $("newCode").addEventListener("click", () => { state.code = makeCode(state.referrer); $("code").value = state.code; refresh(); });
+
+  // Brand settings panel
+  const bind = [["b_name","name"],["b_tagline","tagline"],["b_phone","phone"],["b_whatsapp","whatsapp"],["b_email","email"],["b_website","website"],["b_link","referralLink"],["b_prefix","codePrefix"],["b_reward","reward"],["b_note","rewardNote"]];
+  function fillBrandForm() {
+    bind.forEach(([id, k]) => ($(id).value = brand[k] || ""));
+    $("b_primary").value = hex(brand.primaryColor); $("b_primary_hex").value = hex(brand.primaryColor);
+    $("b_accent").value = hex(brand.accentColor); $("b_accent_hex").value = hex(brand.accentColor);
+    document.documentElement.style.setProperty("--brand", hex(brand.primaryColor));
+    document.documentElement.style.setProperty("--brand-soft", rgba(brand.primaryColor, 0.14));
+  }
+  bind.forEach(([id, k]) => $(id).addEventListener("input", (e) => { brand[k] = e.target.value; resetMessageIfUntouched(); refresh(); }));
+  for (const [picker, text, key] of [["b_primary","b_primary_hex","primaryColor"],["b_accent","b_accent_hex","accentColor"]]) {
+    $(picker).addEventListener("input", (e) => { brand[key] = e.target.value.toUpperCase(); $(text).value = brand[key]; fillBrandForm(); refresh(); });
+    $(text).addEventListener("input", (e) => { if (/^#[0-9a-f]{6}$/i.test(e.target.value)) { brand[key] = e.target.value.toUpperCase(); $(picker).value = brand[key]; fillBrandForm(); refresh(); } });
+  }
+  $("b_logo").addEventListener("change", (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    if (f.size > 1.5 * 1024 * 1024) { toast("Please use a logo under 1.5 MB."); return; }
+    const r = new FileReader();
+    r.onload = () => { brand.logoUrl = r.result; loadLogo().then(refresh); };
+    r.readAsDataURL(f);
+  });
+  $("b_logo_clear").addEventListener("click", () => { brand.logoUrl = ""; $("b_logo").value = ""; loadLogo().then(refresh); });
+  $("b_reset").addEventListener("click", () => { brand = { ...window.BRAND }; fillBrandForm(); resetMessageIfUntouched(); loadLogo().then(refresh); toast("Brand restored from file"); });
+
+  // Actions
+  let toastTimer;
+  function toast(msg) { const el = $("toast"); el.textContent = msg; el.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove("show"), 2600); }
+  const blob = () => new Promise((res) => $("card").toBlob(res, "image/png"));
+  const fileName = () => `${(brand.name || "invite").toLowerCase().replace(/[^a-z0-9]+/g, "-")}-invite-${state.format}.png`;
+
+  async function copy(text, done) {
+    try { await navigator.clipboard.writeText(text); toast(done); }
+    catch { const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select(); const ok = document.execCommand("copy"); ta.remove(); toast(ok ? done : "Couldn't copy — please copy manually."); }
+  }
+  $("copyMsgBtn").addEventListener("click", () => copy(shareText(), "Message copied"));
+  $("copyLinkBtn").addEventListener("click", () => { const u = refUrl(); u ? copy(u, "Referral link copied") : toast("Add a referral link in Brand settings first."); });
+  $("downloadBtn").addEventListener("click", async () => {
+    try {
+      const b = await blob(); if (!b) throw new Error();
+      const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = fileName(); a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 2000); toast("Image downloaded");
+    } catch { toast("Download failed. If you use a logo from another website, upload the file instead."); }
+  });
+  $("shareBtn").addEventListener("click", async () => {
+    const text = shareText();
+    try {
+      const b = await blob();
+      const file = b && new File([b], fileName(), { type: "image/png" });
+      if (file && navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], text, title: brand.name }); return; }
+      if (navigator.share) { await navigator.share({ text, title: brand.name, url: refUrl() || undefined }); return; }
+      window.open($("waBtn").href, "_blank", "noopener");
+    } catch (e) { if (e && e.name !== "AbortError") toast("Sharing isn't available here — use WhatsApp or Download."); }
+  });
+
+  let raf;
+  function refresh() {
+    $("count").textContent = `${(state.message || "").length}/320`;
+    cancelAnimationFrame(raf); raf = requestAnimationFrame(() => { draw(); save(); });
+  }
+
+  fillBrandForm();
+  const fontsReady = document.fonts ? Promise.all(["400 20px Inter","600 20px Inter","700 20px Inter","500 20px Fraunces","600 20px Fraunces"].map((f) => document.fonts.load(f))).catch(() => {}) : Promise.resolve();
+  Promise.all([fontsReady, loadLogo()]).then(refresh);
+  if (document.fonts) document.fonts.addEventListener("loadingdone", refresh);
+})();
+</script>
+</body>
+</html>
