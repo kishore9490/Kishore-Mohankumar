@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Digital ID · Infinitia Links (Demo)</title>
+  <meta name="description" content="Interactive student digital ID card demo by Infinitia Links, featuring the fictional Nova Institute of Technology.">
+  <meta name="theme-color" content="#0A1433">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+  <link rel="stylesheet" href="css/styles.css">
+  <script>
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem('infinitia.theme'); } catch (e) {}
+      if (!t) t = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+</head>
+<body data-page="wallet">
+  <div id="splash" aria-hidden="true"><div class="splash-in"><svg class="splash-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M7.2 8.2c-2.1 0-3.8 1.7-3.8 3.8s1.7 3.8 3.8 3.8c3 0 6.6-7.6 9.6-7.6 2.1 0 3.8 1.7 3.8 3.8s-1.7 3.8-3.8 3.8c-3 0-6.6-7.6-9.6-7.6Z"/></svg><b>Infinitia Links</b><span>Digital Identity</span><div class="splash-bar"></div></div></div>
+  <div id="shell-top"></div>
+  <main>
+    <section class="container hero">
+      <div class="hero-copy">
+        <span class="eyebrow"><span class="dot"></span><span id="hero-inst">Live demo · Nova Institute of Technology</span></span>
+        <h1>The student ID, <span class="grad">reimagined</span> for the next generation.</h1>
+        <p class="lead">Infinitia Links gives every student a beautiful, verifiable digital identity — one link, one QR code, infinite possibilities. Everything on this page is a working sample.</p>
+        <div class="hero-points">
+          <span class="chip chip-blue" id="chip-template"></span>
+          <span class="chip chip-amber">Sample data · not valid for ID</span>
+        </div>
+      </div>
+      <div class="hero-card">
+        <div class="stage stage-float" id="stage"></div>
+        <div class="stage-hint" id="stage-hint"></div>
+        <div class="segmented" role="tablist" aria-label="Card side">
+          <button type="button" class="active" data-side="front" role="tab" aria-selected="true">Front</button>
+          <button type="button" data-side="back" role="tab" aria-selected="false">Back</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="container dock" aria-label="Card actions">
+      <div class="dock-grid" id="dock"></div>
+    </section>
+
+    <section class="container two-col">
+      <div class="panel">
+        <div class="panel-head">
+          <span class="panel-ic" data-icon="layers"></span>
+          <div><h2>Choose a card design</h2><p>Switch templates instantly — institutions can add their own.</p></div>
+        </div>
+        <div class="tpl-grid" id="templates"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">
+          <span class="panel-ic" data-icon="shield"></span>
+          <div><h2>Digital identity status</h2><p>Live status shown to anyone who scans the card.</p></div>
+        </div>
+        <div id="status"></div>
+      </div>
+    </section>
+
+    <section class="container wallet-sec" id="wallet">
+      <div class="wallet-copy">
+        <span class="eyebrow-sm">Infinitia Wallet · Simulated</span>
+        <h2 class="section-title">Always in their pocket.</h2>
+        <p class="section-sub">Students keep their campus ID alongside library and event passes. This simulated wallet shows how the card lives on a phone — no app store or real wallet integration required for the demo.</p>
+        <ul class="feature-list">
+          <li><span data-icon="bolt"></span>Opens instantly from a link or home-screen shortcut</li>
+          <li><span data-icon="qr"></span>Every card carries a scannable verification QR</li>
+          <li><span data-icon="power"></span>Institutions can activate or deactivate a card centrally</li>
+        </ul>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-primary" id="wallet-cta" type="button"></button>
+          <a class="btn btn-ghost" id="profile-cta" href="profile.html"><span data-icon="user"></span>View student profile</a>
+        </div>
+      </div>
+      <div class="phone" aria-label="Simulated phone wallet">
+        <div class="phone-screen">
+          <div class="phone-notch"></div>
+          <div class="phone-head"><b>Wallet</b><button class="icon-btn" type="button" id="phone-add" aria-label="Add pass"></button></div>
+          <div class="passes" id="passes"></div>
+          <p class="phone-foot">Simulated wallet · Demo passes only</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="container pitch">
+      <span class="eyebrow-sm">For institutions</span>
+      <h2 class="section-title">Deploy under your own brand and domain.</h2>
+      <p class="section-sub">Infinitia Links is designed to be white-labelled — your crest, your colours, your domain. Here is what an institution gets.</p>
+      <div class="pitch-grid">
+        <div class="pitch-card"><span class="panel-ic" data-icon="idcard"></span><h3>Premium digital IDs</h3><p>Multiple card designs, flip-to-back details, PNG export and wallet-style passes.</p></div>
+        <div class="pitch-card"><span class="panel-ic" data-icon="shield"></span><h3>Instant QR verification</h3><p>Anyone can scan a card to see its current status — active or deactivated.</p></div>
+        <div class="pitch-card"><span class="panel-ic" data-icon="user"></span><h3>Student profile link</h3><p>One shareable link with academic details, campus shortcuts, events and announcements.</p></div>
+        <div class="pitch-card"><span class="panel-ic" data-icon="grid"></span><h3>Admin control</h3><p>Create, edit, bulk-import, brand and export student identities from one dashboard.</p></div>
+      </div>
+      <div class="cta-band">
+        <div><h3>See what your institution would manage.</h3><p>Explore the admin preview — sample data only, nothing connects to real systems.</p></div>
+        <div class="btns"><a class="btn btn-primary" href="admin.html"><span data-icon="grid"></span>Open Admin Preview</a><a class="btn btn-ghost" id="verify-cta" href="verify.html"><span data-icon="scan"></span>Try verification</a></div>
+      </div>
+    </section>
+  </main>
+  <div id="shell-bottom"></div>
+  <script src="js/data.js"></script>
+  <script src="js/qr.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/card.js"></script>
+  <script src="js/wallet.js"></script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Demo Identity Verification · Infinitia Links</title>
+  <meta name="description" content="Simulated QR verification page. Demonstration only — not an official credential check.">
+  <meta name="theme-color" content="#0A1433">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+  <link rel="stylesheet" href="css/styles.css">
+  <script>
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem('infinitia.theme'); } catch (e) {}
+      if (!t) t = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+</head>
+<body data-page="verify">
+  <div id="splash" aria-hidden="true"><div class="splash-in"><svg class="splash-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M7.2 8.2c-2.1 0-3.8 1.7-3.8 3.8s1.7 3.8 3.8 3.8c3 0 6.6-7.6 9.6-7.6 2.1 0 3.8 1.7 3.8 3.8s-1.7 3.8-3.8 3.8c-3 0-6.6-7.6-9.6-7.6Z"/></svg><b>Infinitia Links</b><span>Digital Identity</span><div class="splash-bar"></div></div></div>
+  <div id="shell-top"></div>
+  <main class="container verify-wrap">
+    <div class="verify-card" id="verify-card"></div>
+    <aside class="panel">
+      <div class="panel-head"><span class="panel-ic" data-icon="scan"></span><div><h2>Scan simulator</h2><p>Pick a sample student to simulate scanning their card.</p></div></div>
+      <div class="search" style="margin-bottom:12px"><span data-icon="search"></span><input class="input" id="sim-search" type="search" placeholder="Search sample students" aria-label="Search sample students"></div>
+      <div class="sim-list" id="sim-list"></div>
+    </aside>
+  </main>
+  <div id="shell-bottom"></div>
+  <script src="js/data.js"></script>
+  <script src="js/qr.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/card.js"></script>
+  <script src="js/verify.js"></script>
+</body>
+</html>
