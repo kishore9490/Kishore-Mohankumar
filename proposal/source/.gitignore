@@ -1,0 +1,4 @@
+node_modules/
+build/icons/
+build/embed/
+package-lock.json

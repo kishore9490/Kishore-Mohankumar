@@ -1,0 +1,68 @@
+/* Infinitia Links — enterprise proposal (A4, printed by Chromium) */
+@page { size: A4; margin: 0; }
+:root { --navy: #0B1433; --ink: #0B1433; --ink2: #36425F; --muted: #5B6683; --blue: #1463FF; --cyan: #00B4F5; --violet: #7B2CF5; --line: #E3E8F2; --soft: #F3F6FC; --soft2: #EEF3FF; --green: #12B76A; --amber: #B45309; --grad: linear-gradient(120deg, #00B4F5, #1463FF 50%, #7B2CF5); }
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body { font-family: Inter, system-ui, sans-serif; color: var(--ink); font-size: 9.6pt; line-height: 1.55; -webkit-font-smoothing: antialiased; -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #fff; }
+.page { position: relative; width: 210mm; height: 297mm; padding: 22mm 18mm 20mm; overflow: hidden; page-break-after: always; break-after: page; }
+.page:last-child { page-break-after: auto; }
+.ph { position: absolute; left: 18mm; right: 18mm; top: 9mm; display: flex; align-items: center; justify-content: space-between; font-size: 7.5pt; color: var(--muted); }
+.ph img { height: 5.2mm; }
+.pf { position: absolute; left: 18mm; right: 18mm; bottom: 8mm; display: flex; justify-content: space-between; font-size: 7.3pt; color: var(--muted); border-top: 0.6pt solid var(--line); padding-top: 2.4mm; }
+.kicker { font-size: 8pt; font-weight: 800; letter-spacing: .16em; color: var(--blue); text-transform: uppercase; margin-bottom: 2mm; }
+h1 { font-size: 22pt; line-height: 1.15; letter-spacing: -.02em; margin: 0 0 4mm; font-weight: 800; }
+h2 { font-size: 13pt; margin: 6mm 0 2.5mm; letter-spacing: -.01em; font-weight: 750; }
+h3 { font-size: 10.5pt; margin: 4mm 0 1.5mm; font-weight: 750; }
+p { margin: 0 0 2.6mm; color: var(--ink2); }
+.lead { font-size: 11pt; color: var(--ink2); line-height: 1.55; }
+ul { margin: 0 0 3mm; padding-left: 4.5mm; color: var(--ink2); } li { margin-bottom: 1.1mm; }
+b, strong { color: var(--ink); }
+.muted { color: var(--muted); }
+.small { font-size: 8.2pt; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4.5mm; }
+.box { background: var(--soft); border-radius: 3.5mm; padding: 4.5mm 5mm; }
+.box h3 { margin-top: 0; }
+.box p:last-child, .box ul:last-child { margin-bottom: 0; }
+.boxw { border: 0.7pt solid var(--line); border-radius: 3.5mm; padding: 4.5mm 5mm; }
+.note { border-radius: 3mm; padding: 3.2mm 4mm; background: #FFF6E0; color: #6B4A00; font-size: 8.4pt; line-height: 1.5; }
+.note b { color: #5A3E00; }
+.info { border-radius: 3mm; padding: 3.2mm 4mm; background: var(--soft2); color: var(--ink2); font-size: 8.4pt; line-height: 1.5; }
+figure { margin: 3mm 0; }
+figure img { display: block; max-width: 100%; }
+figcaption { font-size: 7.6pt; color: var(--muted); margin-top: 1.6mm; text-align: center; }
+.shot img { border-radius: 2.5mm; box-shadow: 0 2mm 6mm -3mm rgba(11,20,51,.35); }
+table { width: 100%; border-collapse: collapse; font-size: 8.4pt; margin: 2mm 0 3mm; }
+th { text-align: left; background: var(--navy); color: #fff; font-weight: 700; padding: 2.1mm 2.6mm; font-size: 7.9pt; }
+th:first-child { border-top-left-radius: 2mm; } th:last-child { border-top-right-radius: 2mm; }
+td { padding: 2mm 2.6mm; border-bottom: 0.6pt solid var(--line); vertical-align: top; color: var(--ink2); }
+tr:nth-child(even) td { background: #FAFBFE; }
+td:first-child { color: var(--ink); font-weight: 650; }
+.tag { display: inline-block; padding: .4mm 2mm; border-radius: 5mm; font-size: 7pt; font-weight: 800; letter-spacing: .04em; white-space: nowrap; }
+.t-core { background: #E7F7EF; color: #0B7A47; } .t-opt { background: #EEE8FE; color: #5B21B6; } .t-road { background: #FFF1D6; color: #8A5300; } .t-cfg { background: var(--soft2); color: var(--blue); }
+.price { font-weight: 800; color: var(--blue); white-space: nowrap; }
+.steps { counter-reset: s; display: grid; gap: 2.6mm; }
+.step { display: grid; grid-template-columns: 8mm 1fr; gap: 3mm; align-items: start; }
+.step::before { counter-increment: s; content: counter(s); width: 7mm; height: 7mm; border-radius: 2.2mm; display: grid; place-items: center; background: var(--grad); color: #fff; font-weight: 800; font-size: 9pt; }
+.step b { display: block; } .step span { color: var(--ink2); font-size: 9pt; }
+.icon-row { display: flex; gap: 3mm; align-items: flex-start; }
+.dot { width: 2.2mm; height: 2.2mm; border-radius: 50%; background: var(--blue); margin-top: 1.6mm; flex: none; }
+.toc { display: grid; gap: 0; margin-top: 4mm; }
+.toc div { font-size: 9.5pt !important; display: flex; align-items: baseline; gap: 3mm; padding: 1.15mm 0; border-bottom: 0.6pt dashed var(--line); font-size: 10pt; }
+.toc span.n { width: 8mm; color: var(--blue); font-weight: 800; }
+.toc span.p { margin-left: auto; color: var(--muted); font-variant-numeric: tabular-nums; }
+/* cover */
+.cover { background: #0B1433 url(../build/bg-dark.png) center / cover; color: #fff; padding: 20mm 18mm; }
+.cover h1 { color: #fff; font-size: 30pt; margin-top: 14mm; max-width: 120mm; }
+.cover .sub { font-size: 12pt; color: rgba(255,255,255,.78); max-width: 118mm; line-height: 1.5; }
+.cover .tagline { font-size: 13pt; font-weight: 700; font-style: italic; color: #4CC9FF; margin-top: 6mm; }
+.cover .meta { position: absolute; left: 18mm; bottom: 18mm; right: 18mm; display: flex; align-items: flex-end; justify-content: space-between; font-size: 8.5pt; color: rgba(255,255,255,.7); }
+.cover .meta b { color: #fff; }
+.cover .hero { position: absolute; right: 10mm; top: 148mm; width: 128mm; }
+.closing { background: #0B1433 url(../build/bg-dark.png) center / cover; color: #fff; }
+.closing p, .closing li { color: rgba(255,255,255,.8); } .closing b, .closing h1, .closing h2, .closing h3 { color: #fff; }
+.closing .ph, .closing .pf { color: rgba(255,255,255,.55); border-color: rgba(255,255,255,.15); }
+.glass { background: rgba(255,255,255,.07); border: .6pt solid rgba(255,255,255,.16); border-radius: 4mm; padding: 5mm 6mm; }
+.statgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3mm; margin: 3mm 0 4mm; }
+.stat { background: var(--soft); border-radius: 3mm; padding: 3.5mm; }
+.stat b { display: block; font-size: 10.5pt; } .stat span { font-size: 8pt; color: var(--muted); }

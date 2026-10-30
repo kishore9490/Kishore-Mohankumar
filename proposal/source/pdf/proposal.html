@@ -1,0 +1,607 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Infinitia Links — Enterprise Digital Identity Proposal</title>
+<meta name="author" content="Infinitia Hub">
+<link rel="stylesheet" href="proposal.css">
+</head><body>
+
+<!-- 1 COVER -->
+<section class="page cover" data-nohf>
+  <img src="../../visual-assets/brand/infinitia-links-logo-white.png" style="height:34mm" alt="Infinitia Links">
+  <h1>Enterprise Digital Identity &amp; Verification Platform</h1>
+  <p class="sub">Business and technical proposal for a centralised digital identity, verification and workforce information platform — for universities, healthcare, corporates, financial services and field workforces.</p>
+  <p class="tagline">One link. Infinite possibilities.</p>
+  <img class="hero" src="../build/embed/hero-phones.png" alt="Digital ID mockups">
+  <div class="meta">
+    <div style="display:flex;gap:4mm;align-items:center"><img src="../../visual-assets/brand/infinitia-hub-logo-white.png" style="height:14mm" alt="Infinitia Hub"><div>An enterprise digital identity solution by <b>Infinitia Hub</b><br>infinitialinks.com</div></div>
+    <div style="text-align:right">Prepared for: <b>[Organisation name]</b><br>Version 1.0 · October 2026</div>
+  </div>
+</section>
+
+<!-- 2 CONTENTS -->
+<section class="page" data-section="Contents">
+  <div class="kicker">About this document</div>
+  <h1>Contents</h1>
+  <div class="toc">
+    <div><span class="n">01</span>Executive summary<span class="p">3</span></div>
+    <div><span class="n">02</span>Business challenges<span class="p">4</span></div>
+    <div><span class="n">03</span>Product overview &amp; positioning<span class="p">5</span></div>
+    <div><span class="n">04</span>Solution architecture overview<span class="p">6</span></div>
+    <div><span class="n">05</span>Detailed feature descriptions<span class="p">7</span></div>
+    <div><span class="n">06</span>Digital ID samples &amp; templates<span class="p">8</span></div>
+    <div><span class="n">07</span>QR verification experience<span class="p">10</span></div>
+    <div><span class="n">08</span>Admin dashboard, credential status &amp; analytics<span class="p">11</span></div>
+    <div><span class="n">09</span>Bulk onboarding<span class="p">14</span></div>
+    <div><span class="n">10</span>Staff directory &amp; communication modules<span class="p">15</span></div>
+    <div><span class="n">11</span>Industry-specific use cases<span class="p">16</span></div>
+    <div><span class="n">12</span>Field executive &amp; loan recovery agent module<span class="p">17</span></div>
+    <div><span class="n">13</span>Optional advanced integrations<span class="p">18</span></div>
+    <div><span class="n">14</span>Security, privacy &amp; governance<span class="p">19</span></div>
+    <div><span class="n">15</span>Deployment methodology<span class="p">20</span></div>
+    <div><span class="n">16</span>Scalability &amp; rollout planning<span class="p">21</span></div>
+    <div><span class="n">17</span>Commercial model<span class="p">22</span></div>
+    <div><span class="n">18</span>Business benefits &amp; ROI framework<span class="p">23</span></div>
+    <div><span class="n">19</span>Responsibilities &amp; assumptions<span class="p">24</span></div>
+    <div><span class="n">20</span>Conclusion &amp; next steps<span class="p">25</span></div>
+  </div>
+  <h2 style="margin-top:6mm">How to read this proposal</h2>
+  <div class="grid3">
+    <div class="box"><span class="tag t-core">CORE PLATFORM</span><p class="small" style="margin-top:2mm">Capabilities proposed as part of the standard Infinitia Links deployment scope. Exact availability is confirmed during discovery.</p></div>
+    <div class="box"><span class="tag t-opt">OPTIONAL</span><p class="small" style="margin-top:2mm">Integrations or modules scoped and quoted separately. They may require third-party hardware, software or subscriptions.</p></div>
+    <div class="box"><span class="tag t-road">FUTURE ROADMAP</span><p class="small" style="margin-top:2mm">Capabilities under consideration, subject to feasibility and customer demand. Not committed in this proposal.</p></div>
+  </div>
+  <div class="note" style="margin-top:5mm"><b>Demonstration content.</b> All people, organisations, employee IDs, QR codes, screenshots and figures shown in this document are fictional and labelled DEMO. They do not represent any real institution, employee or customer. Demonstration QR codes do not open live verification links.</div>
+</section>
+
+<!-- 3 EXEC SUMMARY -->
+<section class="page" data-section="Executive summary">
+  <div class="kicker">01 · Executive summary</div>
+  <h1>A single, verifiable identity for every member of your workforce</h1>
+  <p class="lead">Infinitia Links is a centralised digital identity, verification and workforce information platform. Every employee receives a secure, mobile-accessible digital identity card with a unique QR code. The organisation issues, manages, verifies, updates, suspends and deactivates those identities from one administrative dashboard.</p>
+  <p>Physical ID cards remain useful, but they are slow to issue, costly to replace and impossible to check for current validity. A printed card cannot tell a visitor, patient, customer or security officer whether its holder is still employed, suspended, or authorised for a particular role. Infinitia Links closes that gap: the QR code on each identity opens a secure verification page that checks the credential’s <b>live status</b> with the issuing organisation.</p>
+  <div class="statgrid">
+    <div class="stat"><b>Issue</b><span>Individually or by Excel/CSV, on your own branded templates</span></div>
+    <div class="stat"><b>Carry</b><span>On any smartphone via a secure link — no app required</span></div>
+    <div class="stat"><b>Verify</b><span>Anyone scans the QR to see current, server-side status</span></div>
+    <div class="stat"><b>Govern</b><span>Renew, suspend or revoke centrally, with a full audit trail</span></div>
+  </div>
+  <h2>What this proposal covers</h2>
+  <div class="grid2">
+    <ul>
+      <li>Digital identity cards with six configurable templates</li>
+      <li>QR verification with active, suspended, expired and revoked states</li>
+      <li>Enterprise admin dashboard and credential lifecycle management</li>
+      <li>Bulk onboarding with validation and error reporting</li>
+      <li>Optional staff directory and staff service links</li>
+    </ul>
+    <ul>
+      <li>Sector use cases: education, healthcare, corporate, financial services, field workforce</li>
+      <li>A dedicated field executive and loan recovery agent module</li>
+      <li>Optional integrations: NFC, access control, SSO, HRMS/ERP, GPS</li>
+      <li>Security, privacy and governance approach</li>
+      <li>Deployment methodology, rollout plans and a commercial framework</li>
+    </ul>
+  </div>
+  <h2>Recommendation</h2>
+  <p>We recommend a phased approach: a short discovery, configuration of branding and structure, a pilot in one department or branch, and a full rollout once the pilot is accepted. Pricing is provided as an editable framework and will be quoted after discovery.</p>
+  <div class="info"><b>Scope note.</b> Infinitia Links manages identity credentials and their verification. It connects to — but does not replace — HRMS, payroll, attendance or ERP systems. QR verification confirms credential status; it does not independently prove the physical identity of the person presenting it.</div>
+</section>
+
+<!-- 4 CHALLENGES -->
+<section class="page" data-section="Business challenges">
+  <div class="kicker">02 · Business challenges</div>
+  <h1>Why physical identity cards are no longer enough</h1>
+  <p class="lead">Organisations of every kind face the same set of identity problems — amplified by multiple branches, contract staff, visiting professionals and field teams.</p>
+  <table>
+    <tr><th style="width:26%">Challenge</th><th style="width:38%">Impact on the organisation</th><th>How Infinitia Links addresses it</th></tr>
+    <tr><td>Slow, costly issuance and reissue</td><td>Delays for new joiners; budget spent on reprints for lost, damaged or outdated cards</td><td>Identities are generated digitally, individually or in bulk, and updated without reprinting</td></tr>
+    <tr><td>No way to check current validity</td><td>A printed card looks valid even after suspension or exit</td><td>Every QR opens a server-side check of live credential status</td></tr>
+    <tr><td>Leavers’ cards remain in circulation</td><td>Security and reputational risk; misuse of the organisation’s name</td><td>Revocation takes effect at the next scan; revoked IDs never appear valid</td></tr>
+    <tr><td>Fragmented records</td><td>Identity data scattered across spreadsheets, HR systems and card vendors</td><td>One administrative record per credential, with status history</td></tr>
+    <tr><td>Unverifiable field staff</td><td>Customers cannot confirm that a field visitor or agent is genuinely authorised</td><td>Agent identities with employer, service area, status and official contact channels</td></tr>
+    <tr><td>Inconsistent branding</td><td>Different campuses and branches issue different-looking cards</td><td>Centrally managed templates, logos and colours</td></tr>
+    <tr><td>Limited administrative visibility</td><td>No clear view of who currently holds a valid credential</td><td>Dashboard of active, suspended and expired IDs plus verification analytics</td></tr>
+  </table>
+  <div class="grid2" style="margin-top:4mm">
+    <div class="box"><h3>Who feels the pain</h3><ul><li><b>HR &amp; registry</b> — issuance, renewals, exits</li><li><b>Security &amp; facilities</b> — checking staff at the gate</li><li><b>IT</b> — consistent, secure identity data</li><li><b>Leadership</b> — brand, risk and compliance</li></ul></div>
+    <div class="box"><h3>Who verifies identity</h3><ul><li>Visitors, parents and partners on campus</li><li>Patients and families in hospitals</li><li>Clients visiting corporate offices</li><li>Customers receiving field or collection visits</li></ul></div>
+  </div>
+</section>
+
+<!-- 5 PRODUCT OVERVIEW -->
+<section class="page" data-section="Product overview">
+  <div class="kicker">03 · Product overview &amp; positioning</div>
+  <h1>A centralised digital identity, verification &amp; workforce information platform</h1>
+  <p class="lead">Infinitia Links is not simply an online ID card generator. It is the system of record for workforce identity credentials: issuance, presentation, verification, lifecycle management and governance in one configurable platform.</p>
+  <div class="grid2">
+    <div>
+      <h2 style="margin-top:2mm">Brand hierarchy</h2>
+      <div class="boxw" style="display:grid;gap:2mm;padding:3mm 4mm">
+        <div class="icon-row"><img src="../../visual-assets/brand/infinitia-hub-logo.png" style="height:9mm"><div><b>Infinitia Hub</b><br><span class="small muted">Parent technology company</span></div></div>
+        <div class="icon-row"><img src="../../visual-assets/brand/infinitia-links-mark.png" style="height:9mm"><div><b>Infinitia Links</b><br><span class="small muted">The digital identity platform</span></div></div>
+        <div class="icon-row"><div style="width:12mm;text-align:center;font-weight:800;color:#1463FF">“…”</div><div><b>Powered by Infinitia Links</b><br><span class="small muted">Discreet endorsement on identity pages — the client organisation’s brand always leads</span></div></div>
+      </div>
+      <h2 style="margin-top:4mm">Core principles</h2>
+      <ul>
+        <li><b>Organisation-branded</b> — each customer has its own logo, colours, templates, fields and roles.</li>
+        <li><b>Verifiable by design</b> — every credential has a unique, non-guessable verification link.</li>
+        <li><b>Privacy-first</b> — the organisation decides what is visible, to whom.</li>
+      </ul>
+    </div>
+    <figure class="shot" style="margin-top:2mm"><img src="../build/embed/phone-corporate-id.png" style="width:54mm;margin:0 auto;box-shadow:none" alt="Corporate digital ID"><figcaption>Sample corporate digital ID · fictional employee</figcaption></figure>
+  </div>
+  <h2>Capability overview</h2>
+  <table>
+    <tr><th>Capability area</th><th>Summary</th><th style="width:22%">Status</th></tr>
+    <tr><td>Digital identity cards</td><td>Branded, mobile-accessible identity with photo, role, validity and QR</td><td><span class="tag t-core">CORE</span></td></tr>
+    <tr><td>QR verification</td><td>Server-side status check; active / suspended / expired / revoked</td><td><span class="tag t-core">CORE</span></td></tr>
+    <tr><td>Admin dashboard &amp; lifecycle</td><td>Issue, edit, renew, suspend, revoke; status history and audit</td><td><span class="tag t-core">CORE</span></td></tr>
+    <tr><td>Bulk onboarding</td><td>Excel/CSV import, validation, batch generation and actions</td><td><span class="tag t-core">CORE</span></td></tr>
+    <tr><td>Directory, links, integrations</td><td>Privacy-controlled directory and service links (configurable); API, SSO, HRMS/ERP, NFC, GPS (optional)</td><td><span class="tag t-cfg">CONFIG</span> <span class="tag t-opt">OPTIONAL</span></td></tr>
+  </table>
+</section>
+
+<!-- 6 ARCHITECTURE -->
+<section class="page" data-section="Solution architecture">
+  <div class="kicker">04 · Solution architecture overview</div>
+  <h1>A multi-organisation platform with server-side verification at its core</h1>
+  <figure><img src="../build/embed/platform-architecture.png" alt="Platform architecture"><figcaption>Logical architecture · dashed components are optional, separately scoped integrations</figcaption></figure>
+  <div class="grid2">
+    <div>
+      <h3>Experiences</h3>
+      <p>Employees open their identity on a mobile browser through a secure link. Verifiers scan the QR code with any phone camera — no app or login is required. Administrators work in a web console with role-based access.</p>
+      <h3>Platform services</h3>
+      <p>The identity &amp; credential service owns each credential and its lifecycle. The verification service answers every scan from the server, so a changed status is reflected immediately. The branding engine renders each organisation’s templates.</p>
+    </div>
+    <div>
+      <h3>Data</h3>
+      <p>Each organisation’s records are logically segregated. Photographs and assets are held in access-controlled storage. All traffic is encrypted in transit (HTTPS/TLS). Backup frequency and retention are agreed per deployment.</p>
+      <h3>Why server-side verification matters</h3>
+      <p>The QR code contains only a unique, non-guessable reference — never personal data or a status flag. A screenshot of an old card therefore cannot show a valid status once the credential has been suspended or revoked.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 7 FEATURES -->
+<section class="page" data-section="Feature descriptions">
+  <div class="kicker">05 · Detailed feature descriptions</div>
+  <h1>Platform modules at a glance</h1>
+  <table>
+    <tr><th style="width:21%">Module</th><th>Key capabilities</th><th style="width:16%">Status</th></tr>
+    <tr><td>Digital identity card</td><td>Organisation logo and branding; photograph; full name; unique employee ID; designation; department; branch or location; employment category; joining date (where appropriate); validity / expiry; unique QR; credential status; official contact; emergency contact (where authorised)</td><td><span class="tag t-core">CORE</span></td></tr>
+    <tr><td>QR verification</td><td>Unique verification URL per credential; server-side status; verified / not-active result; photograph and approved fields; issuing organisation; validity; timestamp; withheld details for non-active credentials</td><td><span class="tag t-core">CORE</span></td></tr>
+    <tr><td>Overview dashboard</td><td>Total employees; active, suspended and expired IDs; recently issued IDs; verification statistics; lifecycle tasks needing attention</td><td><span class="tag t-core">CORE</span></td></tr>
+    <tr><td>Employee management</td><td>Add, edit and view employees; upload photograph; assign department and branch; update designation; change credential status; renew ID</td><td><span class="tag t-core">CORE</span></td></tr>
+    <tr><td>Bulk management</td><td>Excel/CSV import; column mapping; validation with error reports; bulk ID generation; bulk activation, renewal and suspension</td><td><span class="tag t-core">CORE</span></td></tr>
+    <tr><td>Verification analytics</td><td>Total and daily scans; verification history; date and time; privacy-safe source (device type, approximate city where enabled)</td><td><span class="tag t-core">CORE</span></td></tr>
+    <tr><td>Organisation management</td><td>Organisation profile; logo; brand colours; ID templates; branches; departments; administrative roles</td><td><span class="tag t-core">CORE</span></td></tr>
+    <tr><td>Security &amp; audit</td><td>Role-based access; admin activity history; credential status history; access logs; secure authentication; data-export permissions</td><td><span class="tag t-core">CORE</span></td></tr>
+    <tr><td>Staff directory</td><td>Search by name or ID; filter by department, designation, branch; approved fields only; visibility settings per field</td><td><span class="tag t-cfg">CONFIGURABLE</span></td></tr>
+    <tr><td>Service links</td><td>HR portal, leave portal, helpdesk, handbook, circulars, training, events, department sites, emergency information, feedback &amp; grievance</td><td><span class="tag t-cfg">CONFIGURABLE</span></td></tr>
+    <tr><td>Field agent module</td><td>Employer and agency details; authorised service area; status; complaint and callback links; official contact; verification history</td><td><span class="tag t-cfg">CONFIGURABLE</span></td></tr>
+    <tr><td>Integrations</td><td>REST API; SSO; HRMS / ERP synchronisation; NFC cards; access control; visitor management; attendance; GPS / geofencing; SOS; mobile wallet</td><td><span class="tag t-opt">OPTIONAL</span></td></tr>
+  </table>
+  <p class="small muted">Status labels describe the proposed scope. Final availability, configuration and any custom work are confirmed in the discovery phase and documented in the statement of work.</p>
+</section>
+
+<!-- 8 ID SAMPLES -->
+<section class="page" data-section="Digital ID samples">
+  <div class="kicker">06 · Digital ID samples &amp; templates</div>
+  <h1>Six templates, configurable to each organisation</h1>
+  <p class="lead">Templates are starting points. Each organisation sets its own logo, colours, field selection and layout. The samples below show fictional identities for six roles.</p>
+  <div class="grid3" style="gap:6mm 5mm;margin-top:4mm">
+    <figure style="margin:0"><img src="../build/embed/card-professor.png" style="width:46mm;margin:0 auto"><figcaption><b>University Institutional</b><br>University professor</figcaption></figure>
+    <figure style="margin:0"><img src="../build/embed/card-admin.png" style="width:46mm;margin:0 auto"><figcaption><b>Modern Minimal White</b><br>College administrative staff</figcaption></figure>
+    <figure style="margin:0"><img src="../build/embed/card-corporate.png" style="width:46mm;margin:0 auto"><figcaption><b>Premium Corporate Blue</b><br>Corporate employee</figcaption></figure>
+    <figure style="margin:0"><img src="../build/embed/card-hospital.png" style="width:46mm;margin:0 auto"><figcaption><b>Healthcare Professional</b><br>Hospital employee</figcaption></figure>
+    <figure style="margin:0"><img src="../build/embed/card-field.png" style="width:46mm;margin:0 auto"><figcaption><b>Premium Dark</b><br>Field executive</figcaption></figure>
+    <figure style="margin:0"><img src="../build/embed/card-agent.png" style="width:46mm;margin:0 auto"><figcaption><b>Financial Services</b><br>Loan recovery agent</figcaption></figure>
+  </div>
+  <div class="note" style="margin-top:4mm">All six identities are fictional and marked DEMO · NOT VALID ID. Demonstration QR codes encode a placeholder reference, not a live verification link. No real institution’s official card has been imitated.</div>
+</section>
+
+<!-- 9 MOBILE IDS -->
+<section class="page" data-section="Digital ID samples">
+  <div class="kicker">06 · Digital ID samples &amp; templates</div>
+  <h1>The identity experience on a phone</h1>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:3mm;margin:2mm 0 3mm">
+    <figure style="margin:0"><img src="../build/embed/phone-university-id.png"><figcaption>University staff</figcaption></figure>
+    <figure style="margin:0"><img src="../build/embed/phone-corporate-id.png"><figcaption>Corporate employee</figcaption></figure>
+    <figure style="margin:0"><img src="../build/embed/phone-hospital-id.png"><figcaption>Hospital employee</figcaption></figure>
+    <figure style="margin:0"><img src="../build/embed/phone-field-executive-id.png"><figcaption>Field executive</figcaption></figure>
+  </div>
+  <h2>Identity fields and how they are controlled</h2>
+  <table>
+    <tr><th>Field</th><th>Shown on card</th><th>Shown on verification page</th><th>Control</th></tr>
+    <tr><td>Logo, name, photograph</td><td>Yes</td><td>Yes (active credentials)</td><td>Required</td></tr>
+    <tr><td>Employee ID, designation, department</td><td>Yes</td><td>Yes</td><td>Required</td></tr>
+    <tr><td>Branch / location, category</td><td>Yes</td><td>Configurable</td><td>Organisation setting</td></tr>
+    <tr><td>Joining date</td><td>Optional</td><td>Usually hidden</td><td>Organisation setting</td></tr>
+    <tr><td>Validity / expiry, status</td><td>Yes</td><td>Yes</td><td>Required</td></tr>
+    <tr><td>Official contact</td><td>Optional</td><td>Configurable</td><td>Organisation setting</td></tr>
+    <tr><td>Emergency contact</td><td>Only where authorised</td><td>Never public</td><td>Explicit authorisation</td></tr>
+  </table>
+  <p class="small muted">Employees can show their identity from a link or home-screen shortcut, share their profile link, open service links and save a copy of their card. Wallet-pass and NFC variants are optional integrations.</p>
+</section>
+
+<!-- 10 QR VERIFICATION -->
+<section class="page" data-section="QR verification">
+  <div class="kicker">07 · QR verification experience</div>
+  <h1>Live status, in seconds, without an app</h1>
+  <div style="display:grid;grid-template-columns:1fr 88mm;gap:6mm">
+    <div>
+      <h2 style="margin-top:0">Verification workflow</h2>
+      <div class="steps" style="gap:1.6mm">
+        <div class="step"><div><b>ID presented</b><span>The employee shows their digital (or printed) identity.</span></div></div>
+        <div class="step"><div><b>QR scanned</b><span>The verifier scans with any phone camera.</span></div></div>
+        <div class="step"><div><b>Secure URL opens</b><span>A unique, non-guessable link for that credential only.</span></div></div>
+        <div class="step"><div><b>Status checked server-side</b><span>The platform looks up the credential’s current status.</span></div></div>
+        <div class="step"><div><b>Approved details shown</b><span>Only fields the organisation has approved.</span></div></div>
+        <div class="step"><div><b>Verdict</b><span>Active, suspended, expired or revoked — with a timestamp.</span></div></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:3mm"><figure style="margin:0"><img src="../build/embed/verification-page-active.png"><figcaption>Verified · active</figcaption></figure><figure style="margin:0"><img src="../build/embed/verification-page-revoked.png"><figcaption>Not active · revoked</figcaption></figure></div>
+  </div>
+  <h2>Verification page content</h2>
+  <p>Verified / Not Active status · employee photograph · name · employee ID · designation · organisation · department · branch · validity · issuing organisation · verification timestamp. For non-active credentials, personal details beyond the minimum are withheld.</p>
+  <h2>Safeguards</h2>
+  <table>
+    <tr><th style="width:32%">Safeguard</th><th>Description</th></tr>
+    <tr><td>Non-guessable identifiers</td><td>Each credential link uses a long random reference, not a sequential employee number.</td></tr>
+    <tr><td>Server-side verification</td><td>No status or personal data is stored in the QR; every scan is answered by the platform.</td></tr>
+    <tr><td>Revocation</td><td>Revoked, suspended and expired credentials never display as valid.</td></tr>
+    <tr><td>Data minimisation</td><td>Confidential employee data is never exposed; only approved fields are shown.</td></tr>
+    <tr><td>Anti-tampering</td><td>HTTPS only; rate limiting; tamper-evident page design; timestamped results.</td></tr>
+  </table>
+  <div class="info"><b>Important:</b> QR verification confirms the credential’s status with the issuing organisation. It does not independently prove the physical identity of the person presenting it — verifiers should compare the photograph.</div>
+</section>
+
+<!-- 11 ADMIN -->
+<section class="page" data-section="Admin dashboard">
+  <div class="kicker">08 · Admin dashboard</div>
+  <h1>One console for the entire identity lifecycle</h1>
+  <figure class="shot"><img src="../build/embed/admin-dashboard.png" alt="Admin dashboard"><figcaption>Overview dashboard · sample data for a fictional organisation</figcaption></figure>
+  <div class="grid2">
+    <div><h3>Overview</h3><p>Total employees, active, suspended and expired IDs, recently issued identities and verification statistics, with lifecycle tasks that need attention.</p>
+      <h3>Employee management</h3><p>Add, edit and view employees; upload photographs; assign department and branch; update designation; change status; renew IDs.</p></div>
+    <div><h3>Organisation management</h3><p>Organisation profile, logo, brand colours, ID templates, branches, departments and administrative roles.</p>
+      <h3>Security &amp; audit</h3><p>Role-based access, admin activity history, credential status history, access logs, secure authentication and data-export permissions.</p></div>
+  </div>
+</section>
+
+<!-- 12 STATUS + ANALYTICS -->
+<section class="page" data-section="Credential status & analytics">
+  <div class="kicker">08 · Credential status &amp; verification analytics</div>
+  <h1>Control every credential — and see how it is used</h1>
+  <figure class="shot" style="margin-top:1mm"><img src="../build/embed/credential-status.png" style="width:150mm;margin:0 auto" alt="Credential status management"><figcaption>Credential status management with full status history</figcaption></figure>
+  <table>
+    <tr><th>Status</th><th>Meaning</th><th>Verification result</th><th>Reversible</th></tr>
+    <tr><td>Active</td><td>Credential is valid and within its validity period</td><td>Verified · Active</td><td>—</td></tr>
+    <tr><td>Suspended</td><td>Temporarily not valid (e.g. under review)</td><td>Not active · Suspended</td><td>Yes</td></tr>
+    <tr><td>Expired</td><td>Validity date has passed; renewal required</td><td>Not active · Expired</td><td>Yes, by renewal</td></tr>
+    <tr><td>Revoked</td><td>Permanently invalid (e.g. exit, loss, misuse)</td><td>Not active · Revoked</td><td>No — reissue instead</td></tr>
+  </table>
+  <div class="info">Status changes are made by authorised administrators, require a reason and are recorded with the actor and timestamp. Suspended, expired and revoked credentials never display as valid, and personal details are withheld on non-active results.</div>
+</section>
+
+<!-- 12b ANALYTICS -->
+<section class="page" data-section="Verification analytics">
+  <div class="kicker">08 · Verification analytics</div>
+  <h1>See how and where credentials are being verified</h1>
+  <figure class="shot"><img src="../build/embed/verification-analytics.png" alt="Verification analytics"><figcaption>Verification analytics · sample data for a fictional organisation</figcaption></figure>
+  <table>
+    <tr><th style="width:30%">Metric</th><th>Purpose</th></tr>
+    <tr><td>Total and daily scans</td><td>Understand verification volume and peaks across the organisation</td></tr>
+    <tr><td>Unique credentials verified</td><td>See how widely digital identities are being used in practice</td></tr>
+    <tr><td>Not-active results</td><td>Spot attempts to use suspended, expired or revoked credentials</td></tr>
+    <tr><td>Verification history</td><td>Date, time, credential and result for each verification</td></tr>
+    <tr><td>Verification source</td><td>Device type and approximate city only, where enabled — no verifier identity is stored</td></tr>
+  </table>
+  <div class="note"><b>Privacy safeguard.</b> Verification analytics are designed to support administration and security, not to profile verifiers or employees. Source information is limited, configurable and retained only for the agreed period.</div>
+</section>
+
+<!-- 13 BULK -->
+<section class="page" data-section="Bulk onboarding">
+  <div class="kicker">09 · Bulk onboarding</div>
+  <h1>Hundreds of identities in a single, validated batch</h1>
+  <figure class="shot"><img src="../build/embed/bulk-upload.png" alt="Bulk upload"><figcaption>Bulk onboarding · validation results with downloadable error report</figcaption></figure>
+  <div class="grid2">
+    <div>
+      <h2 style="margin-top:2mm">Process</h2>
+      <div class="steps">
+        <div class="step"><div><b>Upload</b><span>Excel or CSV using the standard template, or map existing columns.</span></div></div>
+        <div class="step"><div><b>Validate</b><span>Missing fields, duplicates, invalid dates, unknown branches, missing photos.</span></div></div>
+        <div class="step"><div><b>Correct</b><span>Invalid rows are held back with an error report; valid rows proceed.</span></div></div>
+        <div class="step"><div><b>Generate &amp; activate</b><span>Identities created on the default template and activated on the chosen date.</span></div></div>
+      </div>
+    </div>
+    <div>
+      <h2 style="margin-top:2mm">Standard import template</h2>
+      <table>
+        <tr><th>Column</th><th>Required</th></tr>
+        <tr><td>employee_id</td><td>Yes · unique</td></tr>
+        <tr><td>full_name</td><td>Yes</td></tr>
+        <tr><td>designation, department</td><td>Yes</td></tr>
+        <tr><td>branch, category</td><td>Yes</td></tr>
+        <tr><td>joining_date, valid_until</td><td>Valid until: yes</td></tr>
+        <tr><td>official_email, photo_file</td><td>Recommended</td></tr>
+      </table>
+      <p class="small muted">Bulk activation, renewal and suspension use the same selection and approval flow, with reasons recorded in the audit log.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 14 DIRECTORY + LINKS -->
+<section class="page" data-section="Directory & communication">
+  <div class="kicker">10 · Staff directory &amp; communication modules</div>
+  <h1>Find the right person — reach the right service</h1>
+  <figure class="shot"><img src="../build/embed/staff-directory.png" style="width:155mm;margin:0 auto" alt="Staff directory"><figcaption>Optional staff directory with organisation-controlled visibility</figcaption></figure>
+  <div style="display:grid;grid-template-columns:1fr 50mm;gap:6mm">
+    <div>
+      <h2 style="margin-top:1mm">Staff directory <span class="tag t-cfg">CONFIGURABLE</span></h2>
+      <p>Search by employee name or ID; filter by department, designation or branch; display approved professional information; give direct access to official contact channels where authorised. The organisation decides whether the directory is disabled, visible to signed-in staff only, or public — and which fields appear.</p>
+      <h2>Staff service links <span class="tag t-cfg">CONFIGURABLE</span></h2>
+      <p>The identity page can link to existing organisational resources: HR portal, leave management, internal helpdesk, staff handbook, official circulars, training resources, event registrations, department websites, emergency information, and feedback &amp; grievance channels.</p>
+      <div class="info">These links open the organisation’s <b>existing</b> systems. Infinitia Links is not a complete HRMS, payroll or attendance management system.</div>
+    </div>
+    <figure style="margin:0"><img src="../build/embed/staff-service-links.png" alt="Service links"><figcaption>Staff links page</figcaption></figure>
+  </div>
+</section>
+
+<!-- 15 USE CASES -->
+<section class="page" data-section="Industry use cases">
+  <div class="kicker">11 · Industry-specific use cases</div>
+  <h1>One platform, configured for every sector</h1>
+  <table>
+    <tr><th style="width:17%">Sector</th><th style="width:30%">Typical organisations</th><th>Representative uses</th></tr>
+    <tr><td>Education</td><td>Universities; engineering, medical, dental, nursing and pharmacy colleges; schools; autonomous and research institutions</td><td>Faculty and staff IDs; multi-campus administration; visitor-facing verification for parents, examiners and partners; academic directory; LMS and library links</td></tr>
+    <tr><td>Healthcare</td><td>Hospitals, clinics, diagnostic centres, medical institutions</td><td>Clinical, nursing and support staff IDs; time-bound credentials for visiting consultants; patient-facing verification; rapid deactivation</td></tr>
+    <tr><td>Corporate</td><td>IT companies, manufacturing, corporate offices, business groups, multi-branch organisations</td><td>Employee and contractor IDs; onboarding and offboarding; branch-level administration; client-facing verification</td></tr>
+    <tr><td>Financial services</td><td>Banks, NBFCs, financial service providers, loan recovery and collection agencies</td><td>Branch staff and agent identities; customer verification of field visits; complaint and callback channels</td></tr>
+    <tr><td>Field workforce</td><td>Field executives, sales representatives, service engineers, delivery and inspection personnel, contract staff</td><td>Customer-verifiable identity at the doorstep; authorised service area; official contact; verification history</td></tr>
+  </table>
+  <figure><img src="../build/embed/multi-org-branding.png" alt="Multi-organisation branding"><figcaption>Each organisation keeps its own branding, templates, structure, permissions and administrative controls</figcaption></figure>
+</section>
+
+<!-- 16 FIELD / RECOVERY -->
+<section class="page" data-section="Field & recovery agent module">
+  <div class="kicker">12 · Field executive &amp; loan recovery agent module</div>
+  <h1>Customers can confirm a field visitor is genuinely authorised</h1>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1.25fr;gap:4mm">
+    <figure style="margin:0"><img src="../build/embed/phone-recovery-agent-id.png"><figcaption>Agent digital ID</figcaption></figure>
+    <figure style="margin:0"><img src="../build/embed/verification-page-agent.png"><figcaption>Customer verification view</figcaption></figure>
+    <div>
+      <h3 style="margin-top:0">Module features</h3>
+      <ul class="small">
+        <li>Agent digital identity</li><li>QR-based customer verification</li><li>Employer and agency information</li><li>Designation and authorised service area</li><li>Active / suspended / expired status</li><li>Customer complaint link</li><li>Callback request link</li><li>Official company contact</li><li>Verification history for the organisation</li><li>Duty-based location features <span class="tag t-opt">OPTIONAL</span></li>
+      </ul>
+    </div>
+  </div>
+  <h2>Privacy and compliance safeguards</h2>
+  <table>
+    <tr><th style="width:34%">Principle</th><th>How it is applied</th></tr>
+    <tr><td>No borrower data on public pages</td><td>Borrower account numbers, loan amounts, personal financial information and confidential customer details are never shown on identity or verification pages.</td></tr>
+    <tr><td>Organisation-approved authorisation</td><td>Agent authorisation, lender assignments and service areas are provided and approved by the relevant organisation. Infinitia Links displays them; it does not authorise agents or validate lender assignments.</td></tr>
+    <tr><td>Immediate deactivation</td><td>When an engagement ends or is suspended, the next scan shows the agent as not active.</td></tr>
+    <tr><td>Customer recourse</td><td>Complaint and callback links route to the organisation’s official channels.</td></tr>
+    <tr><td>Location (optional)</td><td>Only with explicit permission, during duty hours, with limited retention and a visible indicator.</td></tr>
+  </table>
+  <p class="small muted">Organisations remain responsible for complying with the regulatory requirements and codes of conduct that apply to their collection and field activities.</p>
+</section>
+
+<!-- 17 INTEGRATIONS -->
+<section class="page" data-section="Advanced integrations">
+  <div class="kicker">13 · Optional advanced integrations</div>
+  <h1>Extend the platform when you need to</h1>
+  <p>The capabilities below are <b>optional</b> or <b>future</b> integrations. They are not automatically available and are scoped, quoted and scheduled separately.</p>
+  <table>
+    <tr><th style="width:27%">Integration</th><th>What it enables</th><th style="width:30%">Separately required</th><th style="width:12%">Status</th></tr>
+    <tr><td>NFC-enabled ID cards</td><td>Tap-based identification at readers</td><td>NFC cards, encoding, readers</td><td><span class="tag t-opt">OPTIONAL</span></td></tr>
+    <tr><td>Physical access control</td><td>Door and turnstile decisions using credential status</td><td>Controllers, readers, vendor API</td><td><span class="tag t-opt">OPTIONAL</span></td></tr>
+    <tr><td>Attendance integration</td><td>Pass identity to an existing attendance system</td><td>Attendance platform, devices</td><td><span class="tag t-opt">OPTIONAL</span></td></tr>
+    <tr><td>Visitor management</td><td>Host verification for visitor workflows</td><td>Visitor-management platform</td><td><span class="tag t-opt">OPTIONAL</span></td></tr>
+    <tr><td>GPS, field-force &amp; geofencing</td><td>Duty-based location and service-area checks</td><td>Mobile app / field-force platform</td><td><span class="tag t-opt">OPTIONAL</span></td></tr>
+    <tr><td>Emergency SOS</td><td>Alert routing for field staff</td><td>Mobile app, response process</td><td><span class="tag t-road">ROADMAP</span></td></tr>
+    <tr><td>REST API</td><td>Status lookups and data exchange with approved systems</td><td>Integration scope, API agreement</td><td><span class="tag t-opt">OPTIONAL</span></td></tr>
+    <tr><td>Single Sign-On</td><td>Admin and employee sign-in via existing identity provider</td><td>Customer identity provider</td><td><span class="tag t-opt">OPTIONAL</span></td></tr>
+    <tr><td>HRMS / University ERP</td><td>Synchronise employee master data</td><td>System access, mapping, approvals</td><td><span class="tag t-opt">OPTIONAL</span></td></tr>
+    <tr><td>Mobile wallet credentials</td><td>Wallet passes, if supported through a future integration</td><td>Wallet provider programme</td><td><span class="tag t-road">ROADMAP</span></td></tr>
+  </table>
+  <div class="grid2" style="gap:4mm;width:150mm;margin:0 auto"><figure style="margin:1mm 0"><img src="../build/embed/nfc-integration.png" style="border-radius:3mm"><figcaption>NFC &amp; access control — hardware required</figcaption></figure><figure style="margin:1mm 0"><img src="../build/embed/gps-field-integration.png" style="border-radius:3mm"><figcaption>Duty-based GPS — consent-driven</figcaption></figure></div>
+  <div class="note"><b>A standard QR code does not provide</b> NFC, biometric attendance, physical access or continuous GPS tracking. NFC readers, access-control hardware, GPS services, mobile applications, third-party APIs and associated subscriptions may be separately required.</div>
+</section>
+
+<!-- 18 SECURITY -->
+<section class="page" data-section="Security & privacy">
+  <div class="kicker">14 · Security, privacy &amp; governance</div>
+  <h1>Identity data is sensitive — governance is designed in</h1>
+  <p>Employee identity information is sensitive organisational data. Each deployment is configured according to applicable data-protection laws and the customer’s own policies.</p>
+  <table>
+    <tr><th style="width:30%">Control area</th><th>Approach</th></tr>
+    <tr><td>Employee data management</td><td>Per-organisation data segregation; access-controlled photo storage; defined data owners</td></tr>
+    <tr><td>Role-based administrative access</td><td>Roles for HQ, branch and department administrators; least-privilege permissions; export permissions</td></tr>
+    <tr><td>Unique credential identifiers</td><td>Long, random, non-guessable references for every credential link</td></tr>
+    <tr><td>QR verification controls</td><td>Server-side checks, rate limiting, approved-field display, timestamps</td></tr>
+    <tr><td>Revocation &amp; expiry</td><td>Immediate effect at next scan; renewal reminders; expiry automation</td></tr>
+    <tr><td>Audit trails</td><td>Admin activity, credential status history and access logs with actor, reason and time</td></tr>
+    <tr><td>Data minimisation &amp; visibility</td><td>Only necessary fields collected; organisation controls every visible field</td></tr>
+    <tr><td>Consent &amp; transparency</td><td>Employees informed what is displayed and where; consent captured where applicable</td></tr>
+    <tr><td>Retention &amp; deletion</td><td>Retention periods agreed per deployment; deletion on exit or contract end per policy</td></tr>
+    <tr><td>Secure transmission</td><td>HTTPS/TLS for all traffic</td></tr>
+    <tr><td>Backup &amp; recovery</td><td>Scheduled backups and a documented recovery process; targets agreed per deployment</td></tr>
+  </table>
+  <div class="grid2" style="margin-top:2mm">
+    <div class="box"><h3>Location features (optional)</h3><ul class="small"><li>Explicit permission from the employee</li><li>Clear duty-based controls — no off-duty collection</li><li>Limited, defined retention</li><li>Transparent, visible location-sharing indicator</li></ul></div>
+    <div class="box"><h3>Certifications</h3><p class="small">This proposal makes no claim of ISO, SOC, GDPR or other certification. Security documentation and any customer-required assessments are addressed during discovery.</p></div>
+  </div>
+</section>
+
+<!-- 19 DEPLOYMENT -->
+<section class="page" data-section="Deployment methodology">
+  <div class="kicker">15 · Deployment methodology</div>
+  <h1>A structured ten-stage onboarding</h1>
+  <figure><img src="../build/embed/onboarding-workflow-steps.png" alt="Onboarding workflow"></figure>
+  <table>
+    <tr><th style="width:5%">#</th><th style="width:25%">Stage</th><th>Key activities &amp; deliverables</th><th style="width:19%">Led by</th></tr>
+    <tr><td>1</td><td>Registration &amp; discovery</td><td>Objectives, scope, stakeholders, data owners, policies; discovery summary</td><td>Joint</td></tr>
+    <tr><td>2</td><td>Branding &amp; configuration</td><td>Logo, colours, template selection, field visibility; approved card design</td><td>Infinitia Links</td></tr>
+    <tr><td>3</td><td>Departments &amp; branches</td><td>Organisation structure, admin roles and users</td><td>Joint</td></tr>
+    <tr><td>4</td><td>Employee data preparation</td><td>Template completion, photographs, data cleansing</td><td>Customer</td></tr>
+    <tr><td>5</td><td>Bulk employee import</td><td>Validation, error reports, corrections</td><td>Joint</td></tr>
+    <tr><td>6</td><td>Identity generation</td><td>Credentials, unique links and QR codes</td><td>Infinitia Links</td></tr>
+    <tr><td>7</td><td>QR verification configuration</td><td>Public fields, status messages, contact channels</td><td>Joint</td></tr>
+    <tr><td>8</td><td>Pilot deployment</td><td>One department or branch; feedback and sign-off</td><td>Joint</td></tr>
+    <tr><td>9</td><td>Full rollout</td><td>Phased activation; employee communications</td><td>Joint</td></tr>
+    <tr><td>10</td><td>Ongoing administration &amp; support</td><td>Joiners, leavers, renewals, support requests</td><td>Customer, supported</td></tr>
+  </table>
+  <p class="small muted">Actual timelines depend on data readiness, approvals, integration requirements and deployment scope.</p>
+</section>
+
+<!-- 20 SCALABILITY -->
+<section class="page" data-section="Scalability">
+  <div class="kicker">16 · Scalability &amp; rollout planning</div>
+  <h1>From a single department to thousands of employees</h1>
+  <p class="lead">The platform is designed for multiple organisations, branches and administrators. Rollout is phased so that each wave is validated before the next.</p>
+  <table>
+    <tr><th>Deployment size</th><th>Pilot</th><th>Rollout approach</th><th>Admin model</th><th>Indicative timeline*</th></tr>
+    <tr><td>100 employees</td><td>Full group</td><td>Single-phase launch</td><td>1–2 central admins</td><td>2 – 3 weeks</td></tr>
+    <tr><td>500 employees</td><td>One department</td><td>Two phases</td><td>Central + department admins</td><td>3 – 5 weeks</td></tr>
+    <tr><td>2,000 employees</td><td>One branch or faculty</td><td>Phased by branch</td><td>Central + branch admins</td><td>5 – 8 weeks</td></tr>
+    <tr><td>5,000 employees</td><td>One or two branches</td><td>Phased by region / unit</td><td>Delegated multi-level admins</td><td>8 – 12 weeks</td></tr>
+  </table>
+  <p class="small muted">*Indicative only, assuming clean data and timely approvals, and excluding optional integrations. Actual timelines depend on data readiness, approvals, integration requirements and deployment scope.</p>
+  <h2>Sample rollout plan — 2,000 employees</h2>
+  <table>
+    <tr><th style="width:18%">Week</th><th>Activities</th></tr>
+    <tr><td>1</td><td>Discovery; branding and template approval; structure and admin roles</td></tr>
+    <tr><td>2 – 3</td><td>Data template issued; customer prepares data and photographs; first import and validation</td></tr>
+    <tr><td>4</td><td>Pilot branch identities generated and activated; verification configured; staff briefing</td></tr>
+    <tr><td>5</td><td>Pilot feedback, adjustments and sign-off</td></tr>
+    <tr><td>6 – 8</td><td>Remaining branches activated in waves; communications; handover to administrators</td></tr>
+  </table>
+  <div class="grid3" style="margin-top:3mm">
+    <div class="box"><h3>Multi-organisation</h3><p class="small">Separate branding, data and admins for each organisation or group company.</p></div>
+    <div class="box"><h3>Multi-branch</h3><p class="small">Branch-level administrators and reporting under a central view.</p></div>
+    <div class="box"><h3>Batch operations</h3><p class="small">Import, renew and suspend at scale with validation and audit.</p></div>
+  </div>
+</section>
+
+<!-- 21 COMMERCIAL -->
+<section class="page" data-section="Commercial model">
+  <div class="kicker">17 · Commercial model</div>
+  <h1>A transparent, modular pricing framework</h1>
+  <p>The framework below is editable. All prices are placeholders and will be quoted after discovery. <b>No figure in this document is an approved quotation.</b></p>
+  <table>
+    <tr><th style="width:38%">Component</th><th>Basis</th><th style="width:24%">Price</th></tr>
+    <tr><td>Initial setup &amp; onboarding</td><td>One-time</td><td class="price">₹[To be quoted]</td></tr>
+    <tr><td>Branding &amp; configuration</td><td>One-time</td><td class="price">₹[To be quoted]</td></tr>
+    <tr><td>Per-employee annual subscription</td><td>Per active employee, per year</td><td class="price">₹[To be quoted]</td></tr>
+    <tr><td>Enterprise annual subscription</td><td>Per organisation, per year</td><td class="price">₹[To be quoted]</td></tr>
+    <tr><td>API &amp; integration</td><td>Per integration</td><td class="price">Separately quoted</td></tr>
+    <tr><td>NFC / GPS hardware</td><td>Per card / device</td><td class="price">Separately quoted</td></tr>
+    <tr><td>Custom development</td><td>Per agreed scope</td><td class="price">Based on scope</td></tr>
+  </table>
+  <h2>Illustrative comparison by deployment size</h2>
+  <p class="small">Shows which components typically apply — not prices.</p>
+  <table>
+    <tr><th>Component</th><th>100</th><th>500</th><th>2,000</th><th>5,000</th></tr>
+    <tr><td>Setup &amp; onboarding</td><td>Standard</td><td>Standard</td><td>Extended</td><td>Extended</td></tr>
+    <tr><td>Subscription model</td><td>Per-employee</td><td>Per-employee</td><td>Per-employee or enterprise</td><td>Enterprise</td></tr>
+    <tr><td>Admin roles</td><td>Central</td><td>Central + dept.</td><td>Multi-branch</td><td>Multi-level</td></tr>
+    <tr><td>Integrations</td><td>Usually none</td><td>Optional</td><td>Often SSO / HRMS</td><td>Typically scoped</td></tr>
+    <tr><td>Price</td><td>₹[To be quoted]</td><td>₹[To be quoted]</td><td>₹[To be quoted]</td><td>₹[To be quoted]</td></tr>
+  </table>
+  <h2>Revenue models available</h2>
+  <div class="grid3">
+    <div class="box"><b>Annual subscription</b><p class="small">Platform access billed yearly.</p></div>
+    <div class="box"><b>Per-employee licensing</b><p class="small">Scales with active identities.</p></div>
+    <div class="box"><b>Enterprise licensing</b><p class="small">Organisation-wide licence.</p></div>
+    <div class="box"><b>Initial onboarding</b><p class="small">One-time setup and configuration.</p></div>
+    <div class="box"><b>Integration services</b><p class="small">API, SSO, HRMS / ERP work.</p></div>
+    <div class="box"><b>Premium modules</b><p class="small">Optional add-ons as scoped.</p></div>
+  </div>
+</section>
+
+<!-- 22 BENEFITS -->
+<section class="page" data-section="Business benefits">
+  <div class="kicker">18 · Business benefits &amp; ROI framework</div>
+  <h1>What organisations gain</h1>
+  <table>
+    <tr><th style="width:34%">Benefit</th><th>How it is achieved</th></tr>
+    <tr><td>Reduced dependency on physical ID replacement</td><td>Digital identities are updated without reprinting; physical cards become optional</td></tr>
+    <tr><td>Faster issuance of employee credentials</td><td>Individual or bulk generation on approved templates</td></tr>
+    <tr><td>Centralised identity management</td><td>One record and status per credential, across branches</td></tr>
+    <tr><td>Faster identity verification</td><td>Any phone camera; no app or login for verifiers</td></tr>
+    <tr><td>Better credential lifecycle management</td><td>Renewals, suspensions and revocations with history</td></tr>
+    <tr><td>Easier onboarding and offboarding</td><td>Issue on day one; revoke on exit with immediate effect</td></tr>
+    <tr><td>Improved administrative visibility</td><td>Dashboard of active, suspended and expired credentials</td></tr>
+    <tr><td>Consistent organisation branding</td><td>Centrally managed templates across all locations</td></tr>
+    <tr><td>Convenient mobile access</td><td>Identity available on the employee’s phone</td></tr>
+    <tr><td>Better verification auditability</td><td>Timestamped, privacy-safe verification history</td></tr>
+  </table>
+  <h2>ROI framework — transparent assumptions</h2>
+  <p>We do not quote savings in advance. Instead, ROI is estimated with the customer using their own figures:</p>
+  <div class="boxw" style="font-size:9pt">
+    <p style="margin-bottom:2mm"><b>Annual card cost avoided</b> = (employees × reissues per employee per year × cost per physical card) + (new joiners × cost per card)</p>
+    <p style="margin-bottom:2mm"><b>Administrative time saved</b> = (cards issued or updated per year × minutes saved per card ÷ 60) × loaded hourly cost</p>
+    <p style="margin-bottom:0"><b>Net annual value</b> = card cost avoided + time saved − annual subscription [To be quoted]</p>
+  </div>
+  <p class="small muted" style="margin-top:3mm">Qualitative value — reduced impersonation risk, faster verification and better auditability — is assessed alongside, not converted into invented monetary figures.</p>
+</section>
+
+<!-- 23 RESPONSIBILITIES -->
+<section class="page" data-section="Responsibilities & assumptions">
+  <div class="kicker">19 · Responsibilities &amp; assumptions</div>
+  <h1>A clear division of responsibilities</h1>
+  <div class="grid2">
+    <div class="box"><h3>Infinitia Links will</h3><ul class="small"><li>Provide and operate the platform for the agreed scope</li><li>Configure branding, templates, structure and roles</li><li>Support data import, validation and identity generation</li><li>Configure QR verification and approved fields</li><li>Support the pilot and phased rollout</li><li>Provide administrator onboarding and support as agreed</li></ul></div>
+    <div class="box"><h3>The organisation will</h3><ul class="small"><li>Nominate a project owner and administrators</li><li>Provide accurate employee data and photographs</li><li>Approve card designs, visible fields and policies</li><li>Inform employees and obtain consent where applicable</li><li>Provide and approve any agent authorisations and service areas</li><li>Maintain employee status (joiners, leavers, changes)</li></ul></div>
+  </div>
+  <h2>Assumptions</h2>
+  <ul>
+    <li>Employee data is supplied in the agreed template, with photographs meeting basic quality guidelines.</li>
+    <li>Approvals for designs, fields and policies are provided within the agreed timeline.</li>
+    <li>Optional integrations, hardware and custom development are outside the base scope unless specified in the statement of work.</li>
+    <li>Timelines in this document are indicative and are finalised after discovery.</li>
+    <li>Configuration complies with applicable data-protection laws and the organisation’s policies, as agreed with the organisation.</li>
+  </ul>
+  <h2>Out of scope (unless separately agreed)</h2>
+  <ul>
+    <li>HRMS, payroll, attendance or examination management functionality</li>
+    <li>Physical card printing, NFC hardware, readers and access-control devices</li>
+    <li>Authorisation of field or recovery agents, or validation of lender assignments</li>
+  </ul>
+  <div class="note"><b>Terminology.</b> “Credential” refers to a digital identity issued to one employee; “verification” refers to checking a credential’s status via its QR link; “organisation” refers to the customer issuing the credentials.</div>
+</section>
+
+<!-- 24 CLOSING -->
+<section class="page closing" data-section="Next steps">
+  <div class="kicker" style="color:#4CC9FF">20 · Conclusion &amp; next steps</div>
+  <h1 style="font-size:26pt;max-width:150mm">Every employee, verifiably identified. Every identity, centrally governed.</h1>
+  <p class="lead" style="color:rgba(255,255,255,.8);max-width:160mm">Infinitia Links gives your organisation a branded, mobile-accessible digital identity for every employee, live QR verification for everyone who needs to check it, and one console to manage the full credential lifecycle — configured to your structure, your policies and your brand.</p>
+  <h2 style="margin-top:9mm">Proposed next steps</h2>
+  <div class="grid3">
+    <div class="glass"><b style="font-size:12pt">1 · Discovery call</b><p class="small" style="margin-top:2mm">Objectives, scope, data readiness and policies.</p></div>
+    <div class="glass"><b style="font-size:12pt">2 · Pilot scope</b><p class="small" style="margin-top:2mm">One department or branch, success criteria and timeline.</p></div>
+    <div class="glass"><b style="font-size:12pt">3 · Tailored proposal</b><p class="small" style="margin-top:2mm">Configuration, statement of work and quotation.</p></div>
+  </div>
+  <div class="glass" style="margin-top:10mm;display:grid;grid-template-columns:1fr auto;gap:8mm;align-items:center">
+    <div><div class="kicker" style="color:#4CC9FF">Contact</div><b style="font-size:16pt">infinitialinks.com</b><p style="margin-top:3mm">Name: [To be added]<br>Email: [To be added]<br>Phone: [To be added]</p></div>
+    <img src="../../visual-assets/brand/infinitia-links-logo-white.png" style="height:38mm">
+  </div>
+  <div style="position:absolute;left:18mm;right:18mm;bottom:22mm;display:flex;align-items:center;justify-content:space-between">
+    <div style="display:flex;gap:4mm;align-items:center"><img src="../../visual-assets/brand/infinitia-hub-logo-white.png" style="height:13mm"><span style="font-size:9pt;color:rgba(255,255,255,.75)">An enterprise digital identity solution by Infinitia Hub</span></div>
+    <span style="font-size:13pt;font-weight:700;font-style:italic;color:#4CC9FF">One link. Infinite possibilities.</span>
+  </div>
+</section>
+
+<script>
+  // Page header / footer with page numbers
+  document.querySelectorAll('.page').forEach(function (p, i) {
+    if (p.hasAttribute('data-nohf')) return;
+    var dark = p.classList.contains('closing');
+    p.insertAdjacentHTML('afterbegin', '<div class="ph"><img src="../../visual-assets/brand/infinitia-links-wordmark' + (dark ? '-white' : '') + '.png" alt="Infinitia Links"><span>' + (p.getAttribute('data-section') || '') + '</span></div>');
+    p.insertAdjacentHTML('beforeend', '<div class="pf"><span>Infinitia Links · Enterprise Digital Identity Proposal · Fictional sample data marked DEMO</span><span>' + (i + 1) + '</span></div>');
+  });
+</script>
+</body></html>
